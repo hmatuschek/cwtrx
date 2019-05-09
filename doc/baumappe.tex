@@ -1,0 +1,77 @@
+\documentclass[10pt, a4paper]{paper}
+\usepackage[ngerman]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage[multiple]{footmisc}
+\usepackage{parskip}
+\usepackage{wrapfig}
+\usepackage{xfrac}
+\usepackage{xcolor}
+
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan
+}
+
+\newcommand{\warn}[1]{{\color{red} #1}}
+
+\title{QRP CW Transceiver Baumappe}
+\author{Hannes Matuschek -- DM3MAT\\\texttt{<dm3mat [at] darc [dot] de>}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Dieser Multiband Kurzwellen Transceiver deckt alle Bänder von 80m-15m ab und liefert zwischen 2W und 5W. Der Sender besteht aus der PLL (Si5351) die über einen Treiber (74HCT00) die getastete PA (3-4x BS170) ansteuert. Der Empfänger ist ein Direktmischer mit einem sample-hold Mischer (74HCT4053) mit Seitenbandunterdrückung durch die sog. \emph{Phasingmethode}. Die NF Aufbereitung und Verstärkung geschieht durch 12(!) LM833 OPVs. Die OPVs sind auch die einzigen Verstärker in der Schaltung. Daher ist auch das Grundrauschen des Empfängers recht hoch. Der Empfänger besitzt auch keinen HF Vorverstärker (ist in Arbeit, wird es als Erweiterung mit AGC geben). Daher sollte gerade auf den oberen Bändern (20m, 17m \& 15m) eine gute Antenne verwendet werden. 
+\end{abstract}
+
+\section{Controller}
+Zuerst sollte das Controllerboard aufgebaut und getestet werden. Es stellt die PLL und Frequenzaufbereitung (74AC74) sowie den Controller (ATMega328) zur Steuerung der PLL und des Displays bereit. 
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline 
+Bauteil & Wert & Bemerkung \\ \hline 
+R1,R2,R4-R6 & 10k & \\
+R3 & 1k & \\
+RV1 & 10k & Trimmer\\
+C1-C3, C5, C9-C19 & 100n & \\
+C7 & 10uF & Elko \\
+L1-L8 & 100uH & \\
+Y1 & 20MHz & Quarz \\
+Q1 & 2N3904 & \\
+U1 & 74AC74 & ohne Sockel \\
+U2 & ATMega328 & mit Sockel! \\
+U3 & L7805 & \\
+J4 & -- & SIP-Sockel für Si5351 \\
+J1-J3, J5-J20 & -- & Stiftleisten \\\hline
+\end{tabular}
+\caption{Bauteilwerte für die Controllerplatine.}
+\end{table}
+
+Beim Aufbau ist zu beachten, \warn{dass der Controller (ATMega328) sowie die PLL (Si5351) mit Sockel installiert werden!} Dies ist nötig damit die Firmware des Controllers später noch verändert werden kann. Die Frequenzaufbereitung (74AC74) kann jedoch direkt auf die Platine gelötet werden. 
+
+Alle Anschlüsse auf der Controllerplatine (Display, Taste, Drehimpulsgeber, Spannungsversorgung, ...) sollte durch Stiftleisten hergestellt werden. Dies erleichtert den Zusammenbau später.
+
+Der Anschluss J18 (PTT) ist ein optionaler Open-Kollektor Ausgang zur Steuerung einer PA. Beim Senden zieht der Transistor Q1 den PTT Ausgang auf Masse.
+
+
+\section{PA}
+
+\section{Empfänger}
+
+\section{Abgleich}
+
+\section{Gehäuse}
+
+\end{document}
