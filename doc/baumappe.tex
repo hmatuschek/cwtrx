@@ -12,7 +12,11 @@
 \usepackage{wrapfig}
 \usepackage{xfrac}
 \usepackage{xcolor}
-
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows.meta}
+\usepackage{longtable}
+\usepackage{pdfpages}
 
 \hypersetup{
     colorlinks=true,
@@ -22,6 +26,8 @@
 }
 
 \newcommand{\warn}[1]{{\color{red} #1}}
+\newcommand{\con}[1]{\texttt{#1}}
+\newcommand{\dis}[1]{\textbf{\texttt{#1}}}
 
 \title{QRP CW Transceiver Baumappe}
 \author{Hannes Matuschek -- DM3MAT\\\texttt{<dm3mat [at] darc [dot] de>}}
@@ -31,10 +37,11 @@
 \maketitle
 
 \begin{abstract}
-Dieser Multiband Kurzwellen Transceiver deckt alle Bänder von 80m-15m ab und liefert zwischen 2W und 5W. Der Sender besteht aus der PLL (Si5351) die über einen Treiber (74HCT00) die getastete PA (3-4x BS170) ansteuert. Der Empfänger ist ein Direktmischer mit einem sample-hold Mischer (74HCT4053) mit Seitenbandunterdrückung durch die sog. \emph{Phasingmethode}. Die NF Aufbereitung und Verstärkung geschieht durch 12(!) LM833 OPVs. Die OPVs sind auch die einzigen Verstärker in der Schaltung. Daher ist auch das Grundrauschen des Empfängers recht hoch. Der Empfänger besitzt auch keinen HF Vorverstärker (ist in Arbeit, wird es als Erweiterung mit AGC geben). Daher sollte gerade auf den oberen Bändern (20m, 17m \& 15m) eine gute Antenne verwendet werden. 
+Dieser multiband Kurzwellen Transceiver deckt alle Bänder von 80m-15m ab und liefert zwischen 2W und 5W. Der Sender besteht aus der PLL (Si5351) die über einen Treiber (74HCT00) die getastete PA (3-4x BS170) ansteuert. Der Empfänger ist ein Direktmischer mit einem sample-hold Mischer (74HCT4052) mit Seitenbandunterdrückung durch die sog. \emph{Phasingmethode}. Die NF Aufbereitung und Verstärkung geschieht durch 12(!) OPVs. Die OPVs sind auch die einzigen Verstärker in der Schaltung. Daher ist auch das Grundrauschen des Empfängers recht hoch. Der Empfänger besitzt auch keinen HF Vorverstärker (ist in Arbeit, wird es als Erweiterung mit AGC geben). Daher sollte gerade auf den oberen Bändern (20m, 17m \& 15m) eine gute Antenne verwendet werden. 
 \end{abstract}
 
-\section{Controller}
+
+\section{Aufbau der Controllerplatine} \label{sec:ctrl}
 Zuerst sollte das Controllerboard aufgebaut und getestet werden. Es stellt die PLL und Frequenzaufbereitung (74AC74) sowie den Controller (ATMega328) zur Steuerung der PLL und des Displays bereit. 
 
 \begin{table}[!ht]
@@ -42,7 +49,7 @@ Zuerst sollte das Controllerboard aufgebaut und getestet werden. Es stellt die P
 \begin{tabular}{|l|l|l|}
 \hline 
 Bauteil & Wert & Bemerkung \\ \hline 
-R1,R2,R4-R6 & 10k & \\
+R1,R2,R4-R6 & 10k & R1 Zunächst nicht installieren! \\
 R3 & 1k & \\
 RV1 & 10k & Trimmer\\
 C1-C3, C5, C9-C19 & 100n & \\
@@ -59,19 +66,380 @@ J1-J3, J5-J20 & -- & Stiftleisten \\\hline
 \caption{Bauteilwerte für die Controllerplatine.}
 \end{table}
 
-Beim Aufbau ist zu beachten, \warn{dass der Controller (ATMega328) sowie die PLL (Si5351) mit Sockel installiert werden!} Dies ist nötig damit die Firmware des Controllers später noch verändert werden kann. Die Frequenzaufbereitung (74AC74) kann jedoch direkt auf die Platine gelötet werden. 
+Beim Aufbau ist zu beachten, \warn{dass der Controller (ATMega328) sowie die PLL (Si5351) mit Sockel installiert werden!} Dies ist nötig damit die Firmware des Controllers später noch verändert werden kann. Die Frequenzaufbereitung (74AC74) kann und sollte jedoch direkt auf die Platine gelötet werden. 
 
-Alle Anschlüsse auf der Controllerplatine (Display, Taste, Drehimpulsgeber, Spannungsversorgung, ...) sollte durch Stiftleisten hergestellt werden. Dies erleichtert den Zusammenbau später.
+Alle Anschlüsse auf der Controllerplatine (Display, Taste, Drehimpulsgeber, Spannungsversorgung, ...) sollten durch Stiftleisten hergestellt werden. Dies erleichtert den Zusammenbau später.
 
 Der Anschluss J18 (PTT) ist ein optionaler Open-Kollektor Ausgang zur Steuerung einer PA. Beim Senden zieht der Transistor Q1 den PTT Ausgang auf Masse.
 
 
-\section{PA}
+\subsection{Test der Frequenzaufbereitung}
+Zunächst wird das Display und der Drehimpulsgeber mit der Controllerplatine verbunden. Dazu werden die 4 Datenleitungen zum Display verbunden. \con{D4} auf der Platine zum Pin 11 auf dem LCD, \con{D5} zu Pin 12, \con{D6} zu Pin 13 und \con{D7} zu Pin 14. \con{RS} (Reset) auf der Platine wird dann mit Pin 4 und \con{EN} (Enable) mit Pin 6 auf dem LCD verbunden. Schließlich folgt noch Anschluss \con{5, C \& G} (5V, Contrast, GND auf Stiftleiste J8) mit den Pins 2, 3 \& 1 auf dem LCD. Das Display ist nun angeschlossen. Der Kontrast des LCD lässt sich dann über den Widerstand RV1 einstellen. \warn{Pin 5 und 2 auf dem LCD müssen noch mit einander verbunden werden.}
 
-\section{Empfänger}
+Der Drehimpulsgeber wird mit \con{RotA, RotB \& RotC} und Masse verbunden (ein Pin der Stiftleiste J12) verbunden, wobei \con{RotA} \& \con{RotB} mit den entsprechenden Pins des Drehimpulsgebers (meist \con{A} und \con{B} genannt) und \con{RotC} mit dem Pin des Achsentasters verbunden wird. 
 
-\section{Abgleich}
+Zuletzt wird die Spannungsversorgung (13.8V) an \con{J3} oder \con{J17} hergestellt. \warn{Diese Platine besitzt keine Verpolschutzdiode! Daher unbedingt auf den polrichtigen Anschluss achten!}
 
-\section{Gehäuse}
+Wenn alles stimmt, sollten Sie nun im Display die Frequenzanzeige \dis{3500.00} sehen und im unteren Zeile des Displays \dis{AR}. Nun können Sie sich mit der Menüführung (siehe Abschnitt \ref{sec:user}) vertraut machen. 
 
+Zum Test der Frequenzaufbereitung benutzen Sie ein Oszilloskop mit Frequenzzähler. Am Anschluss \con{I} (J2) und \con{Q} (J1) sollten Sie eine um 700Hz geringere Frequenz als im Display angezeigt wird ablesen können. Falls Ihr Oszilloskop über zwei Kanäle verfügt, können sie auch die Phasenverschiebung zwischen den beiden Signalen \con{I} und \con{Q} überprüfen. 
+
+Wenn Sie nun den Anschluss \con{Dit} (J10) mit einer Krokoklemme mit Masse verbinden, sollte am Anschluss \con{TxOsc} (J16) die eingestellte Frequenz messbar und die Ausgänge \con{I} und \con{Q} abgeschaltet sein. Damit ist der Test der Frequenzaufbereitung und der Controllerplatine abgeschlossen. Es folgt der Aufbau der PA.
+
+
+\clearpage
+\section{Aufbau der PA-Platine} \label{sec:pa}
+\begin{wraptable}{l}{9cm}
+ \begin{tabular}{|p{3cm}|p{2cm}|p{2cm}|} \hline 
+ Bauteil & Wert & Bemerkung \\ \hline
+ R1, R3, R5, R7, R11, R15, R16 & 10k & \\
+ R2, R4, R6, R8 & 100k & \\
+ R9 & 470 & \\
+ R10 & 1k & \\
+ R12, R13 & 100 & \\
+ R14 & 4.7k & \\
+ 
+ C1, C10, C19, C20, C22-C24, C26, C27 & 100n & \\
+ C2, C15 & 100p & NP0 \\
+ C3, C16 & 150p & NP0 \\
+ C4, C17, C7, C12 & 330p & NP0 \\
+ C5, C18 & 470p & NP0 \\
+ C8, C13 & 680p & NP0 \\
+ C6, C11 & 220p & NP0 \\
+ C9, C14, C21 & 1.0n & NP0 \\
+ C25 & 1u & \\
+ C28 & 100u & Elko \\
+ 
+ L1, L9 & 440nH & 12T T37-6\\
+ L2, L10 & 650nH & 15T T37-6\\
+ L3, L11 & 1330nH & 18T T37-2\\
+ L4, L12 & 2050nH & 22T T37-2\\
+ L5 & 520nH & 13T T37-6\\
+ L6 & 760nH & 16T T37-6\\
+ L7 & 1530nH & 20T T37-2\\
+ L8 & 3000nH & 27T T37-2\\
+
+ T1 & --- & Siehe Text.\\ 
+ 
+ D1-D3,D5 & 1n4148 & \\
+ D4 & 1N4001 & \\
+
+ Q1-Q3, Q10 & 2N3904 & \\
+ Q4, Q6-Q9 ,Q11 & BS170 & \\
+ Q5 & BD140 & \\
+
+ U1 & 74HCT00 & \\
+ U2 & L78L05 & \\
+
+ K1-K4 & FINDER-30.22 & \\
+
+ J1 & BNC & \\
+
+ J2-J12 & --- & Stiftleisten \\ \hline
+ \end{tabular}
+ \caption{Bauteilwerte der PA Platine.} \label{tab:pa}
+\end{wraptable}
+
+Die PA und Tiefpassfilter Platine beheimatet nicht nur die PA und Tiefpassfilterschaltung sondern auch den Treiber (75HCT00), Sende/Empfangsumschalter (Q4) und die PA-Tastung/Keyshaping (Q5 \& Q8).
+
+Der Aufbau ist soweit recht unkritisch, \warn{jedoch müssen die Spulen für den Tiefpass gewickelt und ausgemessen werden!} Außerdem ist es Hilfreich die BNC-Buchse zunächst nur mit den zwei Anschlusspin zu verlöten. \warn{Die Befestigungspfosten der Buchse sollten noch nicht verlötet werden!} Dies geschieht erst, wenn die PA Platine in das Gehäuse eingebaut wird. 
+
+Damit die Spulen der Tiefpässe die korrekten Werte besitzen, werden zunächst 1-2 Windungen mehr auf die Kerne gebracht als in Tabelle \ref{tab:pa} angegeben und dann die resultierenden Spulen mit einer LCR Brücke vermessen. Gegebenenfalls werden dann Windungen abgenommen bis die gewünschte Induktivität in etwa erreicht wird. Zum Schluss kann die Induktivität dann noch leicht durch zusammendrücken oder auseinanderziehen der Windungen verändert werden. 
+
+Für den 15m \& 17m Tiefpass sind L1 \& L9 je 440nH mit c.a. 12 Windungen und L5 520nH mit c.a. 13 Windungen auf einem T37-6 Kern (gelb). 
+
+Für den 20m \& 30m Tiefpass sind L2 \& L10 je 650nH mit c.a. 15 Windungen und L6 760nH mit c.a. 16 Windungen auf einem T37-6 Kern (gelb).
+
+Für den 40m \& 60m Tiefpass sind L3 \& L11 je 1330nH mit c.a. 18 Windungen und L7 1530nH mit c.a. 20 Windungen auf einem T37-2 Kern (rot).
+
+Für den 80m Tiefpass sind L4 \& L12 je 2050nH mit c.a. 22 Windungen und L8 3000nH mit c.a. 27 Windungen auf einem T37-2 Kern (rot).
+
+Damit die Ringspulen alle gut auf die Platine passen und sich nicht gegenseitig berühren, \warn{muss auf den Wickelsinn geachtet werden!} Alle Spulen L1-L8 werden wie folgt gewickelt: Die Windungen werden \textbf{gegen den Uhrzeigersinn} aufgebracht wobei das erste Ende des Drahtes zunächst \textbf{von Vorn durch den Kern gesteckt wird} und dann die Windungen aufgetragen werden. 
+
+\warn{Der Transformator T1 wird genau andersherum gewickelt!} Es werden die Windungen zwar auch gegen den Uhrzeigersinn aufgetragen, jedoch wird das erste Ende des Drahtes \textbf{von Hinten durch den Kern gesteckt} und dann die Windungen aufgetragen. 
+
+\begin{wrapfigure}{l}{3cm}
+ \centering
+ \includegraphics[width=2.5cm]{fig/T1.png}
+ \caption{T1 auf der PA Platine.} \label{fig:T1}
+\end{wrapfigure}
+Der Transformator T1 bestimmt auch die Ausgangsleistung des Transceivers. Er ist als Autotransformator verschaltet. Die Primärseite hat immer 8 Windungen auf einem FT37-43 (schwarz) Kern. Werden \textbf{keine} Sekundärwindungen aufgetragen wird die Ausgangsleistung c.a. 1.5-2W betragen bei 12-13.8V Betriebsspannung. Werden dann 5 Sekundärwindungen aufgetragen, sollte die Ausgangsleistung c.a. 4-5W betragen bei 12-13.8V Betriebsspannung.
+
+Die Anschlüsse des Transformators auf der Platine sind nummeriert und in Abbildung \ref{fig:T1} dargestellt: \con{1} (links unten), \con{4} (links Mitte), \con{2} (rechts Mitte), \con{3} (rechts oben). Die Primärspule geht von \con{4} nach \con{3} und die Sekundärspule von 1-2. 
+
+Zum Testen der PA sollte zunächst keine Sekundärwicklung aufgebracht werden. D.h., T1 ist dann nur eine Spule mit 10 Windungen auf dem FT37-43 Kern wobei ein Ende durch Loch \con{4} und das andere Ende durch Loch \con{2} auf der Platine gesteckt und verlötet wird. Danach werden die Löcher \con{2} und \con{3} mit einer Brücke aus Lötzinn miteinander Verbunden. Später kann dann der Transformator T1 mit dem gewünschten Windungsverhältnis (siehe Tabelle \ref{tab:Pout}) installiert werden.
+
+\begin{table}[!ht]
+ \centering
+ \begin{tabular}{|l|l|l|l|l|} \hline
+  Primär & Sekundär & Pwr (9V) & Pwr (12V) & Pwr (13.8V) \\ \hline
+  8 & 0 & 0.8 & 1.4 & 1.9 \\
+  8 & 1 & 1.0 & 1.8 & 2.4 \\
+  8 & 2 & 1.3 & 2.2 & 3.0 \\
+  8 & 3 & 1.5 & 2.7 & 3.6 \\
+  8 & 4 6 1.8 & 3.2 & 4.3 \\
+  8 & 5 & 2.1 & 3.8 & 5.0 \\
+  8 & 6 & 2.5 & 4.4 & \warn{5.8} \\
+  8 & 7 & 2.8 & \warn{5.1} & \warn{6.7} \\
+  8 & 8 & 3.2 & \warn{5.8} & \warn{7.6} \\ \hline 
+ \end{tabular}
+ \caption{Theoretische maximale Ausgangsleistungen für bestimmte Windungsverhältnisse auf T1 und verschiedenen Betriebsspannungen. \warn{Werden mehr als 5W Ausgangsleistung erwartet, sollte auch der vierte PA Transistor Q11 Installiert werden. Für Ausgangsleistungen kleiner 5W genügen drei (Q6,Q7,Q9) MosFETs.}} \label{tab:Pout} 
+\end{table}
+
+
+\subsection{Test der PA-Platine}
+Zum Testen der PA Platine werden \con{TX 5V} (J10) und \con{Key} (J5) der PA Platine mit \con{T} und \con{K} (J6) auf der Controllerplatine verbunden. Dann wird die Spannungsversorgung der PA Platine (J8 oder J12) von J3 oder J17 der Controllerplatine durchgeschleift. Danach werden die Tiefpassfiltersteuersignale \con{10}, \con{20}, \con{40} und \con{80} (J13) von der Controllerplatine zu den jeweiligen Bandpassfiltern (J9, J2, J3, J4) auf der PA-Platine geführt.
+
+Mit einem kurzen Stück RG-174 wird dann das \con{TxOsc} Signal von der Controllerplatine zur Vorstufe \con{TX HF} auf der PA Platine geführt.
+
+Zuletzt wird die Stromversorgung der Endstufe (J11) direkt mit der Spannungsversorgung Verbunden.  \warn{Achten Sie bei der Spannungsversorgung auf den polrichtigen Anschluss!}
+
+\warn{Bevor die Schaltung in Betrieb genommen wird, muss ein Dummyload an die BNC Buchse angeschlossen werden!}
+
+Wenn Sie nun wieder \con{Dit} (J10, Controllerplatine) mit Masse verbinden, sollte der TRX senden und c.a. 1.9W in das Dummyload abgeben.  Prüfen sie auch die Signalform am Dummyload und das Keyshaping der Tastung.
+
+Verhält sich die Schaltung vernünftig, können sie T1 mit dem gewünschten Windungsverhältnis bewickeln und in die PA einbauen. Prüfen Sie nach dem Austausch von T1 nochmal die Signalform am Dummyload. 
+
+Ist der Endstufentest abgeschlossen, kann nun mit dem Aufbau des Empfängers begonnen werden. 
+ 
+\subsubsection{(Optional) Abgleich der Tiefpassfilter}
+Um die Tiefpassfilter final fein abzustimmen, wird ein Spectrumanalyzer mit Trackinggenerator, Wobbler oder Netwerkanalyzer benötigt. 
+
+Zunächst wird zur Sicherheit die Spannungsversorgung der Endstufentransistoren (J11) getrennt. Danach wird eine 100uH Festinduktivität über dem \con{RX HF} (J6) Anschluss gelötet. Diese Induktivität simuliert den benötigten Eingangstransformator des Empfängers damit die Sen\-de/Emp\-fangs\-um\-schal\-tung (Q4) funktioniert. Das Ausgangssignal des Analyzers/Wobblers wird dann mit der BNC Buche verbunden. Das gefilterte Signal kann dann über der temporären Induktivität an \con{RX HF} (J6) abgegriffen werden. Die Tiefpassfilter können nun durch auseinanderziehen oder zusammendrücken der Filterspulen leicht abgeglichen werden. 
+
+\clearpage
+\section{Aufbau der Empfängerplatine} \label{sec:rx}
+\begin{wraptable}{l}{9cm}
+ \begin{tabular}{|p{3.5cm}|p{1.5cm}|p{2cm}|} \hline 
+ Bauteil & Wert & Bemerkung \\ \hline
+ R1, R4 & 30k & \\
+ R3, R6, R7, R18, R19, R23, R26, R28 & 10k & \\
+ R8-R10 & 33k & \\
+ R11 & 120k & \\
+ R12, R17 & 36k & \\
+ R13-R16 & 100 & \\
+ R20, R22 & 4.7k & \\
+ R21, R40, R41 & 1k & \\
+ R24 & 5.1k & \\
+ R25, R27, R29, R30, R33, R35, R38, R39 & 3.3k & \\
+ R31 & 470k & \\
+ R32 & 4.3k & \\
+ R34 & 7.5k & \\
+ RV1, RV2 & 50k & Timmer\\
+ RV3 & 500 & Timmer \\
+
+ C1-C3, C5, C6, C8-C10, C14, C19, C20, C23, C29, C37 & 100n & \\
+ C4, C11, C21, C33 & 47n & \\
+ C7, C16, C28 & 1n & \\
+ C12, C22, C24, C27, C35, C38 & 10u & Elko \\
+ C13, C15, C17, C18, C36 & 470n & \\
+ C25, C26, C30, C34 & 10n & \\
+ C31, C32 & 3.3n & \\
+
+ L1 & 470u & \\
+ T1 & 3 x 35uH & 10 Wind. trifilar auf FT37-43 \\
+
+ D1 & 1N4148 & \\ 
+ Q1 & BS170 & \\
+
+ U1-U3, U6, U7 & LM833 & In Sockel! \\
+ U4 & 74HC4052 & \\
+ U5 & TLC272 & In Sockel! \\
+ U8 & L78L05 & \\
+
+ J1-J9 & --- & Stiftleisten \\ \hline
+ \end{tabular}
+ \caption{Bauteilwerte der Empfängerplatine.}
+\end{wraptable}
+
+Der Aufbau der Empfängerplatine ist unkritisch, da der einzige Bereich der Platine mit HF die linke obere Ecke um den 74HC4052 ist. Der Rest der Platine ist nur NF Aufbereitung, Filter und Verstärkung. Daher können die OPVs auch auf IC-Sockel montiert werden um später Bessere oder Defekte OPVs austauschen zu können. 
+
+Beim Wickeln des Eingangstransformators T1 \warn{muss wieder auf den Windungssinn geachtet werden!} Es werden 10 Windungen trifilar auf den Kern gebracht, indem drei Stücke CuL-Draht verdrillt und dann \textbf{gegen den Uhrzeigersinn} auf den Kern gewickelt werden. Sie beginnen die erste Windung, indem sie das Ende des Drahtes \textbf{von Hinten durch den Kern stecken}.
+
+\subsection{Abgleich}
+Verbinden Sie zunächst den HF Eingang \con{RF} (J2) auf der Emp\-fän\-ger\-pla\-ti\-ne mit \con{RX HF} (J6) auf der PA-Platine mit einem Stück RG-174. Danach werden \con{I} \& \con{Q} (J6 \& J7) auf der Empfängerplatine mit den Ausgängen \con{I} \& \con{Q} (J2 \& J1) auf der Controllerplatine mit zwei Stücken RG-174 verbunden. 
+
+Verbinden Sie dann die Kopf\-hö\-rer\-buch\-se mit \con{HP} (J5) mit dem Audiokoaxialkabel und das Lautstärke Poti mit \con{Vol} (J3) mit dem zweiadrigen geschirmten Audiokabel. Verbinden Sie dann \con{TX5V} (J8) auf der Empfängerplatine mit \con{T} (J15) auf der Controllerplatine. Verbinden Sie dann \con{T} (J4) auf der Empfängerplatine mit \con{ST} (J13) auf der Controllerplatine mit einem Stück Audiokoaxialkabel. 
+
+Schleifen sie dann die Spannungsversorgung des Empfängers von der PA-Platine (J8 oder J12) zur Empfängerplatine (J1 oder J9) durch. \warn{Achten Sie auf den polrichtigen Anschluss!}
+
+Wenn alles gut gegangen ist, sollten Sie nun bei voll aufgedrehter Lautstärke Rauschen im Kopfhörer hören. Im Folgenden werde ich den Abgleich der Audiophasenverschiebung zur Seitebandunterdrückung beschreiben. Meiner Erfahrung nach ist die Seitenbandunterdrückung bei weitem nicht perfekt. Auch wenn Sie eine nahezu ideale Seitenbandunterdrückung auf einem Band bekommen, wird sie auf einem anderen Band deutlich schlechter sein. Es ist also nötig beim Abgleich immer wieder die Bänder zu wechseln und ein gutes Mittelmaß für die für Sie interessanten Bänder zu finden. 
+
+Schließen Sie zunächst einen Signalgenerator mit geringer Ausgangsleistung oder mit Hilfe eines geeigneten Dämpfungsgliedes an den Eingang des TRX. Stellen sie am Signalgenerator eine Frequenz innerhalb eines Amateurfunkbandes ein (z.B., 14010.00kHz). Stimmen sie nun den Empfänger auf eben jene Frequenz ab. Erhöhen oder verringern sie die Leistung des Signalgenerators oder wählen sie die Dämpfung des Dämpfungsgliedes so, dass ein lauter Ton im Kopfhörer zu hören ist. Stimmen sie nun den Empfänger auf eine 1.4kHz höhere Frequenz ab (für das vorherige Beispiel wäre es dann 14011.4kHz). Wenn sie nun einen (leiseren) Ton hören, versuchen sie mit Hilfe der Einstellwiderständen RV1, RV2 und RV3 die Lautstärke dieses Tons zu minimieren. Es ist möglich für ein Band diesen Ton vollständig zum Verschwinden zu bringen. Jedoch wird dadurch die Seitenbandunterdrückung auf anderen Bändern schlechter. Sie müssen also immer wieder das Band wechseln und die Prozedur von vorn beginnen, bis sie ein über mehrere Bänder akzeptables Ergebnis erreichen. 
+
+Testen sie den Empfänger und Sender ruhig schon mal auf dem Band. Wenn alles zu Ihrer Zufriedenheit funktioniert, können sie mit dem Gehäusebau und der Endmontage beginnen.
+
+\clearpage
+\section{Gehäusebau und Endmontage} \label{sec:box}
+%\begin{figure}[!ht]
+% \begin{subfigure}[b]{0.49\textwidth}
+%  \includegraphics[scale=.45, angle=-90]{fig/FrontPanel.png}
+%  \subcaption{Dimensionen und Bohrungen der Frontplatte.}
+% \end{subfigure}
+% \begin{subfigure}[b]{0.49\textwidth}
+%  \includegraphics[scale=.45, angle=-90]{fig/BackPanel.png}
+%  \caption{Dimensionen und Bohrungen der Rückplatte.}
+% \end{subfigure}
+% \caption{Dimensionen und Bohrungen der Panele.}\label{fig:panel}
+%\end{figure}
+
+Im Anhang können die Positionen, Dimensionen und Bohrungen für die Front und Rückplatten des Gehäuses abgelesen werden. Fertigen Sie die Front- und Rückplatte an und fixieren Sie schon mal die Bedienelemente an der Frontplatte. Sie können nun mit der Endmontage beginnen.
+
+Die Endmontage ist etwas fummelig, da im Gehäuse nicht wirklich viel Platz ist und eine Menge Kabel verlegt werden müssen. Da im TRX keine Steckverbinder verwendet werden, werden alle internen Verbindungen verlötet. Dazu ist eine spitz Pinzette hilfreich!
+
+Das Aluminiumgehäuse ist eloxiert. D.h., die relativ dicke Aluminiumoxidschicht wirkt als Isolator zwischen dem Gehäuse und den Masseflächen der Platinen. Daher sollte mit etwas feinem Schleifpapier die Oxidschicht in den Rillen des Gehäuses entfernt werden, die die Platinen aufnehmen. 
+
+Entfernen Sie alle Kabel die zur PA Platine führen, belassen sie aber alle Kabel an der PA Platine befestigt. Schieben Sie nun die PA Platine in der untersten Rille bis ans Ende des Gehäuses und fixieren Sie die BNC Buchse mit der dazugehörigen Schraube. Entfernen Sie nun die untere Gehäuseplatte und löten sie die Pfosten der BNC Buchse an der Platine fest. Die PA Platine ist nun montiert.
+
+Als nächstes wird die Controllerplatine montiert. Dazu entfernen sie alle Kabel die von der Empfängerplatine zur Controllerplatine führen, belassen sie jedoch diese Kabel an der Emp\-fän\-ger\-pla\-ti\-ne. Schieben sie nun die Controllerplatine ebenfalls in die unterste Rille des Gehäuses. Verlegen und kürzen sie alle Kabel die von der PA Platine zur Controller Platine führen außer dem Koaxialkabel \con{TxOsc}. Befestigen Sie nun die Hohlsteckerbuchse an der Rückplatte und führen Sie die Spannungsversorgung zunächst zum Schalter an der Frontplatte und dann zur Controllerplatine. Die Spannungsversorgung der Platinen erfolgt vom Schalter über die Controllerplatine zur PA Platine und schließlich zur Empfängerplatine. 
+
+Schließlich wird die Empfängerplatine montiert. Schieben Sie dazu die Empfängerplatine in eine Rille des Gehäuses über die PA Platine. Befestigen sie zunächst das Koaxialkabel von der PA Platine zum Empfängereingang und dann die Spannungsversorgung von der PA Platine zum Empfänger.
+Danach kürzen und befestigen Sie die beiden Koaxialkabel \con{I} \& \con{Q} an der Controllerplatine. Erst jetzt befestigen sie das Koaxialkabel \con{TxOsc} von der PA Platine an der Controllerplatine. Kürzen und befestigen sie nun die restlichen Leitungen von der Empfängerplatine an der Controllerplatine. 
+
+Nun wird die Klinkenbuchse für die Taste verdrahtet\footnote{\warn{Durch einen Designfehler kann der TRX bisher nur mit einer Handtaste betrieben werden. Dies wird später mit einem Firmwareupdate und den Tausch zweier Anschlüsse auf der Controllerplatine behoben.}}. Verbinden Sie dazu den Spitzenkontakt der Klinkenbuchse mit dem \con{dit} (J10) auf der Controllerplatine. 
+
+Zum Schluss verbinden sie die Chinchbuchse zur Umschaltung von separaten PAs mit dem \con{TX-OC} (J18) auf der Controllerplatine und befestigen sie die Erdanschluss und die Hohlsteckerbuchse an der Gehäuserückwand. Zuletzt verbinden Sue die Spannungsversorgung der Endstufe direkt mit der Hohlsteckerbuchse.
+
+\warn{Bevor Sie das Gehäuse verschließen, testen Sie noch einmal den TRX.}
+
+\clearpage
+\section{Bedienung und Endabgleich der PLL} \label{sec:user}
+Die Bedienung der TRX erfolgt allein über den Abstimmknopf mit Mitteltaster. Wenn Sie am Abstimmknopf drehen, verstellen Sie wie gewohnt die Frequenz des TRX um eine einstellbare Schrittweite. Wenn Sie kurz auf den Abstimmknopf drücken, gelangen Sie in das Menu (Blaue Kästchen in Abb. \ref{fig:menu}). 
+
+\begin{figure}[!h!]
+ \centering
+ \footnotesize
+ \begin{tikzpicture}[node distance=2.3cm,
+	>={Latex[width=2mm,length=2mm]},
+    menu/.style = {rectangle, rounded corners, draw=black,
+                   minimum width=1.5cm, minimum height=1cm,
+                   text centered, font=\sffamily, fill=blue!30},
+    submenu/.style = {menu, fill=red!30}]
+  \node (step) [menu]{Step size};
+  \node (vfo) [menu, right of=step] {VFO};
+  \node (band) [menu, right of=vfo] {Band};
+  \node (setup) [menu, right of=band] {Setup};
+  \node (cw) [submenu, below of=setup] {CW Mode}; 
+  \node (speed) [submenu, right of=cw] {CW Speed}; 
+  \node (tone) [submenu, right of=speed] {CW Tone}; 
+  \node (level) [submenu, below of=tone] {CW Level}; 
+  \node (hold) [submenu, left of=level] {TX Hold}; 
+  \node (enable) [submenu, left of=hold] {TX Enable}; 
+  \node (pll) [submenu, left of=enable] {PLL Correction};
+  
+  \path[->,thick]
+	(step) edge (vfo)
+	(vfo) edge (band)
+	(band) edge (setup)
+	(setup) edge[bend left=45] (step);
+	
+  \path[->,thick,dashed]
+    (setup) edge (cw) ;
+  \path[->,thick]
+    	(cw) edge (speed)
+    	(speed) edge (tone) 
+    	(tone) edge[bend left=90] (level) 
+    	(level) edge (hold) 
+    	(hold) edge (enable) 
+    	(enable) edge (pll) 
+    	(pll) edge[bend left=35] (cw);
+ \end{tikzpicture}
+ \caption{Menüführung} \label{fig:menu}
+\end{figure}
+
+Mit dem Abstimmknopf können Sie nun einen Menüpunkt auswählen. Im Hauptmenü (blaue Kästchen) können Sie die Schrittweite bei der Abstimmung, den VFO Modus (A, B, Split) das aktuelle Band einstellen. Für weitere Einstellungen gibt es ein Untermenü (rote Kästchen), das vom Hauptmenü über \emph{Setup} erreicht werden kann. Um die gewünschte Einstellung vorzunehmen, drücken sie kurz auf den Abstimmknopf. Der Mikrocontroller merkt sich den Menüpunkt, den Sie zuletzt ausgewählt hatten und zeigt diesen an, wenn sie das Menü wieder aufrufen.
+
+Im Untermenü \emph{PLL corr.} können Sie die Frequenzkorrektur der PLL in ppm einstellen. Dazu verwenden Sie einen Signalgenerator mit glaubwürdiger Frequenzgenauigkeit und ändern die PLL Korrektur entsprechend nach Gehör.
+
+
+\clearpage
+\section{Bill-of-Material (BOM)}
+\begin{longtable}{|p{0.05\textwidth}|p{0.2\textwidth}|p{0.5\textwidth}|p{0.05\textwidth}|p{0.05\textwidth}|}\hline
+Qt.& Wert         & Reichelt Nr.    & Preis & $\Sigma$ \\\hline \hline
+ 6 & 100          & METALL 100      & 0.048 & 0.29 \\
+ 1 & 470          & METALL 470      & 0.049 & 0.05 \\
+ 5 & 1k           & METALL 1,00k    & 0.049 & 0.24 \\
+ 8 & 3.3k         & METALL 3,30k    & 0.049 & 0.39 \\
+ 1 & 4.3k         & METALL 4,30k    & 0.049 & 0.05 \\
+ 3 & 4.7k         & METALL 4,70k    & 0.049 & 0.15 \\
+ 1 & 5.1k         & METALL 5,10k    & 0.049 & 0.05 \\
+ 1 & 7.5k         & METALL 7,50k    & 0.049 & 0.05 \\
+19 & 10k          & METALL 10,0k    & 0.049 & 0.93 \\
+ 2 & 30k          & METALL 30,0k    & 0.049 & 0.10 \\
+ 3 & 33k          & METALL 33,0k    & 0.049 & 0.15 \\
+ 2 & 36k          & METALL 36,0k    & 0.049 & 0.10 \\
+ 4 & 100k         & METALL 100k     & 0.049 & 0.20 \\
+ 1 & 120k         & METALL 120k     & 0.049 & 0.05 \\
+ 1 & 470k         & METALL 470k     & 0.049 & 0.05 \\
+ 1 & 500 Tr (vert)& 64W-500         & 0.27  & 0.27 \\
+ 1 & 10k Tr (min) & ACP 6-L 5K      & 0.20  & 0.20 \\
+ 2 & 50k Tr (vert)& 64W-50k         & 0.32  & 0.64 \\
+ 1 & 10k Pt (min) & RK11K112-LOG10K & 1.50  & 1.50 \\ \hline
+ \multicolumn{4}{|l|}{Zwischensumme}        & 5.46 \\ \hline 
+ 2 & 100p (NP0)   & NPO-2,5 100P    & 0.07  & 0.14 \\
+ 2 & 150p (NP0)   & NPO-2,5 150P    & 0.07  & 0.14 \\
+ 2 & 220p (NP0)   & NPO-2,5 220P    & 0.08  & 0.16 \\
+ 4 & 330p (NP0)   & NPO-2,5 330P    & 0.08  & 0.32 \\
+ 2 & 470p (NP0)   & NPO-2,5 470P    & 0.08  & 0.14 \\
+ 2 & 680p (NP0)   & NPO-2,5 680P    & 0.10  & 0.20 \\
+ 2 & 1n   (NP0)   & NPO-2,5 1,0N    & 0.08  & 0.16 \\
+ 4 & 1n           & X7R-2,5 1,0N    & 0.07  & 0.28 \\
+ 2 & 3.3n         & X7R-2,5 3,3N    & 0.07  & 0.14 \\
+ 5 & 10n          & X7R-2,5 10N     & 0.07  & 0.35 \\
+ 4 & 47n          & X7R-2,5 47N     & 0.06  & 0.24 \\
+38 & 100n         & Z5U-2,5 100N    & 0.06  & 2.28 \\
+ 5 & 470n         & Z5U-5 470N      & 0.19  & 0.95 \\
+ 1 & 1u           & Z5U-5 1,0u      & 0.26  & 0.26 \\
+ 7 & 10u Elko     & RAD 10/35       & 0.02  & 0.14 \\
+ 1 & 100u Elko    & RAD 100/25      & 0.04  & 0.04 \\ \hline
+ \multicolumn{4}{|l|}{Zwischensumme}        & 5.94 \\ \hline 
+ 5 & 1N4148       & RND 1N4148      & 0.02  & 0.10 \\
+ 1 & 1N4001       & 1N 4001         & 0.02  & 0.02 \\ 
+ 5 & 2N3904       & 2N 3904         & 0.04  & 0.20 \\ 
+ 7 & BS170        & BS 170          & 0.10  & 0.70 \\
+ 1 & BD140        & BD140           & 0.19  & 0.19 \\
+ 5 & LM833        & LM 833 N        & 0.65  & 3.25 \\
+ 1 & TLC272       & TLC 272 DIP     & 0.99  & 0.99 \\
+ 1 & 74HCT00      & 74HCT 00        & 0.25  & 0.25 \\
+ 1 & 74AC74       & 74AC 74         & 0.35  & 0.35 \\
+ 1 & 74HCT4052    & 74HCT 4052      & 0.51  & 0.51 \\
+ 1 & ATmega328-PU & ATMEGA 328P-PU  & 1.80  & 1.80 \\
+ 2 & L78L05       & µA 78L05        & 0.11  & 0.22 \\
+ 6 & PDIP-8       & GS 8            & 0.04  & 0.24 \\
+ 1 & PDIP-28      & GS 28-S         & 0.10  & 0.10 \\
+ 1 & L7805        & L7805CV-DG STM  & 0.24  & 0.24 \\ \hline
+ \multicolumn{4}{|l|}{Zwischensumme}        & 9.16 \\ \hline
+ 8 & 100uH        & (C: 1569150)    & 0.07  & 0.56 \\
+ 1 & 470uH        & (C: 1572846)    & 0.12  & 0.12 \\
+ 6 & T37-2        & T 37-2          & 0.50  & 3.00 \\
+ 6 & T37-6        & T 37-6          & 0.71  & 4.26 \\
+ 2 & FT37-43      & FT 37-43        & 0.82  & 1.64 \\
+ 1 & 20Mhz Quarz  & 20,0000-HC49U-S & 0.20  & 0.20 \\ 
+ 4 & FINDER-30.22 & RY 12W K        & 0.99  & 3.96 \\ 
+10 & 10x Stiftl.  & RND 205-00631   & 0.03  & 0.30 \\
+ 1 & 7x Buchsenl. & RND 205-00647   & 0.10  & 0.10 \\
+ 1 & BNC horiz.   & UG 1094W1       & 1.05  & 1.05 \\ \hline
+ \multicolumn{4}{|l|}{Zwischensumme}        & 15.19 \\ \hline
+ 1 & Gehäuse      & GEH EG 2        & 10.59 & 10.59 \\
+ 1 & Chinch       & CBM METALL      & 0.15  & 0.15 \\ 
+ 2 & Klinke 3.5mm & EBS 35          & 0.19  & 0.38 \\
+ 1 & 5.1mm Power  & HEBL 21         & 0.27  & 0.27 \\
+ 1 & 2x8 Display  & LCD-PM 2X8-5 A  & 7.30  & 7.30 \\ 
+ 1 & RotEnc 20/20 & STEC11B13       & 3.85  & 3.85 \\
+ 1 & Schalter     & KIPP 1A11       & 1.20  & 1.20 \\
+ 1 & 1m Mic       & & & \\
+ 1 & 1m 2x Mic    & & & \\
+ 1 & 1m RG-174    & & & \\ \hline 
+ \multicolumn{4}{|l|}{Zwischensumme}        & 23.74 \\ \hline \hline
+ \multicolumn{4}{|r|}{Gesammtsumme:}        & 59.94 \\ \hline
+\end{longtable}
+
+\includepdf[landscape=true]{fig/pa_scm.pdf}
+\includepdf[pages={1,2,3},landscape=true]{fig/pa_brd.pdf}
+\includepdf[landscape=true]{fig/crtl_scm.pdf}
+\includepdf[pages={1,2,3},landscape=true]{fig/ctrl_brd.pdf}
+\includepdf[landscape=true]{fig/rx_scm.pdf}
+\includepdf[pages={1,2,3},landscape=true]{fig/rx_brd.pdf}
+\includepdf[landscape=true]{fig/FrontPanel.png}
+\includepdf[landscape=true]{fig/BackPanel.png}
 \end{document}

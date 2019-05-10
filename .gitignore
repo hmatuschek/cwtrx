@@ -1,0 +1,16 @@
+*.txt.user
+*.bak
+*.kicad_pcb-bak
+*.net
+prod/*
+doc/sim/*
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/*.synctex.gz
+doc/*.pdf
+doc/*.png
+!doc/fig/*.pdf
+!doc/fig/*.png
+.DS_Store
+
