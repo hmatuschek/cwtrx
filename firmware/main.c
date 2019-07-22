@@ -11,7 +11,7 @@ int main(void) {
 
   sei();
 
-  rot_button_up();
+  rot_button();
   rot_delta();
   meter_start();
 

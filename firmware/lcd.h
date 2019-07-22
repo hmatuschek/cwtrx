@@ -8,11 +8,18 @@
 #include <avr/io.h>
 #include <stdint.h>
 
-#define LCD_PORT   PORTD
-#define LCD_DDR    DDRD
+// Data port, DDR and pins
+#define LCDD_PORT  PORTD
+#define LCDD_DDR   DDRD
 #define LCD_DB     PD0
-#define LCD_RS     PD5
-#define LCD_EN     PD6
+// Reset port, DDR and pin
+#define LCDR_PORT  PORTC
+#define LCDR_DDR   DDRC
+#define LCD_RS     PC4
+// Chipselect port, DDR and pin
+#define LCDE_PORT  PORTD
+#define LCDE_DDR   DDRD
+#define LCD_EN     PD4
 
 
 /* Initialisierung: muss ganz am Anfang des Programms aufgerufen werden. */
@@ -26,6 +33,9 @@ void lcd_home(void);
 
 /* Cursor an eine beliebige Position */
 void lcd_setcursor(uint8_t spalte, uint8_t zeile);
+void lcd_showcursor();
+void lcd_blinkcursor();
+void lcd_hidecursor();
 
 /* Ausgabe eines einzelnen Zeichens an der aktuellen Cursorposition */
 void lcd_data(uint8_t data);

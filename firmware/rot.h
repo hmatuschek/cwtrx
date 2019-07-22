@@ -14,8 +14,14 @@
 
 void rot_init();
 
+typedef enum {
+  ROT_BUTTON_NONE = 0,
+  ROT_BUTTON_CLICK,
+  ROT_BUTTON_LONG
+} RotButton;
+
 uint8_t rot_button_read();
-uint8_t rot_button_up();
+RotButton rot_button();
 int8_t rot_delta();
 
 void rot_tick();

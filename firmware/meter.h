@@ -5,12 +5,17 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
-void meter_init();
+typedef enum {
+  METER_NONE,
+  METER_SIG,
+  METER_VOLTAGE,
+  METER_TEMP
+} MeterType;
+
+void meter_init(MeterType type);
+void meter_set_type(MeterType type);
 void meter_start();
 void meter_poll();
 void meter_update();
-
-/** Returns signal strength in 6dB voltages. */
-uint8_t meter_sig();
 
 #endif // __METER_H__

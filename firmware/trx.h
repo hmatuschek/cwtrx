@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "band.h"
 #include "keyer.h"
+#include "meter.h"
 
 #define TRX_TX_PORT PORTD
 #define TRX_TX_DDR  DDRD
@@ -41,6 +42,10 @@ typedef enum {
   VFO_MODE_SPLIT
 } VFOMode;
 
+#define TRX_RIT_MIN -100
+#define TRX_RIT_MAX  100
+#define TRX_CWTEXT_MAXLEN 64
+
 
 void trx_init();
 
@@ -53,6 +58,9 @@ void trx_set_state(TRXState state);
 
 void trx_tune(int8_t delta);
 uint32_t trx_dial_freq();
+int8_t trx_rit();
+uint8_t trx_rit_sym();
+void trx_set_rit(int8_t off);
 void trx_set_vfo();
 TRXStepSize trx_tune_step();
 void trx_set_tune_step(TRXStepSize step);
@@ -66,10 +74,16 @@ uint8_t trx_cw_level();
 void trx_set_cw_level(uint8_t level);
 uint8_t trx_cw_speed();
 void trx_set_cw_speed(uint8_t idx);
+uint8_t *trx_cwtext();
+void trx_clear_cwtext();
+void trx_update_cwtext();
+void trx_set_meter_type(MeterType type);
+MeterType trx_meter_type();
 uint16_t trx_tx_hold();
 void trx_set_tx_hold(uint16_t delay);
 uint8_t trx_tx_enabled();
 void trx_set_tx_enabled(uint8_t enabled);
+uint8_t *trx_greet();
 int32_t trx_pll_correction();
 void trx_set_pll_correction(int32_t pptm);
 

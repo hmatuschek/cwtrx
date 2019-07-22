@@ -2,19 +2,13 @@
 #define __MENU_H__
 
 #include "trx.h"
-/*
- * Menu Structure:
- *
- * +-------------------------------------+
- * |                                     |
- * +-> Step <-> VFO <-> Band <-> Setup <-+
- *                                 |
- *                            +-> Key <-> CWSp <-> Tone <-> Lvl <-> Hld <-> TX En <-> PLL <-+
- *                            |                                                             |
- *                            +-------------------------------------------------------------+
- */
+#include "rot.h"
 
 typedef enum {
+  MENU_RIT,
+  MENU_SET_RIT,
+  MENU_CW_SPEED,
+  MENU_SET_CW_SPEED,
   MENU_STEP,
   MENU_SET_STEP,
   MENU_VFO,
@@ -22,24 +16,36 @@ typedef enum {
   MENU_BAND,
   MENU_SET_BAND,
   MENU_SETUP,
+
   MENU_CW_MODE,
   MENU_SET_CW_MODE,
-  MENU_CW_SPEED,
-  MENU_SET_CW_SPEED,
   MENU_CW_TONE,
   MENU_SET_CW_TONE,
   MENU_CW_LEVEL,
   MENU_SET_CW_LEVEL,
+  MENU_CW_TEXT,
+  MENU_SET_CW_TEXT,
+  MENU_SET_CW_TEXT_CHAR,
+  MENU_CLEAR_CW_TEXT,
+  MENU_CLEAR_CW_TEXT_NO,
+  MENU_CLEAR_CW_TEXT_YES,
+  MENU_METER,
+  MENU_SET_METER,
   MENU_TX_HOLD,
   MENU_SET_TX_HOLD,
   MENU_TX_ENABLE,
   MENU_SET_TX_ENABLE,
+  MENU_GREET,
+  MENU_SET_GREET,
+  MENU_SET_GREET_CHAR,
   MENU_PLL_CORRECTION,
   MENU_SET_PLL_CORRECTION
 } MenuState;
 
 
 MenuState menu_state();
-void menu_update(uint8_t button_up, int8_t delta);
+uint8_t menu_cursor();
+
+void menu_update(RotButton button_up, int8_t delta);
 
 #endif // __MENU_H__

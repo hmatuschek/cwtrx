@@ -13,6 +13,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/eeprom.h>
+#include <string.h>
 
 // AVR comp for QtCreator
 #ifndef ISR
@@ -26,8 +27,10 @@
 #define TRX_DEFAULT_CW_LEVEL       255
 #define TRX_DEFAULT_CW_SPEED       10
 #define TRX_DEFAULT_CW_MODE        KEYER_MODE_STRAIGHT
-#define TRX_DEFAULT_TX_HOLD        250
-#define TRX_DEFAULT_PLL_CORRECTION 000
+#define TRX_DEFAULT_METER_TYPE     METER_SIG
+#define TRX_DEFAULT_TX_HOLD        50
+#define TRX_DEFAULT_PLL_CORRECTION 0
+#define TRX_DEFAULT_RIT            0
 #define TRX_UPDATE_PERIOD          500
 #define TRX_SAVE_PERIOD            10000UL
 
@@ -65,6 +68,8 @@ typedef struct {
   VFOSettings vfo_b;
   /** Tuing stepsize. */
   TRXStepSize step;
+  /** RIT */
+  int8_t      rit;
   /** If true, TX is enabled. */
   uint8_t     tx_enabled;
   /** The frequency of the CW sidetone. */
@@ -75,10 +80,13 @@ typedef struct {
   uint8_t     cw_speed;
   /** Mode of the CW keyer (straight or paddle). */
   KeyerMode   cw_mode;
+  MeterType   meter_type;
   /** TX hold delay in ms. */
   uint16_t    tx_hold;
   /** PLL reference frequeny correction in 0.1ppm. */
   int32_t     pll_correction;
+  uint8_t     cwtext[TRX_CWTEXT_MAXLEN];
+  uint8_t     greet[8];
 } TRXSettings;
 
 
@@ -88,14 +96,18 @@ TRXSettings _ee_trx EEMEM = {
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN} },
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN} },
-  TRX_STEP_1k,
+  TRX_STEP_50,
+  TRX_DEFAULT_RIT,
   1,
   TRX_DEFAULT_CW_TONE,
   TRX_DEFAULT_CW_LEVEL,
   TRX_DEFAULT_CW_SPEED,
   TRX_DEFAULT_CW_MODE,
+  TRX_DEFAULT_METER_TYPE,
   TRX_DEFAULT_TX_HOLD,
-  TRX_DEFAULT_PLL_CORRECTION
+  TRX_DEFAULT_PLL_CORRECTION,
+  {},
+  {' ','D','M','3','M','A','T',' '}
 };
 
 TRXSettings _trx;
@@ -119,20 +131,26 @@ void trx_init() {
   TRX_KEY_DDR |= (1 << TRX_KEY_BIT);
   TRX_KEY_PORT &= ~(1 << TRX_KEY_BIT);
 
+  lcd_init();
+  rot_init();
+
   // Load settings from eeprom
   eeprom_read_block(&_trx, &_ee_trx, sizeof(TRXSettings));
 
-  lcd_init();
-  rot_init();
-  meter_init();
+  meter_init(_trx.meter_type);
 
   lcd_clear();
   lcd_home();
   lcd_string(" CW TRX");
-  lcd_setcursor(1,2);
-  lcd_string("DM3MAT");
+  lcd_setcursor(0,2);
+  for (uint8_t i=0; i<8; i++)
+    lcd_data(_trx.greet[i]);
 
   keyer_init(_trx.cw_mode, _trx.cw_speed);
+  _delay_ms(100);
+  if (0x02 == keyer_read_paddle())
+    trx_set_cw_mode(KEYER_MODE_STRAIGHT);
+
   tone_init();
   tone_set_frequency(_trx.cw_tone);
   tone_set_volume(_trx.cw_level);
@@ -180,6 +198,24 @@ uint32_t trx_dial_freq() {
     return _trx.vfo_a.band_freq[_trx.vfo_a.band];
   }
   return _trx.vfo_b.band_freq[_trx.vfo_b.band];
+}
+
+uint8_t trx_rit_sym() {
+  if (_trx.rit==0)
+    return 'R';
+  else if (_trx.rit>0)
+    return '+';
+  return '-';
+}
+
+int8_t trx_rit() {
+  return _trx.rit;
+}
+
+void trx_set_rit(int8_t off) {
+  _trx.rit = MINMAX(off, TRX_RIT_MIN, TRX_RIT_MAX);
+  trx_set_vfo();
+  eeprom_write_block(&(_trx.rit), &(_ee_trx.rit), sizeof(int8_t));
 }
 
 TRXState trx_state() {
@@ -239,13 +275,15 @@ void trx_set_vfo() {
     dialf    = _trx.vfo_b.band_freq[band];
   }
 
-  uint32_t vfo = 4*(dialf-((int16_t)_trx.cw_tone));
-  if (TRX_TX == _state) {
+  uint32_t vfo = 4*(dialf-((int16_t)_trx.cw_tone)+10*((int16_t)_trx.rit));
+  if ((TRX_TX == _state)) {
+    //si5351_set_freq(0,     SI5351_PLL_FIXED, SI5351_CLK1);
     si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK2);
     si5351_clock_enable(SI5351_CLK1, 0);
     si5351_clock_enable(SI5351_CLK2, 1);
   } else {
     si5351_set_freq(vfo, SI5351_PLL_FIXED, SI5351_CLK1);
+    //si5351_set_freq(0,   SI5351_PLL_FIXED, SI5351_CLK2);
     si5351_clock_enable(SI5351_CLK1, 1);
     si5351_clock_enable(SI5351_CLK2, 0);
   }
@@ -405,13 +443,39 @@ uint8_t trx_cw_speed() {
 }
 
 void trx_set_cw_speed(uint8_t idx) {
-  _trx.cw_speed = (idx>=KEYER_NUM_SPEED) ? KEYER_NUM_SPEED-1 : idx;
+  _trx.cw_speed = (idx>=KEYER_NUM_SPEED) ? (KEYER_NUM_SPEED-1) : idx;
   keyer_set_speed_idx(_trx.cw_speed);
   eeprom_write_block(&(_trx.cw_speed), &(_ee_trx.cw_speed), sizeof(uint8_t));
 }
 
+uint8_t *trx_cwtext() {
+  return _trx.cwtext;
+}
+
+void trx_clear_cwtext() {
+  memset(_trx.cwtext, 0, TRX_CWTEXT_MAXLEN);
+}
+
+void trx_update_cwtext() {
+  eeprom_write_block(&(_trx.cwtext), &(_ee_trx.cwtext), TRX_CWTEXT_MAXLEN);
+}
+
+uint8_t *trx_greet() {
+  return _trx.greet;
+}
+
 int32_t trx_pll_correction() {
   return _trx.pll_correction;
+}
+
+MeterType trx_meter_type() {
+  return _trx.meter_type;
+}
+
+void trx_set_meter_type(MeterType type) {
+  _trx.meter_type = type;
+  meter_set_type(type);
+  eeprom_write_block(&(_trx.meter_type), &(_ee_trx.meter_type), sizeof(MeterType));
 }
 
 void trx_set_pll_correction(int32_t val) {
@@ -451,7 +515,7 @@ void trx_poll()
 
   // Get rotary encoder and center button state
   int8_t delta = rot_delta();
-  uint8_t button_up = rot_button_up();
+  RotButton button = rot_button();
 
   // If TRX state has changed -> update display
   if ((TRX_MENU != _state) && (_display_state != _state)) {
@@ -460,17 +524,21 @@ void trx_poll()
   }
 
   // quick exit
-  if ((0 == delta) && (0 == button_up) && (TRX_RX==_state)) {
+  if ((0 == delta) && (ROT_BUTTON_NONE == button) && (TRX_RX==_state)) {
     meter_poll();
     return;
   }
 
   if (TRX_RX == _state) {
-    if (button_up) {
+    if (ROT_BUTTON_CLICK == button) {
       // Save frequency if needed
       trx_save_frequency();
       _state = TRX_MENU;
       display_update();
+    } else if (ROT_BUTTON_LONG == button) {
+      uint8_t len = TRX_CWTEXT_MAXLEN;
+      for (; (len>0) && (0==_trx.cwtext[len-1]); --len);
+      keyer_send_text(_trx.cwtext, len);
     } else if (delta) {
       trx_tune(delta);
       display_frequency();
@@ -478,7 +546,7 @@ void trx_poll()
       trx_save_frequency();
     }
   } else if (TRX_MENU == _state) {
-    menu_update(button_up, delta);
+    menu_update(button, delta);
   }
 }
 

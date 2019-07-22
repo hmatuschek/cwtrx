@@ -99,9 +99,9 @@ Text GLabel 2550 3850 2    50   Input ~ 0
 LCD_D6
 Text GLabel 2550 3950 2    50   Input ~ 0
 LCD_D7
-Text GLabel 2550 4150 2    50   Input ~ 0
+Text GLabel 3500 3700 2    50   Input ~ 0
 LCD_RS
-Text GLabel 2550 4250 2    50   Input ~ 0
+Text GLabel 2550 4050 2    50   Input ~ 0
 LCD_EN
 Wire Wire Line
 	2450 3450 2750 3450
@@ -453,10 +453,6 @@ Wire Wire Line
 	7250 1950 7350 1950
 Connection ~ 7250 1950
 Wire Wire Line
-	2450 4250 2550 4250
-Wire Wire Line
-	2550 4150 2450 4150
-Wire Wire Line
 	7250 4350 7350 4350
 Wire Wire Line
 	6450 2150 6450 2650
@@ -589,14 +585,10 @@ Text GLabel 8600 2500 0    50   Input ~ 0
 LCD_C
 Wire Wire Line
 	8600 2500 9000 2500
-Text GLabel 8600 2800 0    50   Input ~ 0
+Text GLabel 10000 1800 0    50   Input ~ 0
 LCD_RS
-Text GLabel 8600 2900 0    50   Input ~ 0
+Text GLabel 8600 3500 0    50   Input ~ 0
 LCD_EN
-Wire Wire Line
-	8600 2800 9000 2800
-Wire Wire Line
-	8600 2900 9000 2900
 Text GLabel 8600 3100 0    50   Input ~ 0
 LCD_D4
 Text GLabel 8600 3200 0    50   Input ~ 0
@@ -1307,10 +1299,6 @@ Wire Wire Line
 	10200 1700 10100 1700
 Wire Wire Line
 	10100 1700 10100 1900
-Text GLabel 10000 1800 0    50   Input ~ 0
-SDA
-Wire Wire Line
-	10000 1800 10200 1800
 $Comp
 L Connector_Generic:Conn_01x02 J5
 U 1 1 5C1DBD56
@@ -1336,14 +1324,10 @@ F 3 "~" H 9200 3300 50  0001 C CNN
 	1    9200 3300
 	1    0    0    -1  
 $EndComp
-Text GLabel 8600 3500 0    50   Input ~ 0
+Text GLabel 8600 2900 0    50   Input ~ 0
 Dah
-Wire Wire Line
-	8600 3500 9000 3500
-Text GLabel 2550 4050 2    50   Input ~ 0
+Text GLabel 2550 4250 2    50   Input ~ 0
 Dah
-Wire Wire Line
-	2450 4050 2550 4050
 $Comp
 L Device:R R4
 U 1 1 5C10CB1B
@@ -1623,4 +1607,26 @@ Wire Wire Line
 	2450 3050 3300 3050
 Wire Wire Line
 	2450 2950 3300 2950
+Wire Wire Line
+	8600 3500 9000 3500
+Wire Wire Line
+	2550 4050 2450 4050
+Text GLabel 2550 4150 2    50   Input ~ 0
+Dit
+Wire Wire Line
+	2550 4150 2450 4150
+Wire Wire Line
+	2450 4250 2550 4250
+Text GLabel 3400 3700 0    50   Input ~ 0
+SDA
+Wire Wire Line
+	3400 3700 3500 3700
+Wire Wire Line
+	10000 1800 10200 1800
+Text GLabel 8600 2800 0    50   Input ~ 0
+Dit
+Wire Wire Line
+	8600 2800 9000 2800
+Wire Wire Line
+	8600 2900 9000 2900
 $EndSCHEMATC

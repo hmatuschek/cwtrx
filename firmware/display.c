@@ -8,6 +8,7 @@
 void display_update() {
   lcd_clear();
   lcd_home();
+  lcd_hidecursor();
 
   switch (trx_state()) {
     case TRX_RX:
@@ -25,13 +26,13 @@ void display_trx_state() {
   // Time: approx. 180us
   if (TRX_RX == trx_state()) {
     lcd_setcursor(7,2);
-    lcd_data('R');
+    lcd_data(trx_rit_sym());
   } else if (TRX_TX == trx_state()) {
     lcd_setcursor(7,2);
     lcd_data(0x05);
   } else if (TRX_HOLD_TX == trx_state()) {
     lcd_setcursor(7,2);
-    lcd_data('t');
+    lcd_data('T');
   }
 }
 
@@ -52,17 +53,51 @@ void display_frequency() {
 }
 
 void display_smeter(uint8_t s) {
-  if (s > 10)
-    s = 10;
+  if (s > 5)
+    s = 5;
 
   lcd_setcursor(0, 2);
-  for (uint8_t i=0; i<s/2; i++)
+  for (uint8_t i=0; i<s; i++)
     lcd_data(i);
-  for (uint8_t i=s/2; i<5; i++)
+  for (uint8_t i=s; i<5; i++)
     lcd_data(' ');
 }
 
+void display_voltage(uint8_t v) {
+  lcd_setcursor(0, 2);
+  uint8_t a = v/100;
+  uint8_t b = (v%100)/10;
+  uint8_t c = v%10;
+  if (a) lcd_data('0'+a);
+  else lcd_data(' ');
+  lcd_data('0'+b);
+  lcd_data('.');
+  lcd_data('0'+c);
+  lcd_data('V');
+}
+
+void display_temp(uint16_t v) {
+  lcd_setcursor(0, 2);
+  // mK -> deg C
+  int16_t t = (v-3720)/10;
+  // sign
+  uint8_t n = (t<0) ? '-' : ' ';
+  t = (t<0) ? -t : t;
+  if (t>99)
+    t = 99;
+  // digits
+  uint8_t a = t/10;
+  uint8_t b = '0'+(t%10);
+  a = (0!=a) ? ('0'+a) : ' ';
+  lcd_data(n);
+  lcd_data(a);
+  lcd_data(b);
+  lcd_data(0xdf);
+  lcd_data('C');
+}
+
 void display_menu(MenuState state);
+void display_menu_rit();
 void display_menu_step();
 void display_menu_vfo();
 void display_menu_band();
@@ -72,12 +107,21 @@ void display_menu_cw_mode();
 void display_menu_cw_speed();
 void display_menu_cw_tone();
 void display_menu_cw_level();
+void display_menu_cw_text();
+void display_menu_clear_cw_text();
+void display_menu_meter();
 void display_menu_tx_hold();
+void display_menu_greet();
 void display_menu_pll_correction();
 
 
 void display_menu(MenuState state) {
+  lcd_hidecursor();
   switch (state) {
+    case MENU_RIT:
+    case MENU_SET_RIT:
+      display_menu_rit();
+      break;
     case MENU_STEP:
     case MENU_SET_STEP:
       display_menu_step();
@@ -109,6 +153,20 @@ void display_menu(MenuState state) {
     case MENU_SET_CW_LEVEL:
       display_menu_cw_level();
       break;
+    case MENU_CW_TEXT:
+    case MENU_SET_CW_TEXT:
+    case MENU_SET_CW_TEXT_CHAR:
+      display_menu_cw_text();
+      break;
+    case MENU_CLEAR_CW_TEXT:
+    case MENU_CLEAR_CW_TEXT_NO:
+    case MENU_CLEAR_CW_TEXT_YES:
+      display_menu_clear_cw_text();
+      break;
+    case MENU_METER:
+    case MENU_SET_METER:
+      display_menu_meter();
+      break;
     case MENU_TX_HOLD:
     case MENU_SET_TX_HOLD:
       display_menu_tx_hold();
@@ -117,6 +175,11 @@ void display_menu(MenuState state) {
     case MENU_SET_TX_ENABLE:
       display_menu_tx_enabled();
       break;
+    case MENU_GREET:
+    case MENU_SET_GREET:
+    case MENU_SET_GREET_CHAR:
+      display_menu_greet();
+      break;
     case MENU_PLL_CORRECTION:
     case MENU_SET_PLL_CORRECTION:
       display_menu_pll_correction();
@@ -124,6 +187,25 @@ void display_menu(MenuState state) {
   }
 }
 
+
+void display_menu_rit() {
+  lcd_string("RIT:");
+  if (MENU_SET_RIT == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  int8_t t = trx_rit();
+  int8_t neg = ((t<0) ? '-' : '+');
+  t = ((t<0) ? -t : t);
+  uint8_t tc = t/100; t %= 100;
+  uint8_t td = t/10;  t %= 10;
+  uint8_t tu = (t ? ('0'+t) : ' ');
+  tc = (tc ? ('0'+tc) : ' ');
+  td = (td ? ('0'+td) : ' ');
+  char buffer[8] = {neg,tc,td,tu,'0','H','z',0};
+  lcd_setcursor(1,2);
+  lcd_string(buffer);
+}
 
 void display_menu_step() {
   lcd_string("Step:");
@@ -280,7 +362,7 @@ void display_menu_cw_speed() {
     lcd_setcursor(0,2);
     lcd_data(0x7E);
   }
-  uint8_t speed = 20; //keyer_speed_wpm();
+  uint8_t speed = keyer_speed_wpm();
   uint8_t h = speed/10, l = speed%10;
   char buffer[7] = {'0'+h,'0'+l,' ','W','P','M',0};
   lcd_setcursor(2,2);
@@ -310,13 +392,88 @@ void display_menu_cw_level() {
   uint16_t t = trx_cw_level();
   uint8_t tc = t/100; t %= 100;
   uint8_t td = t/10;  t %= 10;
-  char buffer[7] = {'0'+tc,'0'+td,'0'+t,' ','H','z', 0};
-  lcd_setcursor(2,2);
+  char buffer[4] = {'0'+tc,'0'+td,'0'+t,0};
+  lcd_setcursor(5,2);
   lcd_string(buffer);
 }
 
+void display_menu_cw_text() {
+  lcd_string("CW Text:");
+  if (MENU_CW_TEXT == menu_state()) {
+    lcd_setcursor(0,2);
+    for (uint8_t i=0; i<8; i++)
+      lcd_data(keyer_sym2char(trx_cwtext()[i]));
+  } else {
+    lcd_setcursor(0,2);
+    if (menu_cursor() < 4) {
+      // left part: >0123456
+      lcd_data(0x7E);
+      for (uint8_t i=0; i<7; i++)
+        lcd_data(keyer_sym2char(trx_cwtext()[i]));
+      lcd_setcursor(menu_cursor()+1, 2);
+    } else if (menu_cursor() > TRX_CWTEXT_MAXLEN-5) {
+      // right part: 3456789<
+      for (uint8_t i=0; i<7; i++)
+        lcd_data(keyer_sym2char(trx_cwtext()[TRX_CWTEXT_MAXLEN-7+i]));
+      lcd_data(0x7F);
+      lcd_setcursor(7-TRX_CWTEXT_MAXLEN-menu_cursor(), 2);
+    } else {
+      // middle part: 01234567
+      for (uint8_t i=0; i<7; i++)
+        lcd_data(keyer_sym2char(trx_cwtext()[menu_cursor()-4+i]));
+      lcd_setcursor(4,2);
+    }
+    if (MENU_SET_CW_TEXT == menu_state()) {
+      lcd_showcursor();
+    } else if (MENU_SET_CW_TEXT_CHAR == menu_state()) {
+      lcd_blinkcursor();
+    }
+  }
+}
+
+void display_menu_clear_cw_text() {
+  lcd_string("Clr CWT?");
+  if (MENU_CLEAR_CW_TEXT_YES == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+    lcd_setcursor(5,2);
+    lcd_string("Yes");
+  } else if (MENU_CLEAR_CW_TEXT_NO == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+    lcd_setcursor(6,2);
+    lcd_string("No");
+  }
+}
+
+void display_menu_meter() {
+  lcd_string("Meter:");
+  if (MENU_SET_METER == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  switch(trx_meter_type()) {
+    case METER_NONE:
+      lcd_setcursor(4,2);
+      lcd_string("Off");
+      break;
+    case METER_SIG:
+      lcd_setcursor(1,2);
+      lcd_string("S-Mtr.");
+      break;
+    case METER_VOLTAGE:
+      lcd_setcursor(2,2);
+      lcd_string("Volt.");
+      break;
+    case METER_TEMP:
+      lcd_setcursor(2,2);
+      lcd_string("Temp.");
+      break;
+  }
+}
+
 void display_menu_tx_hold() {
-  lcd_string("TX del.:");
+  lcd_string("TX hold:");
   if (MENU_SET_TX_HOLD == menu_state()) {
     lcd_setcursor(0,2);
     lcd_data(0x7E);
@@ -324,6 +481,20 @@ void display_menu_tx_hold() {
   lcd_setcursor(3,2);
   lcd_print_uint16(trx_tx_hold(), 4);
   lcd_string("ms");
+}
+
+void display_menu_greet() {
+  lcd_string("Greet:");
+  lcd_setcursor(0,2);
+  for (uint8_t i=0; i<8; i++)
+    lcd_data(trx_greet()[i]);
+  if (MENU_SET_CW_TEXT == menu_state()) {
+    lcd_setcursor(menu_cursor(),2);
+    lcd_showcursor();
+  } else if (MENU_SET_CW_TEXT_CHAR == menu_state()) {
+    lcd_setcursor(menu_cursor(),2);
+    lcd_blinkcursor();
+  }
 }
 
 void display_menu_pll_correction() {

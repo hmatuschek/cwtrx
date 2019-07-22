@@ -84,8 +84,8 @@ const uint8_t _lcd_sym_0[8] PROGMEM = {
   0b00000000,
   0b00000000,
   0b00000000,
-  0b00000000,
-  0b00011111
+  0b00011111,
+  0b00000000
 };
 
 const uint8_t _lcd_sym_1[8] PROGMEM = {
@@ -96,7 +96,7 @@ const uint8_t _lcd_sym_1[8] PROGMEM = {
   0b00000000,
   0b00011111,
   0b00011111,
-  0b00011111
+  0b00000000
 };
 
 const uint8_t _lcd_sym_2[8] PROGMEM = {
@@ -107,7 +107,7 @@ const uint8_t _lcd_sym_2[8] PROGMEM = {
   0b00011111,
   0b00011111,
   0b00011111,
-  0b00011111
+  0b00000000
 };
 
 const uint8_t _lcd_sym_3[8] PROGMEM = {
@@ -118,7 +118,7 @@ const uint8_t _lcd_sym_3[8] PROGMEM = {
   0b00011111,
   0b00011111,
   0b00011111,
-  0b00011111
+  0b00000000
 };
 
 const uint8_t _lcd_sym_4[8] PROGMEM = {
@@ -129,18 +129,18 @@ const uint8_t _lcd_sym_4[8] PROGMEM = {
   0b00011111,
   0b00011111,
   0b00011111,
-  0b00011111
+  0b00000000
 };
 
 const uint8_t _lcd_sym_5[8] PROGMEM = {
   0b00011111,
-  0b00010001,
+  0b00000000,
   0b00011011,
   0b00011011,
   0b00011011,
   0b00011011,
-  0b00011111,
-  0b00011111
+  0b00011011,
+  0b00000000
 };
 
 /*
@@ -148,9 +148,9 @@ const uint8_t _lcd_sym_5[8] PROGMEM = {
  */
 static void lcd_enable( void )
 {
-    LCD_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
-    _delay_us( LCD_ENABLE_US );  // kurze Pause
-    LCD_PORT &= ~(1<<LCD_EN);    // Enable auf 0 setzen
+    LCDE_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
+    _delay_us( LCD_ENABLE_US );   // kurze Pause
+    LCDE_PORT &= ~(1<<LCD_EN);    // Enable auf 0 setzen
 }
 
 /*
@@ -160,8 +160,8 @@ static void lcd_out( uint8_t data )
 {
     data &= 0xF0;                       // obere 4 Bit maskieren
 
-    LCD_PORT &= ~(0xF0>>(4-LCD_DB));    // Maske löschen
-    LCD_PORT |= (data>>(4-LCD_DB));     // Bits setzen
+    LCDD_PORT &= ~(0xF0>>(4-LCD_DB));    // Maske löschen
+    LCDD_PORT |= (data>>(4-LCD_DB));     // Bits setzen
     lcd_enable();
 }
 
@@ -171,12 +171,16 @@ static void lcd_out( uint8_t data )
 void lcd_init( void )
 {
     // verwendete Pins auf Ausgang schalten
-    uint8_t pins = (0x0F<<LCD_DB) |             // 4 Datenleitungen
-                   (1<<LCD_RS) |                // R/S Leitung
-                   (1<<LCD_EN);                 // Enable Leitung
-    LCD_DDR |= pins;
+    LCDR_DDR  |= (1 << LCD_RS);
+    LCDR_PORT &= ~(1 << LCD_RS);
+    LCDE_DDR  |= (1 << LCD_EN);
+    LCDE_PORT &= ~(1 << LCD_EN);
+
+    uint8_t pins = (0x0F << LCD_DB);             // 4 Datenleitungen
+    LCDD_DDR  |= pins;
+
     // initial alle Ausgänge auf Null
-    LCD_PORT &= ~pins;
+    LCDD_PORT &= ~pins;
 
     // warten auf die Bereitschaft des LCD
     _delay_ms( LCD_BOOTUP_MS );
@@ -245,7 +249,7 @@ void lcd_data( uint8_t data )
 {
   // Time: 2*LCD_ENABLE_US + LCD_WRITEDATA_US
   // == 86us
-    LCD_PORT |= (1<<LCD_RS);    // RS auf 1 setzen
+    LCDR_PORT |= (1<<LCD_RS);    // RS auf 1 setzen
 
     lcd_out( data );            // zuerst die oberen,
     lcd_out( data<<4 );         // dann die unteren 4 Bit senden
@@ -260,7 +264,7 @@ void lcd_command( uint8_t data )
 {
   // Time: 2*LCD_ENABLE_US + LCD_COMMAND_US
   //  == 82us
-    LCD_PORT &= ~(1<<LCD_RS);    // RS auf 0 setzen
+    LCDR_PORT &= ~(1<<LCD_RS);    // RS auf 0 setzen
 
     lcd_out( data );             // zuerst die oberen,
     lcd_out( data<<4 );           // dann die unteren 4 Bit senden
@@ -312,6 +316,27 @@ void lcd_setcursor( uint8_t x, uint8_t y )
   }
 
   lcd_command( data );
+}
+
+void lcd_showcursor() {
+  lcd_command( LCD_SET_DISPLAY |
+               LCD_DISPLAY_ON |
+               LCD_CURSOR_ON |
+               LCD_BLINKING_OFF );
+}
+
+void lcd_blinkcursor() {
+  lcd_command( LCD_SET_DISPLAY |
+               LCD_DISPLAY_ON |
+               LCD_CURSOR_ON |
+               LCD_BLINKING_ON );
+}
+
+void lcd_hidecursor() {
+  lcd_command( LCD_SET_DISPLAY |
+               LCD_DISPLAY_ON |
+               LCD_CURSOR_OFF |
+               LCD_BLINKING_OFF);
 }
 
 /*
