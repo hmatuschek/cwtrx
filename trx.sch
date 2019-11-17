@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:trx-cache
-EELAYER 26 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -31,7 +31,7 @@ U 1 1 5BFFCC28
 P 1550 2000
 F 0 "T1" H 1550 2578 50  0000 C CNN
 F 1 "10:10:10 @ FT37-43" H 1550 2487 50  0000 C CNN
-F 2 "Transformer_THT:Transformer_Toroid_Tapped_Vertical_D10.5mm_Amidon-T37" H 1550 2000 50  0001 C CNN
+F 2 "DM3MAT:Transformer_1P_2S_Toroid_Vertical_D10.5mm_Amidon-T37_Wide" H 1550 2000 50  0001 C CNN
 F 3 "~" H 1550 2000 50  0001 C CNN
 	1    1550 2000
 	1    0    0    1   

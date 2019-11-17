@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:pa-cache
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -2312,17 +2312,6 @@ Connection ~ 8700 5900
 Wire Wire Line
 	8700 5900 8900 5900
 Connection ~ 8250 1900
-$Comp
-L Device:Transformer_1P_1S T1
-U 1 1 5C424A80
-P 7700 2100
-F 0 "T1" H 7700 2478 50  0000 C CNN
-F 1 "8+8@FT37-43" H 7700 2387 50  0000 C CNN
-F 2 "DM3MAT:Transformer_1P_1S_Toroid_Vertical_D10.5mm_Amidon-T37" H 7700 2100 50  0001 C CNN
-F 3 "~" H 7700 2100 50  0001 C CNN
-	1    7700 2100
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	8100 1900 8250 1900
 Wire Wire Line
@@ -2375,4 +2364,15 @@ Wire Wire Line
 Wire Wire Line
 	7050 3600 7050 3100
 Connection ~ 7750 3600
+$Comp
+L Device:Transformer_1P_1S T1
+U 1 1 5C424A80
+P 7700 2100
+F 0 "T1" H 7700 2478 50  0000 C CNN
+F 1 "8+8@FT37-43" H 7700 2387 50  0000 C CNN
+F 2 "DM3MAT:Transformer_1P_1S_Toroid_Vertical_D10.5mm_Amidon-T37" H 7700 2100 50  0001 C CNN
+F 3 "~" H 7700 2100 50  0001 C CNN
+	1    7700 2100
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
