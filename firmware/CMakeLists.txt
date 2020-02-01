@@ -1,10 +1,10 @@
 # Specify programmer
 set(AVR_UPLOADTOOL avrdude)
 set(AVR_PROGRAMMER stk500v2)
-set(AVR_UPLOADTOOL_PORT /dev/tty.usbmodem1411)
+set(AVR_UPLOADTOOL_PORT /dev/ttyACM0)
 
 # Specify CPU
-set(AVR_MCU ATmega328P)
+set(AVR_MCU atmega328p)
 
 # Specify fuse magic
 set(AVR_H_FUSE 0xD9)

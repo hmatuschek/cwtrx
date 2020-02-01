@@ -3436,7 +3436,7 @@
     )
   )
 
-  (module DM3MAT:Transformer_1P_1S_Toroid_Vertical_D10.5mm_Amidon-T37 (layer F.Cu) (tedit 5DD17DB9) (tstamp 5DBC3E6F)
+  (module DM3MAT:Transformer_1P_1S_Toroid_Vertical_D10.5mm_Amidon-T37 (layer F.Cu) (tedit 5DD2C508) (tstamp 5DBC3E6F)
     (at 129.54 113.03 90)
     (descr "L_Toroid, Vertical series, Radial, pin pitch=5.08mm, , length*width=10*5mm^2")
     (tags "L_Toroid Vertical series Radial pin pitch 5.08mm  length 10mm width 5mm")
@@ -3484,12 +3484,7 @@
       (net 20 "Net-(C20-Pad2)"))
     (pad 3 thru_hole circle (at 5.08 2.54 90) (size 2 2) (drill 1) (layers *.Cu *.Mask)
       (net 48 "Net-(Q11-Pad1)"))
-    (model ${KISYS3DMOD}/Inductor_THT.3dshapes/L_Toroid_Vertical_L10.0mm_W5.0mm_P5.08mm.wrl
-      (at (xyz 0 0 0))
-      (scale (xyz 1 1 1))
-      (rotate (xyz 0 0 0))
-    )
-    (model /home/hannes/AFU/kicad/DM3MAT/DM3MAT.3dshapes/Transformer_1P_1S_Toroid_Vertical_D10.5mm_Amidon-T37.step
+    (model ${KIPRJMOD}/DM3MAT/DM3MAT.3dshapes/Transformer_1P_1S_Toroid_Vertical_D10.5mm_Amidon-FT37.step
       (at (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
