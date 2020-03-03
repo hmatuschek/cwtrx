@@ -28,7 +28,7 @@ const uint32_t codetable[KEYER_NUM_SYMBOLS] PROGMEM = {
   (12UL<<24 |           0b101110111UL), // G
   (10UL<<24 |             0b1010101UL), // H
   ( 6UL<<24 |                 0b101UL), // I
-  (16UL<<24 |       0b1011101110111UL), // J
+  (16UL<<24 |       0b1110111011101UL), // J
   (12UL<<24 |           0b111010111UL), // K
   (12UL<<24 |           0b101011101UL), // L
   (10UL<<24 |             0b1110111UL), // M
