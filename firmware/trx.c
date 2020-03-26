@@ -215,7 +215,9 @@ int8_t trx_rit() {
 void trx_set_rit(int8_t off) {
   _trx.rit = MINMAX(off, TRX_RIT_MIN, TRX_RIT_MAX);
   trx_set_vfo();
+  cli();
   eeprom_write_block(&(_trx.rit), &(_ee_trx.rit), sizeof(int8_t));
+  sei();
 }
 
 TRXState trx_state() {
@@ -260,7 +262,9 @@ void trx_rx() {
 
 
 inline void trx_save_settings() {
+  cli();
   eeprom_write_block(&_trx, &_ee_trx, sizeof(TRXSettings));
+  sei();
 }
 
 
@@ -357,7 +361,9 @@ TRXStepSize trx_tune_step() {
 
 void trx_set_tune_step(TRXStepSize step) {
   _trx.step = step;
+  cli();
   eeprom_write_block(&(_trx.step), &(_ee_trx.step), sizeof(TRXStepSize));
+  sei();
 }
 
 Band trx_band() {
@@ -369,6 +375,7 @@ Band trx_band() {
 
 void trx_set_band(Band band) {
   // Select band and store in EEPROM
+  cli();
   if ((VFO_MODE_A == _trx.vfo_mode) || ((TRX_RX == _state) && (VFO_MODE_SPLIT == _trx.vfo_mode))) {
     _trx.vfo_a.band = band;
     eeprom_write_block(&(_trx.vfo_a.band), &(_ee_trx.vfo_a.band), sizeof(Band));
@@ -376,6 +383,7 @@ void trx_set_band(Band band) {
     _trx.vfo_b.band = band;
     eeprom_write_block(&(_trx.vfo_b.band), &(_ee_trx.vfo_b.band), sizeof(Band));
   }
+  sei();
   // Set band
   band_set(band);
   // Update VFO freq
@@ -390,7 +398,9 @@ void trx_set_tx_hold(uint16_t delay) {
   if (delay > 1000)
     delay=1000;
   _trx.tx_hold = delay;
+  cli();
   eeprom_write_block(&(_trx.tx_hold), &(_ee_trx.tx_hold), sizeof(uint16_t));
+  sei();
 }
 
 uint8_t trx_tx_enabled() {
@@ -399,7 +409,9 @@ uint8_t trx_tx_enabled() {
 
 void trx_set_tx_enabled(uint8_t enable) {
   _trx.tx_enabled = enable;
+  cli();
   eeprom_write_block(&(_trx.tx_enabled), &(_ee_trx.tx_enabled), sizeof(uint8_t));
+  sei();
 }
 
 KeyerMode trx_cw_mode() {
@@ -409,7 +421,9 @@ KeyerMode trx_cw_mode() {
 void trx_set_cw_mode(KeyerMode mode) {
   _trx.cw_mode = mode;
   keyer_set_mode(_trx.cw_mode);
+  cli();
   eeprom_write_block(&(_trx.cw_mode), &(_ee_trx.cw_mode), sizeof(KeyerMode));
+  sei();
 }
 
 uint16_t trx_cw_tone() {
@@ -423,7 +437,9 @@ void trx_set_cw_tone(uint16_t freq) {
   // Update VFO frequency from dial, BFO and CW tone frequency
   trx_set_vfo();
   // Store CW tone freq in EEPROM
+  cli();
   eeprom_write_block(&(_trx.cw_tone), &(_ee_trx.cw_tone), sizeof(uint16_t));
+  sei();
 }
 
 uint8_t trx_cw_level() {
@@ -435,7 +451,9 @@ void trx_set_cw_level(uint8_t level) {
   _trx.cw_level = level;
   tone_set_volume(_trx.cw_level);
   // Store CW level in EEPROM
+  cli();
   eeprom_write_block(&(_trx.cw_level), &(_ee_trx.cw_level), sizeof(uint8_t));
+  sei();
 }
 
 uint8_t trx_cw_speed() {
@@ -445,7 +463,9 @@ uint8_t trx_cw_speed() {
 void trx_set_cw_speed(uint8_t idx) {
   _trx.cw_speed = (idx>=KEYER_NUM_SPEED) ? (KEYER_NUM_SPEED-1) : idx;
   keyer_set_speed_idx(_trx.cw_speed);
+  cli();
   eeprom_write_block(&(_trx.cw_speed), &(_ee_trx.cw_speed), sizeof(uint8_t));
+  sei();
 }
 
 uint8_t *trx_cwtext() {
@@ -457,7 +477,9 @@ void trx_clear_cwtext() {
 }
 
 void trx_update_cwtext() {
+  cli();
   eeprom_write_block(&(_trx.cwtext), &(_ee_trx.cwtext), TRX_CWTEXT_MAXLEN);
+  sei();
 }
 
 uint8_t *trx_greet() {
@@ -475,7 +497,9 @@ MeterType trx_meter_type() {
 void trx_set_meter_type(MeterType type) {
   _trx.meter_type = type;
   meter_set_type(type);
+  cli();
   eeprom_write_block(&(_trx.meter_type), &(_ee_trx.meter_type), sizeof(MeterType));
+  sei();
 }
 
 void trx_set_pll_correction(int32_t val) {
@@ -484,21 +508,22 @@ void trx_set_pll_correction(int32_t val) {
   if (val < -1000000L)
     val = -1000000L;
   _trx.pll_correction = val;
+  cli();
   si5351_set_correction(val);
   trx_set_vfo();
   eeprom_write_block(&(_trx.pll_correction), &_ee_trx.pll_correction, sizeof(int32_t));
+  sei();
 }
 
 void trx_save_frequency() {
   if (_trx_save_freq) {
     // Store dial frequency in EEPROM
-    if (VFO_MODE_A == _trx.vfo_mode) {
-      eeprom_write_block(&(_trx.vfo_a.band_freq[_trx.vfo_a.band]),
-          &(_ee_trx.vfo_a.band_freq[_trx.vfo_a.band]), sizeof(uint32_t));
-    } else if (VFO_MODE_B == _trx.vfo_mode) {
-      eeprom_write_block(&(_trx.vfo_b.band_freq[_trx.vfo_b.band]),
-          &(_ee_trx.vfo_b.band_freq[_trx.vfo_b.band]), sizeof(uint32_t));
-    }
+    cli();
+    eeprom_write_block(&(_trx.vfo_a.band_freq[_trx.vfo_a.band]),
+        &(_ee_trx.vfo_a.band_freq[_trx.vfo_a.band]), sizeof(uint32_t));
+    eeprom_write_block(&(_trx.vfo_b.band_freq[_trx.vfo_b.band]),
+        &(_ee_trx.vfo_b.band_freq[_trx.vfo_b.band]), sizeof(uint32_t));
+    sei();
     _trx_save_freq = 0;
   }
 }
