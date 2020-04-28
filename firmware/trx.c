@@ -486,6 +486,12 @@ uint8_t *trx_greet() {
   return _trx.greet;
 }
 
+void trx_update_greet() {
+  cli();
+  eeprom_write_block(&(_trx.greet), &(_ee_trx.greet), TRX_GREET_MAXLEN);
+  sei();
+}
+
 int32_t trx_pll_correction() {
   return _trx.pll_correction;
 }

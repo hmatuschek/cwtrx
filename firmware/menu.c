@@ -263,6 +263,7 @@ void menu_update(RotButton button, int8_t delta)
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_GREET_CHAR;
     } else if (ROT_BUTTON_LONG == button) {
+      trx_update_greet();
       _menu_state = MENU_SETUP;
       trx_set_state(TRX_RX);
     } else if ((delta>0) && (_menu_cursor<7)) {

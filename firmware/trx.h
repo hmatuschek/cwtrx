@@ -45,7 +45,7 @@ typedef enum {
 #define TRX_RIT_MIN -100
 #define TRX_RIT_MAX  100
 #define TRX_CWTEXT_MAXLEN 64
-
+#define TRX_GREET_MAXLEN  8
 
 void trx_init();
 
@@ -84,6 +84,7 @@ void trx_set_tx_hold(uint16_t delay);
 uint8_t trx_tx_enabled();
 void trx_set_tx_enabled(uint8_t enabled);
 uint8_t *trx_greet();
+void trx_update_greet();
 int32_t trx_pll_correction();
 void trx_set_pll_correction(int32_t pptm);
 

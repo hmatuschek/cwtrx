@@ -148,9 +148,9 @@ const uint8_t _lcd_sym_5[8] PROGMEM = {
  */
 static void lcd_enable( void )
 {
-    LCDE_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
-    _delay_us( LCD_ENABLE_US );   // kurze Pause
-    LCDE_PORT &= ~(1<<LCD_EN);    // Enable auf 0 setzen
+  LCDE_PORT |= (1<<LCD_EN);     // Enable auf 1 setzen
+  _delay_us( LCD_ENABLE_US );   // kurze Pause
+  LCDE_PORT &= ~(1<<LCD_EN);    // Enable auf 0 setzen
 }
 
 /*
