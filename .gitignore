@@ -2,7 +2,6 @@
 *.bak
 *.kicad_pcb-bak
 *.net
-prod/*
 doc/sim/*
 doc/*.aux
 doc/*.log
@@ -13,4 +12,4 @@ doc/*.png
 !doc/fig/*.pdf
 !doc/fig/*.png
 .DS_Store
-
+hardware/fp-info-cache

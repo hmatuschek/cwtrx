@@ -17,7 +17,7 @@ $Sheet
 S 3250 2450 1400 1100
 U 5E45303E
 F0 "Mixer" 50
-F1 "CW2020Mixer.sch" 50
+F1 "rx_mixer.sch" 50
 F2 "RF" U L 3250 2700 50 
 F3 "I+" O R 4650 2700 50 
 F4 "Q+" O R 4650 2900 50 
@@ -30,7 +30,7 @@ $Sheet
 S 6750 2450 1400 1100
 U 5E510879
 F0 "Audio" 50
-F1 "CW2020Audio.sch" 50
+F1 "rx_audio.sch" 50
 F2 "NF" I L 6750 2700 50 
 F3 "SideTone" I L 6750 3200 50 
 F4 "TX5V" I L 6750 3300 50 
@@ -40,7 +40,7 @@ $Sheet
 S 5000 2450 1400 1100
 U 5E510ACC
 F0 "Demod" 50
-F1 "CW2020Demod.sch" 50
+F1 "rx_demod.sch" 50
 F2 "I+" I L 5000 2700 50 
 F3 "I-" I L 5000 3100 50 
 F4 "Q+" I L 5000 2900 50 
@@ -51,7 +51,7 @@ $Sheet
 S 3250 3950 1400 1100
 U 5E59D431
 F0 "VFO" 50
-F1 "VFO.sch" 50
+F1 "rx_vfo.sch" 50
 F2 "VFO+I" I L 3250 4350 50 
 F3 "VFO-I" I L 3250 4550 50 
 F4 "VFO+Q" I L 3250 4450 50 
@@ -443,7 +443,7 @@ $Sheet
 S 6750 3950 1400 1100
 U 5EBC9BB8
 F0 "Ctrl" 50
-F1 "Ctrl.sch" 50
+F1 "rx_ctrl.sch" 50
 F2 "SDA" B L 6750 4450 50 
 F3 "SCL" O L 6750 4550 50 
 F4 "TX5V" O R 8150 4150 50 
