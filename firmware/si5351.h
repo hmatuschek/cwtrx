@@ -251,14 +251,13 @@ struct Si5351IntStatus
 
 /* Suggested public function prototypes */
 
-uint8_t si5351_init(void);
+uint8_t si5351_init(int32_t refcorr);
 void si5351_set_freq(uint32_t, uint32_t, enum si5351_clock);
 void si5351_set_pll(uint32_t, enum si5351_pll);
 void si5351_clock_enable(enum si5351_clock, uint8_t);
 void si5351_drive_strength(enum si5351_clock, enum si5351_drive);
 void si5351_update_status(void);
 void si5351_set_correction(int32_t);
-int32_t si5351_get_correction(void);
 
 /* Suggested private function prototypes */
 

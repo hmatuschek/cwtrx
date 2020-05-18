@@ -31,12 +31,9 @@
 #include <string.h>
 #include <math.h>
 #include <util/twi.h>
-#include <avr/eeprom.h>
 
 #include "si5351.h"
 #include "i2c.h"
-
-uint32_t EEMEM ee_ref_correction = 0;
 
 int32_t ref_correction = 0;
 uint32_t plla_freq = 0;
@@ -58,7 +55,7 @@ void si5351_pll_reset(enum si5351_pll target_pll);
  * Call this to initialize I2C communications and get the
  * Si5351 ready for use.
  */
-uint8_t si5351_init(void)
+uint8_t si5351_init(int32_t refcorr)
 {
 	i2c_init();
 
@@ -67,7 +64,7 @@ uint8_t si5351_init(void)
     return 1;
 
 	/* Get the correction factor from EEPROM */
-	ref_correction = eeprom_read_dword(&ee_ref_correction);
+  ref_correction = refcorr;
 
   //si5351_reset();
 
@@ -421,19 +418,9 @@ void si5351_update_status(void)
  */
 void si5351_set_correction(int32_t corr)
 {
-	eeprom_write_dword(&ee_ref_correction, corr);
 	ref_correction = corr;
 }
 
-/*
- * si5351_get_correction(void)
- *
- * Returns the oscillator correction factor stored
- * in EEPROM.
- */
-int32_t si5351_get_correction(void) {
-	return eeprom_read_dword(&ee_ref_correction);
-}
 
 /*******************************
  * Suggested private functions *

@@ -255,7 +255,7 @@ void menu_update(RotButton button, int8_t delta)
       _menu_state = MENU_SET_GREET;
       _menu_cursor = 0;
     } else if (delta > 0) {
-      _menu_state = MENU_PLL_CORRECTION;
+      _menu_state = MENU_RESET;
     } else {
       _menu_state = MENU_TX_HOLD;
     }
@@ -279,13 +279,24 @@ void menu_update(RotButton button, int8_t delta)
     } else if ((delta<0) && (trx_greet()[_menu_cursor] > 0x20)) {
       trx_greet()[_menu_cursor]--;
     }
+  } else if (MENU_RESET == _menu_state) {
+    if (ROT_BUTTON_LONG == button) {
+      trx_eeprom_reset();
+      _menu_state = MENU_RESETTED;
+    } else if (delta>0) {
+      _menu_state = MENU_PLL_CORRECTION;
+    } else {
+      _menu_state = MENU_GREET;
+    }
+  } else if (MENU_RESETTED) {
+    // Trap. Needs reboot to exit.
   } else if (MENU_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_PLL_CORRECTION;
     } else if (delta > 0) {
       _menu_state = MENU_CW_MODE;
     } else {
-      _menu_state = MENU_GREET;
+      _menu_state = MENU_RESET;
     }
   } else if (MENU_SET_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {

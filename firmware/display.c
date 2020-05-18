@@ -112,6 +112,7 @@ void display_menu_clear_cw_text();
 void display_menu_meter();
 void display_menu_tx_hold();
 void display_menu_greet();
+void display_menu_reset();
 void display_menu_pll_correction();
 
 
@@ -179,6 +180,10 @@ void display_menu(MenuState state) {
     case MENU_SET_GREET:
     case MENU_SET_GREET_CHAR:
       display_menu_greet();
+      break;
+    case MENU_RESET:
+    case MENU_RESETTED:
+      display_menu_reset();
       break;
     case MENU_PLL_CORRECTION:
     case MENU_SET_PLL_CORRECTION:
@@ -495,6 +500,15 @@ void display_menu_greet() {
     lcd_setcursor(menu_cursor(),2);
     lcd_blinkcursor();
   }
+}
+
+void display_menu_reset() {
+  lcd_string("Reset?");
+  lcd_setcursor(0,2);
+  if (MENU_RESET  == menu_state())
+    lcd_string(" -> Hold");
+  else
+    lcd_string("Ok > Rbt");
 }
 
 void display_menu_pll_correction() {

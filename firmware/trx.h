@@ -55,6 +55,7 @@ VFOMode  trx_vfo_mode();
 void trx_set_vfo_mode(VFOMode mode);
 TRXState trx_state();
 void trx_set_state(TRXState state);
+void trx_eeprom_reset();
 
 void trx_tune(int8_t delta);
 uint32_t trx_dial_freq();
