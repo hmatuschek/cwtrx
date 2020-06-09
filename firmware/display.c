@@ -493,10 +493,10 @@ void display_menu_greet() {
   lcd_setcursor(0,2);
   for (uint8_t i=0; i<8; i++)
     lcd_data(trx_greet()[i]);
-  if (MENU_SET_CW_TEXT == menu_state()) {
+  if (MENU_SET_GREET == menu_state()) {
     lcd_setcursor(menu_cursor(),2);
     lcd_showcursor();
-  } else if (MENU_SET_CW_TEXT_CHAR == menu_state()) {
+  } else if (MENU_SET_GREET_CHAR == menu_state()) {
     lcd_setcursor(menu_cursor(),2);
     lcd_blinkcursor();
   }
