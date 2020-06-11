@@ -316,6 +316,14 @@ void display_menu_band() {
       lcd_setcursor(5,2);
       lcd_string("15m");
       break;
+    case BAND_12:
+      lcd_setcursor(5,2);
+      lcd_string("12m");
+      break;
+    case BAND_10:
+      lcd_setcursor(5,2);
+      lcd_string("10m");
+      break;
   }
 }
 

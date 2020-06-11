@@ -7,13 +7,13 @@
 #include "keyer.h"
 #include "meter.h"
 
-#define TRX_TX_PORT PORTD
-#define TRX_TX_DDR  DDRD
-#define TRX_TX_BIT  PD7
+#define TRX_TX_PORT PORTB
+#define TRX_TX_DDR  DDRB
+#define TRX_TX_BIT  PB6
 
 #define TRX_KEY_PORT PORTB
 #define TRX_KEY_DDR  DDRB
-#define TRX_KEY_BIT  PB0
+#define TRX_KEY_BIT  PB7
 
 typedef enum {
   TRX_RX,

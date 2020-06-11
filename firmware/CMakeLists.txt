@@ -8,10 +8,10 @@ set(AVR_MCU atmega328p)
 
 # Specify fuse magic
 set(AVR_H_FUSE 0xD9)
-set(AVR_L_FUSE 0xf7)
+set(AVR_L_FUSE 0xE2)
 
 # Specify CPU frequency
-set(MCU_SPEED "20000000ULL")
+set(MCU_SPEED "8000000ULL")
 
 # Include avg-gcc toolchain
 include(generic-gcc-avr)

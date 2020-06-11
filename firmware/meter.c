@@ -22,9 +22,11 @@ void meter_init(MeterType type) {
 void meter_set_type(MeterType type) {
   _meter_type = type;
   if (METER_TEMP == _meter_type) {
+    // Select ADC8 (internal temp sensor)
     ADMUX  = ( (1<<REFS1) | (1<<REFS0) | (0<<ADLAR) |
                (1<<MUX3) | (0<<MUX2) | (0<<MUX1) | (0<<MUX0) );
   } else {
+    // Select ADC0 for input
     ADMUX  = ( (0<<REFS1) | (1<<REFS0) | (0<<ADLAR) |
                (0<<MUX3) | (0<<MUX2) | (0<<MUX1) | (0<<MUX0) );
   }

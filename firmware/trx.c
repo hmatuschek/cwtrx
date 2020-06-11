@@ -48,6 +48,10 @@
 #define TRX_17_MAX  18168000UL
 #define TRX_15_MIN  21000000UL
 #define TRX_15_MAX  21450000UL
+#define TRX_12_MIN  24890000UL
+#define TRX_12_MAX  24990000UL
+#define TRX_10_MIN  28000000UL
+#define TRX_10_MAX  29690000UL
 
 #define MINMAX(x, a, b) ( (x<a) ? a : ((x>b) ? b : x))
 
@@ -159,17 +163,19 @@ void trx_init() {
   _display_state = _state = TRX_RX;
   _tx_hold_count = 0;
 
-  // Set Timer on Compare Match (CTC) mode, clock source CLK/64
+  // Set Timer on Compare Match (CTC) mode, clock source CLK/32
   TCCR2A = (1 << WGM21) | (0 << WGM20) | (0 << COM2A1) | (0 << COM2A0) |
       (0 << COM2B1) | (0 << COM2B0);
-  TCCR2B = (0 << WGM22) | (1 << CS22) | (0 << CS21) | (1 << CS20) |
+  TCCR2B = (0 << WGM22) | (0 << CS22) | (1 << CS21) | (1 << CS20) |
       (0 << FOC2A) | (0<<FOC2B);
   // -> 1ms
-  OCR2A  = 156-1;
+  OCR2A  = 250-1;
   // enable interrupt (OC 0A)
   TIMSK2  |= (1<<OCIE2A);
   _trx_tick_count = 0;
 
+  si5351_drive_strength(SI5351_CLK0, SI5351_DRIVE_2MA);
+  si5351_clock_enable(SI5351_CLK0, 0);
   si5351_drive_strength(SI5351_CLK1, SI5351_DRIVE_2MA);
   si5351_clock_enable(SI5351_CLK1, 0);
   si5351_drive_strength(SI5351_CLK2, SI5351_DRIVE_2MA);
@@ -190,6 +196,9 @@ void trx_init() {
   _delay_ms(2000);
 
   display_update();
+
+  // Power reduction, disable Timer 0, UART 0, SPI
+  //PRR |= ( (1 << PRTIM0) | (1 << PRUSART0) | (1 << PRSPI));
 }
 
 
@@ -282,14 +291,14 @@ void trx_set_vfo() {
   uint32_t vfo = 4*(dialf-((int16_t)_trx.cw_tone)+10*((int16_t)_trx.rit));
   if ((TRX_TX == _state)) {
     //si5351_set_freq(0,     SI5351_PLL_FIXED, SI5351_CLK1);
-    si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK2);
-    si5351_clock_enable(SI5351_CLK1, 0);
-    si5351_clock_enable(SI5351_CLK2, 1);
-  } else {
-    si5351_set_freq(vfo, SI5351_PLL_FIXED, SI5351_CLK1);
-    //si5351_set_freq(0,   SI5351_PLL_FIXED, SI5351_CLK2);
-    si5351_clock_enable(SI5351_CLK1, 1);
+    si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK0);
     si5351_clock_enable(SI5351_CLK2, 0);
+    si5351_clock_enable(SI5351_CLK0, 1);
+  } else {
+    si5351_set_freq(vfo, SI5351_PLL_FIXED, SI5351_CLK2);
+    //si5351_set_freq(0,   SI5351_PLL_FIXED, SI5351_CLK2);
+    si5351_clock_enable(SI5351_CLK2, 1);
+    si5351_clock_enable(SI5351_CLK0, 0);
   }
 }
 
@@ -341,6 +350,8 @@ void trx_tune(int8_t delta) {
     case BAND_20:  dialf = MINMAX(dialf, TRX_20_MIN, TRX_20_MAX); break;
     case BAND_17:  dialf = MINMAX(dialf, TRX_17_MIN, TRX_17_MAX); break;
     case BAND_15:  dialf = MINMAX(dialf, TRX_15_MIN, TRX_15_MAX); break;
+    case BAND_12:  dialf = MINMAX(dialf, TRX_12_MIN, TRX_12_MAX); break;
+    case BAND_10:  dialf = MINMAX(dialf, TRX_10_MIN, TRX_10_MAX); break;
   }
 
   // Store dial frequency in current TRX Object

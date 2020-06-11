@@ -4,15 +4,15 @@
 #include <avr/io.h>
 #include <inttypes.h>
 
-#define KEYER_A_PORT PORTD
-#define KEYER_A_PIN  PIND
-#define KEYER_A_DDR  DDRD
-#define KEYER_A_BIT  PD5
+#define KEYER_A_PORT PORTB
+#define KEYER_A_PIN  PINB
+#define KEYER_A_DDR  DDRB
+#define KEYER_A_BIT  PB3
 
-#define KEYER_B_PORT PORTD
-#define KEYER_B_PIN  PIND
-#define KEYER_B_DDR  DDRD
-#define KEYER_B_BIT  PD6
+#define KEYER_B_PORT PORTB
+#define KEYER_B_PIN  PINB
+#define KEYER_B_DDR  DDRB
+#define KEYER_B_BIT  PD2
 
 #define KEYER_NUM_SPEED 25
 
