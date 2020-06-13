@@ -59,45 +59,44 @@
  In a first step, the controller part of the receiver board is assembled. Install C2, C26, J7, L2, C40, C41, C42, U10, J10, C14, J3, R3, C46, R4, U11 - Socket, LCD1, R43, R5, RV4, J9, R41, R40, C39 \& U9 first. 
 
 \begin{warning}
-The metal tab of the TO-220 package of U10 is usually connected directly to the center pin (GND). Please check beforehand if this is the case for your variant. Some rare packages connect this pad to \emph{+5V} leading to a nice solid short circuit that will blow either U10 or L3 or both.
+The metal tab of the TO-220 package of U10 is usually connected directly to the center pin (GND). Please check beforehand if this is the case for your variant. Some rare packages connect this pad to \emph{+5V} leading to a nice \& solid short-circuit that will blow either U10 or L3 or both.
 \end{warning}
 
-If you got one of the rare TO-220 variant of U10 that connects the metal tab to +5V, use a mica-isolator between U10 and the board.
+If you got one of the rare TO-220 variant of U10 that connects the metal tab to +5V, use a mica-insulator between U10 and the PCB.
 
-
-\begin{remark}
- R43 limits the current to the LCD backlight. By default a $220\,\Omega$ resistor is installed. This limits the current to about $23\,mA$. This results in a very dim back-light but reduces the current consumption from max. $120\, mA$ (R43 shorted). I personally consider this dim setting the most useful: During daylight a back light makes no sense as the LCD is perfectly readable. During night, without any external light-sources a very dim back light is still sufficient to read the LCD. There is simply no need to drain the battery live for unused or over-bright back lights. You may also replace the resistor with a push-button at the front panel to switch-on the back-light when needed.
+ R43 limits the current to the LCD backlight. By default a $220\,\Omega$ resistor is installed. This limits the current to about $23\,mA$. This results in a very dim back-light but reduces the current consumption from max. $120\, mA$ (R43 shorted). I personally consider this dim setting the most useful: During daylight a back light makes no sense as the LCD is perfectly readable. During night, without any external light-sources a very dim back light is still sufficient to read the LCD. There is simply no need to drain the battery live for unused or too-bright back lights. If you use the TRX only at home and current consumption is not an issue, you may choose a smaller value for R43 or even bridge it for maximum brightness.
+ 
+\begin{remark} 
+ You may also replace the resistor R43 with a push-button at the front panel to switch the back-light on when needed.
 \end{remark}
  
  Then, assemble the switch plug and (top right corner labeled \emph{SW}). Connect a 12V power-supply (ideally current-limited to not more than 100mA) to the pads of the supply connector (also top-right corner) labeled \emph{+ G}, where the \emph{+} pad is +12V and the \emph{G} pad is ground. 
 
-\begin{warning}
+\begin{remember}
  The receiver board itself has no reverse-polarity protection. So be careful when connecting the RX board to the power-supply!
-\end{warning}
+\end{remember}
   
- If nothing blows up, switch of and continue assembling the rotary-encoder and LCD plugs. 
+ If nothing blows up, switch the TRX off and continue assembling the rotary-encoder and LCD plugs. 
  
  The rotary encoder plug has the following connections (read left-to-right): \emph{Button}, \emph{Encoder B}, \emph{Encoder A}, \emph{Ground}. 
 
- The LCD-plug has the following connections (read left-to-right): \emph{5V} pin 2 on LCD, \emph{contrast} pin 3 on LCD, \emph{LED backlight} pin 15 on LCD, \emph{GND} pin 1 on LCD, \emph{RS (register selection)} pin 4 on LCD, \emph{D4-D7} pins 11-14 on LCD, \emph{chip-enable (EN)} pin 6 on LCD. You also need to connect pins 5 and 16 on the LED directly to ground (pin 1 on LED).
+ The LCD-plug has the following connections (read left-to-right): \emph{5V} pin 2 on LCD, \emph{contrast} pin 3 on LCD, \emph{LED backlight} pin 15 on LCD, \emph{GND} pin 1 on LCD, \emph{RS (register selection)} pin 4 on LCD, \emph{D4-D7} pins 11-14 on LCD, \emph{chip-enable (EN)} pin 6 on LCD. You also need to connect pins 5 and 16 on the LCD-board directly to ground (pin 1 on LCD).
  
- Connect the LCD \& rotary encoder to the board and install the ATMega328 MCU. 
-
- Then connect the board to the power-supply. If you got a pre-programmed MCU you should see a brief greeting on the LCD. If you do not see anything at all or a series of back blocks on the screen, you may have to set the LCD supply/contrast setting using RV4 (under the SI5351 board). If you still don't see anything on the LCD, double-check your connects to the LCD! 
+ Plug the LCD \& rotary encoder into the board and install the ATMega328 MCU. Then connect the board to the power-supply. If you got a pre-programmed MCU you should see a brief greeting on the LCD. If you do not see anything at all or a series of back blocks on the screen, you may have to set the LCD supply/contrast setting using RV4. If you still don't see anything on the LCD, double-check your connects to the LCD! 
 
 \subsection{Testing PLL}
 In a next step, verify the SI5351 PLL. First install the SI5351 break-out board. 
 
 \begin{warning}
- Be careful when inserting the SI5351 beakout-board, there is no protection in the socket to plug it in the wrong way: The board should overlap the LCD connector not U9!
+ Be careful when inserting the SI5351 beakout-board, there is no protection in the socket to plug it in the wrong way: The board should overlap with the LCD connector not U9!
 \end{warning}
  
-Then switch on the RX and verify that there is a $3.5MHz$ signal at the pins 8, 9, 11 and 12 of U9. If not, verify that there is a $14.0Mhz$ signal at the CLK2 output of the SI5351 break-out board. 
+Then switch on the RX and verify that there is a $3.5MHz$ signal at pins 8, 9, 11 and 12 of U9. If not, verify that there is a $14.0Mhz$ signal at the CLK2 output of the SI5351 break-out board. 
 
 You may also verify the $90^\circ$ phase-shift between pins 9 and 12 of U9.
 
 \begin{remark}
-By default, the RX is wired to receive on the USB. If you prefer LSB reception, you may break the jumper labeled \emph{USB} and put a solder-bride on jumper \emph{LSB}. You also need to set the side-band in the firmware.
+By default, the RX is wired to receive on the upper side-band (USB). If you prefer LSB-reception, you may break the jumper labeled \emph{USB} and put a solder-bride on jumper \emph{LSB}. You also need to set the side-band in the firmware.
 \end{remark} 
 
 If everything works fine for you so far, continue with assembling the rest of the receiver board.
@@ -108,11 +107,9 @@ Before starting to assemble the receiver, disconnect everything from the board. 
 
 In a first step, install the SMD SOIC-16 FST3253 mixer. 
 
-\begin{remark}
-If you never soldered SMD components before: it is surprisingly simple. Get a sharp soldering-iron tip and thin solder (e.g., $0.75mm$) as well as plenty of flux. Put a lot of flux on the pads. Then put a small amount of solder on one of the pins, for example pin 1 in the bottom-right corner. Pick the IC with pointy tweezers and place it on the board. Verify the alignment of the pins, in particular the orientation of pin 1. Solder only pin 1 to the board by heating the pad and pushing the IC on the board. Then take a magnifying glass and verify the alignments of all pins with their pads. If needed, reheat pad 1 and improve the alignment. Once the alignment is right, you can start to solder the remaining pads. You do not need much solder and the flux will do all the work for you.
-\end{remark}
+\paragraph{If you never soldered SMD components before} It is surprisingly simple. Get a sharp soldering-iron tip and thin solder (e.g., $0.75mm$) as well as plenty of flux. Put a lot of flux on the pads. Then put a small amount of solder on one of the pins, for example pin 1 in the bottom-right corner. Pick up the IC with pointy tweezers and place it on the board. Verify the orientation and alignment of the IC. Solder only pin 1 to the board by heating the pad and pushing the IC on the board. Then take a magnifying glass and verify the alignment of all pins with their pads. If needed, reheat pad 1 and improve the alignment. Once the alignment is right, you can start to solder the remaining pads. You do not need much solder! And remember: The flux will do all the work for you. If you got a solder-bridge between two pins, grab some desoldering-wig and remove the solder. 
 
-Once the mixer is installed, the order of the next components being installed does not mater. Complete the assembly of the board but leave the board-to-board interconnects (labeled \emph{TX, RX, +G} and the unlabeled 10-pin connector at the bottom) of the board for now. 
+Once the mixer is installed, the order in which the next components are installed, does not mater. Complete the assembly of the board but leave the board-to-board interconnects (labeled \emph{TX, RX, +G} and the unlabeled 10-pin connector at the bottom) of the board for now. 
 
 \begin{remark}
 The audio PA (LM386, U4) has plenty of amplification. If you want to use head-phones, you may leave R13 and C16 off the board. You may add them later if more audio amplification is needed.
@@ -270,7 +267,9 @@ If your output is way less, measure the peak voltages at the PA-output and LP-in
 
 \clearpage
 \section{Usage} \label{sec:user}
-Handling a feature-rich TRX using a single rotary encoder with a single push-button is kind of challenging. I've designed a two-level menu navigation that puts everything needed frequently in the first level (blue in figure \ref{fig:menu}) and everything else in a second level. This keeps the navigation fast for the frequently used options. 
+Handling a feature-rich TRX using a single rotary encoder with a single push-button is kind of challenging. I've designed a two-level menu navigation that puts everything, that is needed frequently, in the first level (blue in figure \ref{fig:menu}) and everything else in a second level. This keeps the navigation fast for frequently used options. 
+
+The second menu level (red in figure \ref{fig:menu}) contains all settings that are usually not touched during the operation. They concern the basic setup and alignment of the TRX. 
 
 \begin{figure}[!ht]
  \centering
@@ -284,18 +283,23 @@ Handling a feature-rich TRX using a single rotary encoder with a single push-but
   \node (rit) [menu] {RIT};   
   \node (speed) [menu, right of=rit] {CW Speed}; 
   \node (step) [menu, right of=speed]{Step size};
-  \node (vfo) [menu, below of=step] {VFO};
-  \node (band) [menu, left of=vfo] {Band};
-  \node (setup) [menu, left of=band] {Setup};
+  \node (vfo) [menu, right of=step] {VFO};
+  \node (band) [menu, right of=vfo] {Band};
+  \node (setup) [menu, right of=band] {Setup};
   
-  \node (cw) [submenu, below of=setup] {CW Mode}; 
-  \node (tone) [submenu, right of=cw] {CW Tone}; 
-  \node (level) [submenu, right of=tone] {CW Level}; 
-  \node (text) [submenu, right of=level] {CW Text}; 
-  \node (meter) [submenu, below of=text] {Meter};
-  \node (hold) [submenu, left of=meter] {TX Hold}; 
-  \node (greet) [submenu, left of=hold] {Greet};
-  \node (pll) [submenu, left of=greet] {PLL Correction};
+  \node (quick) [submenu, below of=setup] {Qick-set};
+  \node (cw) [submenu, left of=quick] {CW Mode}; 
+  \node (tone) [submenu, left of=cw] {CW Tone}; 
+  \node (level) [submenu, left of=tone] {CW Level}; 
+  \node (text) [submenu, left of=level] {CW Text}; 
+  \node (clr) [submenu, left of=text] {Clr. CWT};
+  \node (meter) [submenu, below of=clr] {Meter};
+  \node (hold) [submenu, right of=meter] {TX Hold}; 
+  \node (greet) [submenu, right of=hold] {Greet};
+  \node (enc) [submenu, right of=greet] {Enc.Type};
+  \node (pll) [submenu, right of=enc] {PLL Cor.};
+  \node (reset) [submenu, right of=pll] {Reset};
+  
   
   \path[->,thick]
     (rit) edge (speed)
@@ -303,22 +307,87 @@ Handling a feature-rich TRX using a single rotary encoder with a single push-but
 	(step) edge (vfo)
 	(vfo) edge (band)
 	(band) edge (setup)
-	(setup) edge (rit);
+	(setup) edge[bend right] (rit);
 	
   \path[->,thick,dashed]
-    (setup) edge (cw);
+    (setup) edge (quick);
   \path[->,thick]
+        (quick) edge (cw)
     	(cw) edge (tone)
     	(tone) edge (level) 
     	(level) edge (text)
-    	(text) edge (meter) 
+    	(text) edge (clr)
+    	(clr) edge (meter) 
     	(meter) edge (hold)
     	(hold) edge (greet) 
-    	(greet) edge (pll) 
-    	(pll) edge (cw);
+    	(greet) edge (enc)
+    	(enc) edge (pll)
+    	(pll) edge (reset) 
+    	(reset) edge (quick);
  \end{tikzpicture}
  \caption{Menu navigation} \label{fig:menu}
 \end{figure}
+
+To enter the menu, just click the center button on the rotary encoder. You will land on either the RIT setting or on the last modified setting. Using the rotary-encoder you can navigate through the first menu level. To change a settings, click the center button again. You can now change the selected setting using the rotary encoder. To finish the setting and leave the menu, click on the center button again.
+
+To enter the second menu-level, enter the first level by clicking on the center button and select the menu entry \texttt{Setup}. Click on the center button again to enter the second-level menu. You will land on the \texttt{Quick-set} setting. You may now navigate the second menu-level using the rotary encoder. Changing and leaving the second-level menu works in the same way as the first-level menu. 
+
+\paragraph{Receive/Transmit offset (RIT)}
+[TODO]
+
+\paragraph{CW speed}
+[TODO]
+
+\paragraph{Tuning step-size}
+[TODO]
+
+\paragraph{VFO}
+[TODO]
+
+\paragraph{Band}
+[TODO]
+
+\paragraph{Setup}
+[TODO]
+
+\paragraph{Quick-set}
+(Planned Feature) The Quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature.
+
+\paragraph{Keyer mode}
+[TODO] Straight Key, Iambic, (planned) Iambic reverse, (planned) auto detect
+
+\paragraph{CW side-tone frequency}
+[TODO]
+
+\paragraph{CW side-tone level}
+[TODO]
+
+\paragraph{Keyer memory}
+[TODO]
+
+\paragraph{Clear keyer memory}
+[TODO]
+
+\paragraph{Meter selection}
+[TODO]
+
+\paragraph{TX-hold time}
+[TODO]
+
+\paragraph{Greet text}
+[TODO]
+
+\paragraph{Encoder type}
+[TODO]
+
+\paragraph{PLL correction}
+[TODO]
+
+\paragraph{Factory reset}
+[TODO]
+
+
+
 
 
 \clearpage

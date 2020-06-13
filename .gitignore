@@ -9,6 +9,7 @@ doc/*.out
 doc/*.toc
 doc/*.synctex.gz
 doc/*.pdf
+doc/*.dvi
 doc/*.png
 !doc/fig/*.pdf
 !doc/fig/*.png
