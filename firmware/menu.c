@@ -100,7 +100,7 @@ void menu_update(RotButton button, int8_t delta)
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_BAND;
       trx_set_state(TRX_RX);
-    } else if ((delta > 0) && (trx_band() < BAND_15)) {
+    } else if ((delta > 0) && (trx_band() < BAND_10)) {
       trx_set_band(trx_band()+1);
     } else if ((delta < 0) && (trx_band() > BAND_80)) {
       trx_set_band(trx_band()-1);

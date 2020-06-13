@@ -23,17 +23,17 @@ void band_set(Band band) {
   // Enable relais for each band
   switch (band) {
     case BAND_80:
+    case BAND_60:
       BAND_80_PORT |= (1 << BAND_80_BIT);
       break;
-    case BAND_60:
     case BAND_40:
+    case BAND_30:
       BAND_60_40_PORT |= (1 << BAND_60_40_BIT);
       break;
-    case BAND_30:
     case BAND_20:
+    case BAND_17:
       BAND_30_20_PORT |= (1 << BAND_30_20_BIT);
       break;
-    case BAND_17:
     case BAND_15:
     case BAND_12:
     case BAND_10:

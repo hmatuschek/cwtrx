@@ -76,14 +76,14 @@ ISR(ADC_vect) {
     }
   } else if (METER_VOLTAGE == _meter_type) {
     int32_t temp = v;
-    // Assuming voltage divider -> 2.2k + 1k to GND.
-    temp *= 160; temp /= 1024;
+    // Assuming voltage divider -> 47k + 4.7k to GND.
+    temp *= 500; temp /= 1024;
     _meter_value = temp;
   } else if (METER_TEMP == _meter_type) {
     // Vref = 1.1V, 314mV @ 25C, 1mV/C
     int16_t temp = v; temp -= 292; // (== -314mV)
-    // temp in mK
-    temp = 2731 + (10*temp)/93;
+    // temp in 100 mC
+    temp = 250 + (100*temp)/930;
     _meter_value = temp;
   }
 }

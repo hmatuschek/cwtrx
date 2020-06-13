@@ -6,6 +6,7 @@ doc/sim/*
 doc/*.aux
 doc/*.log
 doc/*.out
+doc/*.toc
 doc/*.synctex.gz
 doc/*.pdf
 doc/*.png

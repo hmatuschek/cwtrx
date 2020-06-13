@@ -59,7 +59,7 @@
  * sideband. */
 typedef struct {
   Band      band;
-  uint32_t  band_freq[7];
+  uint32_t  band_freq[9];
 } VFOSettings;
 
 /** Holds the entire settings for the TRX in memory. */
@@ -97,9 +97,9 @@ typedef struct {
 TRXSettings _ee_trx EEMEM = {
   VFO_MODE_A,
   { BAND_80,
-    {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN} },
+    {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
   { BAND_80,
-    {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN} },
+    {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
   TRX_STEP_50,
   TRX_DEFAULT_RIT,
   1,
@@ -266,6 +266,8 @@ void trx_rx() {
   if (TRX_TX == _state) {
     _tx_hold_count = 0;
     _state = TRX_HOLD_TX;
+    // update VFO frequencies
+    _trx_update_vfo = 1;
   }
 }
 
@@ -608,8 +610,6 @@ ISR(TIMER2_COMPA_vect) {
         band_set(_trx.vfo_a.band);
       // Go to RX state
       _state = TRX_RX;
-      // update VFO frequencies
-      _trx_update_vfo = 1;
       // reset hold count
       _tx_hold_count=0;
     }
