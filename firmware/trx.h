@@ -6,6 +6,7 @@
 #include "band.h"
 #include "keyer.h"
 #include "meter.h"
+#include "rot.h"
 
 #define TRX_TX_PORT PORTB
 #define TRX_TX_DDR  DDRB
@@ -48,6 +49,7 @@ typedef enum {
 #define TRX_GREET_MAXLEN  8
 
 void trx_init();
+void trx_factory_reset();
 
 void trx_tx();
 void trx_rx();
@@ -85,6 +87,8 @@ uint8_t trx_tx_enabled();
 void trx_set_tx_enabled(uint8_t enabled);
 uint8_t *trx_greet();
 void trx_update_greet();
+EncoderType trx_rot_type();
+void trx_set_rot_type(EncoderType type);
 int32_t trx_pll_correction();
 void trx_set_pll_correction(int32_t pptm);
 

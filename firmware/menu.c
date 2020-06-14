@@ -255,7 +255,7 @@ void menu_update(RotButton button, int8_t delta)
       _menu_state = MENU_SET_GREET;
       _menu_cursor = 0;
     } else if (delta > 0) {
-      _menu_state = MENU_PLL_CORRECTION;
+      _menu_state = MENU_ROT_TYPE;
     } else {
       _menu_state = MENU_TX_HOLD;
     }
@@ -279,13 +279,30 @@ void menu_update(RotButton button, int8_t delta)
     } else if ((delta<0) && (trx_greet()[_menu_cursor] > 0x20)) {
       trx_greet()[_menu_cursor]--;
     }
+  } else if (MENU_ROT_TYPE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SET_ROT_TYPE;
+    } else if (delta>0) {
+      _menu_state = MENU_PLL_CORRECTION;
+    } else {
+      _menu_state = MENU_SET_GREET;
+    }
+  } else if (MENU_SET_ROT_TYPE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SETUP;
+      trx_set_state(TRX_RX);
+    } else if ((delta>0) && (trx_rot_type() < ROT_TYPE_B_Rev)) {
+      trx_set_rot_type(trx_rot_type()+1);
+    } else if ((delta<0) && (trx_rot_type() > 0)) {
+      trx_set_rot_type(trx_rot_type()-1);
+    }
   } else if (MENU_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_PLL_CORRECTION;
     } else if (delta > 0) {
-      _menu_state = MENU_CW_MODE;
+      _menu_state = MENU_RESET;
     } else {
-      _menu_state = MENU_GREET;
+      _menu_state = MENU_ROT_TYPE;
     }
   } else if (MENU_SET_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
@@ -296,6 +313,17 @@ void menu_update(RotButton button, int8_t delta)
     } else if ((delta<0) && (trx_pll_correction()>-1000L)) {
       trx_set_pll_correction(trx_pll_correction()+delta);
     }
+  } else if (MENU_RESET == _menu_state) {
+    if (ROT_BUTTON_LONG == button) {
+      _menu_state = MENU_RESET_DONE;
+      trx_factory_reset();
+    } else if (delta > 0) {
+      _menu_state = MENU_CW_MODE;
+    } else {
+      _menu_state = MENU_PLL_CORRECTION;
+    }
+  } else if (MENU_RESET_DONE == _menu_state) {
+    // trap.
   }
   display_update();
 }

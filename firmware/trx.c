@@ -13,6 +13,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 #include <string.h>
 
 // AVR comp for QtCreator
@@ -30,6 +31,7 @@
 #define TRX_DEFAULT_METER_TYPE     METER_SIG
 #define TRX_DEFAULT_TX_HOLD        50
 #define TRX_DEFAULT_PLL_CORRECTION 0
+#define TRX_DEFAULT_ROT_TYPE       ROT_TYPE_A
 #define TRX_DEFAULT_RIT            0
 #define TRX_UPDATE_PERIOD          500
 #define TRX_SAVE_PERIOD            10000UL
@@ -89,6 +91,8 @@ typedef struct {
   uint16_t    tx_hold;
   /** PLL reference frequeny correction in 0.1ppm. */
   int32_t     pll_correction;
+  /** Type of rotary encoder. */
+  uint8_t     rot_type;
   uint8_t     cwtext[TRX_CWTEXT_MAXLEN];
   uint8_t     greet[8];
 } TRXSettings;
@@ -110,9 +114,32 @@ TRXSettings _ee_trx EEMEM = {
   TRX_DEFAULT_METER_TYPE,
   TRX_DEFAULT_TX_HOLD,
   TRX_DEFAULT_PLL_CORRECTION,
+  TRX_DEFAULT_ROT_TYPE,
   {},
   {' ','D','M','3','M','A','T',' '}
 };
+
+const TRXSettings _prog_trx PROGMEM = {
+  VFO_MODE_A,
+  { BAND_80,
+    {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
+  { BAND_80,
+    {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
+  TRX_STEP_50,
+  TRX_DEFAULT_RIT,
+  1,
+  TRX_DEFAULT_CW_TONE,
+  TRX_DEFAULT_CW_LEVEL,
+  TRX_DEFAULT_CW_SPEED,
+  TRX_DEFAULT_CW_MODE,
+  TRX_DEFAULT_METER_TYPE,
+  TRX_DEFAULT_TX_HOLD,
+  TRX_DEFAULT_PLL_CORRECTION,
+  TRX_DEFAULT_ROT_TYPE,
+  {},
+  {' ','D','M','3','M','A','T',' '}
+};
+
 
 TRXSettings _trx;
 
@@ -136,12 +163,13 @@ void trx_init() {
   TRX_KEY_PORT &= ~(1 << TRX_KEY_BIT);
 
   lcd_init();
-  rot_init();
+  rot_init(ROT_TYPE_A);
 
   // Load settings from eeprom
   eeprom_read_block(&_trx, &_ee_trx, sizeof(TRXSettings));
 
   meter_init(_trx.meter_type);
+  rot_set_type(_trx.rot_type);
 
   lcd_clear();
   lcd_home();
@@ -201,6 +229,13 @@ void trx_init() {
   //PRR |= ( (1 << PRTIM0) | (1 << PRUSART0) | (1 << PRSPI));
 }
 
+
+void trx_factory_reset() {
+  cli();
+  memcpy_P(&_trx, &_prog_trx, sizeof(TRXSettings));
+  eeprom_write_block(&_trx, &_ee_trx, sizeof(TRXSettings));
+  sei();
+}
 
 uint32_t trx_dial_freq() {
   if ((VFO_MODE_A == _trx.vfo_mode) || ((TRX_RX == _state) && (VFO_MODE_SPLIT == _trx.vfo_mode))) {
@@ -505,6 +540,15 @@ void trx_update_greet() {
   sei();
 }
 
+EncoderType trx_rot_type() {
+  return _trx.rot_type;
+}
+void trx_set_rot_type(EncoderType type) {
+  _trx.rot_type = type;
+  cli();
+  eeprom_write_block(&(_trx.rot_type), &(_ee_trx.rot_type), sizeof(uint8_t));
+  sei();
+}
 int32_t trx_pll_correction() {
   return _trx.pll_correction;
 }

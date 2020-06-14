@@ -112,78 +112,88 @@ void display_menu_clear_cw_text();
 void display_menu_meter();
 void display_menu_tx_hold();
 void display_menu_greet();
+void display_menu_rot_type();
 void display_menu_pll_correction();
+void display_menu_reset();
 
 
 void display_menu(MenuState state) {
   lcd_hidecursor();
   switch (state) {
-    case MENU_RIT:
-    case MENU_SET_RIT:
-      display_menu_rit();
-      break;
-    case MENU_STEP:
-    case MENU_SET_STEP:
-      display_menu_step();
-      break;
-    case MENU_VFO:
-    case MENU_SET_VFO:
-      display_menu_vfo();
-      break;
-    case MENU_BAND:
-    case MENU_SET_BAND:
-      display_menu_band();
-      break;
-    case MENU_SETUP:
-      display_menu_setup();
-      break;
-    case MENU_CW_MODE:
-    case MENU_SET_CW_MODE:
-      display_menu_cw_mode();
-      break;
-    case MENU_CW_SPEED:
-    case MENU_SET_CW_SPEED:
-      display_menu_cw_speed();
-      break;
-    case MENU_CW_TONE:
-    case MENU_SET_CW_TONE:
-      display_menu_cw_tone();
-      break;
-    case MENU_CW_LEVEL:
-    case MENU_SET_CW_LEVEL:
-      display_menu_cw_level();
-      break;
-    case MENU_CW_TEXT:
-    case MENU_SET_CW_TEXT:
-    case MENU_SET_CW_TEXT_CHAR:
-      display_menu_cw_text();
-      break;
-    case MENU_CLEAR_CW_TEXT:
-    case MENU_CLEAR_CW_TEXT_NO:
-    case MENU_CLEAR_CW_TEXT_YES:
-      display_menu_clear_cw_text();
-      break;
-    case MENU_METER:
-    case MENU_SET_METER:
-      display_menu_meter();
-      break;
-    case MENU_TX_HOLD:
-    case MENU_SET_TX_HOLD:
-      display_menu_tx_hold();
-      break;
-    case MENU_TX_ENABLE:
-    case MENU_SET_TX_ENABLE:
-      display_menu_tx_enabled();
-      break;
-    case MENU_GREET:
-    case MENU_SET_GREET:
-    case MENU_SET_GREET_CHAR:
-      display_menu_greet();
-      break;
-    case MENU_PLL_CORRECTION:
-    case MENU_SET_PLL_CORRECTION:
-      display_menu_pll_correction();
-      break;
+  case MENU_RIT:
+  case MENU_SET_RIT:
+    display_menu_rit();
+    break;
+  case MENU_STEP:
+  case MENU_SET_STEP:
+    display_menu_step();
+    break;
+  case MENU_VFO:
+  case MENU_SET_VFO:
+    display_menu_vfo();
+    break;
+  case MENU_BAND:
+  case MENU_SET_BAND:
+    display_menu_band();
+    break;
+  case MENU_SETUP:
+    display_menu_setup();
+    break;
+  case MENU_CW_MODE:
+  case MENU_SET_CW_MODE:
+    display_menu_cw_mode();
+    break;
+  case MENU_CW_SPEED:
+  case MENU_SET_CW_SPEED:
+    display_menu_cw_speed();
+    break;
+  case MENU_CW_TONE:
+  case MENU_SET_CW_TONE:
+    display_menu_cw_tone();
+    break;
+  case MENU_CW_LEVEL:
+  case MENU_SET_CW_LEVEL:
+    display_menu_cw_level();
+    break;
+  case MENU_CW_TEXT:
+  case MENU_SET_CW_TEXT:
+  case MENU_SET_CW_TEXT_CHAR:
+    display_menu_cw_text();
+    break;
+  case MENU_CLEAR_CW_TEXT:
+  case MENU_CLEAR_CW_TEXT_NO:
+  case MENU_CLEAR_CW_TEXT_YES:
+    display_menu_clear_cw_text();
+    break;
+  case MENU_METER:
+  case MENU_SET_METER:
+    display_menu_meter();
+    break;
+  case MENU_TX_HOLD:
+  case MENU_SET_TX_HOLD:
+    display_menu_tx_hold();
+    break;
+  case MENU_TX_ENABLE:
+  case MENU_SET_TX_ENABLE:
+    display_menu_tx_enabled();
+    break;
+  case MENU_GREET:
+  case MENU_SET_GREET:
+  case MENU_SET_GREET_CHAR:
+    display_menu_greet();
+    break;
+  case MENU_ROT_TYPE:
+  case MENU_SET_ROT_TYPE:
+    display_menu_rot_type();
+    break;
+  case MENU_PLL_CORRECTION:
+  case MENU_SET_PLL_CORRECTION:
+    display_menu_pll_correction();
+    break;
+  case MENU_RESET:
+  case MENU_RESET_DONE:
+    display_menu_reset();
+    break;
   }
 }
 
@@ -496,12 +506,39 @@ void display_menu_greet() {
   lcd_setcursor(0,2);
   for (uint8_t i=0; i<8; i++)
     lcd_data(trx_greet()[i]);
-  if (MENU_SET_CW_TEXT == menu_state()) {
+  if (MENU_SET_GREET == menu_state()) {
     lcd_setcursor(menu_cursor(),2);
     lcd_showcursor();
-  } else if (MENU_SET_CW_TEXT_CHAR == menu_state()) {
+  } else if (MENU_SET_GREET_CHAR == menu_state()) {
     lcd_setcursor(menu_cursor(),2);
     lcd_blinkcursor();
+  }
+}
+
+void display_menu_rot_type() {
+  lcd_string("Enc.Type");
+  lcd_setcursor(0,2);
+  if (MENU_SET_ROT_TYPE == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  switch (trx_rot_type()) {
+  case ROT_TYPE_A:
+    lcd_setcursor(6,2);
+    lcd_data('A');
+    break;
+  case ROT_TYPE_A_Rev:
+    lcd_setcursor(2,2);
+    lcd_string("Rev. A");
+    break;
+  case ROT_TYPE_B:
+    lcd_setcursor(6,2);
+    lcd_data('B');
+    break;
+  case ROT_TYPE_B_Rev:
+    lcd_setcursor(2,2);
+    lcd_string("Rev. B");
+    break;
   }
 }
 
@@ -513,5 +550,16 @@ void display_menu_pll_correction() {
   }
   lcd_setcursor(1,2);
   lcd_print_pllcorr(trx_pll_correction());
+}
+
+void display_menu_reset() {
+  lcd_string("Reset?");
+  if (MENU_RESET_DONE == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_string("Lng Prss");
+  } else {
+    lcd_setcursor(0,2);
+    lcd_string("OK > Off");
+  }
 }
 

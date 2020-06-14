@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8)
-project(qcx-trx)
+project(cwtrx)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
