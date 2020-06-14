@@ -78,16 +78,16 @@ void display_voltage(uint8_t v) {
 
 void display_temp(uint16_t v) {
   lcd_setcursor(0, 2);
-  // mK -> deg C
-  int16_t t = (v-3720)/10;
   // sign
-  uint8_t n = (t<0) ? '-' : ' ';
-  t = (t<0) ? -t : t;
-  if (t>99)
-    t = 99;
+  uint8_t n = (v<0) ? '-' : ' ';
+  // ABS
+  v = (v<0) ? -v : v;
+  v /= 10;
+  if (v>99)
+    v = 99;
   // digits
-  uint8_t a = t/10;
-  uint8_t b = '0'+(t%10);
+  uint8_t a = v/10;
+  uint8_t b = '0'+(v%10);
   a = (0!=a) ? ('0'+a) : ' ';
   lcd_data(n);
   lcd_data(a);

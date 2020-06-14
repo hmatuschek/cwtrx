@@ -13,7 +13,7 @@
 #define ROT_M_BIT  PC3
 
 typedef enum {
-  ROT_TYPE_A,
+  ROT_TYPE_A = 0,
   ROT_TYPE_A_Rev,
   ROT_TYPE_B,
   ROT_TYPE_B_Rev

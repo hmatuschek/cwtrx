@@ -207,14 +207,12 @@ The PA section consist of a 74HCT00 as a pre-driver, 4 BS170 mosfets as PA Trans
 The complete TRX is powered from the barrel-jack J3 and the supply voltage is passed to the RX-board via J11. 
 
 \begin{remark}
-Before assembling the low-pass filers on the board. Please assemble them ugly-style on a piece of PCB material and measure their properties using a network analyzer or spectrum analyzer. Being Chebyshev low-pass filter, the exact component values are critical!
+ Before assembling the low-pass filers on the board. Please assemble them ugly-style on a piece of PCB material and measure their properties using a network analyzer or spectrum analyzer. Being Chebyshev low-pass filter, the exact component values are critical!
 \end{remark}
 
  If no measurement equipment is present. Please subtract one winding from the given values below. The number of turns for each core was determined using the AL-value provided by the manufacturer. In my experience, this leads to an slightly overestimation of the number of turns by about one. Moreover, you are probably more willing to risk a lower stop-band suppression rather than an increased damping in the pass band.
  
- \begin{remark}
  The diode D4 is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} or 1A \emph{träge} fuse will do.
- \end{remark}
  
 \subsection{PA/LP Component List}  \label{sec:pacomp}
 \begin{longtable}{|l|p{6cm}|l|l|} \hline 

@@ -28,7 +28,7 @@
 #define TRX_DEFAULT_CW_LEVEL       255
 #define TRX_DEFAULT_CW_SPEED       10
 #define TRX_DEFAULT_CW_MODE        KEYER_MODE_STRAIGHT
-#define TRX_DEFAULT_METER_TYPE     METER_SIG
+#define TRX_DEFAULT_METER_TYPE     METER_VOLTAGE
 #define TRX_DEFAULT_TX_HOLD        50
 #define TRX_DEFAULT_PLL_CORRECTION 0
 #define TRX_DEFAULT_ROT_TYPE       ROT_TYPE_A
@@ -155,12 +155,12 @@ volatile uint8_t _trx_save_freq;
 
 
 void trx_init() {
-  // Config tx pin & clear output (RX)
-  TRX_TX_DDR |= (1 << TRX_TX_BIT);
-  TRX_TX_PORT &= ~(1 << TRX_TX_BIT);
   // Config key pin & clear output
   TRX_KEY_DDR |= (1 << TRX_KEY_BIT);
   TRX_KEY_PORT &= ~(1 << TRX_KEY_BIT);
+  // Config tx pin & set output (mute)
+  TRX_TX_DDR |= (1 << TRX_TX_BIT);
+  TRX_TX_PORT |= (1 << TRX_TX_BIT);
 
   lcd_init();
   rot_init(ROT_TYPE_A);
@@ -225,8 +225,11 @@ void trx_init() {
 
   display_update();
 
-  // Power reduction, disable Timer 0, UART 0, SPI
-  //PRR |= ( (1 << PRTIM0) | (1 << PRUSART0) | (1 << PRSPI));
+  // Clear TX line -> unmute
+  TRX_TX_PORT &= ~(1 << TRX_TX_BIT);
+
+  // Power & noise reduction, disable Timer 0, UART 0, SPI
+  PRR |= ( (1 << PRTIM0) | (1 << PRUSART0) | (1 << PRSPI));
 }
 
 
@@ -275,13 +278,14 @@ void trx_set_state(TRXState state) {
 void trx_tx() {
   if (_trx.tx_enabled && ((TRX_RX == _state) || (TRX_HOLD_TX == _state)) ) {
     _state = TRX_TX;
+    // Enable tx (mute)
+    TRX_TX_PORT |= (1 << TRX_TX_BIT);
     // Check if band needs to be changed -> change band
     if ( (VFO_MODE_SPLIT == trx_vfo_mode()) && (_trx.vfo_a.band != _trx.vfo_b.band))
       band_set(_trx.vfo_b.band);
     // update VFO frequencies
     _trx_update_vfo = 1;
-    // Enable tx
-    TRX_TX_PORT |= (1 << TRX_TX_BIT);
+    // Key
     TRX_KEY_PORT |= (1 << TRX_KEY_BIT);
     tone_on();
   } else if ((TRX_RX == _state) || (TRX_HOLD_TX == _state)) {
@@ -422,6 +426,8 @@ Band trx_band() {
 }
 
 void trx_set_band(Band band) {
+  // Enable tx (mute)
+  TRX_TX_PORT |= (1 << TRX_TX_BIT);
   // Select band and store in EEPROM
   cli();
   if ((VFO_MODE_A == _trx.vfo_mode) || ((TRX_RX == _state) && (VFO_MODE_SPLIT == _trx.vfo_mode))) {
@@ -436,6 +442,8 @@ void trx_set_band(Band band) {
   band_set(band);
   // Update VFO freq
   trx_set_vfo();
+  // Disable tx (unmute)
+  TRX_TX_PORT &= ~(1 << TRX_TX_BIT);
 }
 
 uint16_t trx_tx_hold() {
@@ -545,6 +553,7 @@ EncoderType trx_rot_type() {
 }
 void trx_set_rot_type(EncoderType type) {
   _trx.rot_type = type;
+  rot_set_type(type);
   cli();
   eeprom_write_block(&(_trx.rot_type), &(_ee_trx.rot_type), sizeof(uint8_t));
   sei();

@@ -285,7 +285,7 @@ void menu_update(RotButton button, int8_t delta)
     } else if (delta>0) {
       _menu_state = MENU_PLL_CORRECTION;
     } else {
-      _menu_state = MENU_SET_GREET;
+      _menu_state = MENU_GREET;
     }
   } else if (MENU_SET_ROT_TYPE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
