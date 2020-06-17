@@ -24,6 +24,7 @@
 #define EEMEM
 #endif
 
+#define TRX_DEFAULT_QUICK_SET      TRX_QS_NONE
 #define TRX_DEFAULT_CW_TONE        700
 #define TRX_DEFAULT_CW_LEVEL       255
 #define TRX_DEFAULT_CW_SPEED       10
@@ -72,6 +73,8 @@ typedef struct {
   VFOSettings vfo_a;
   /** Settings for the VFO B. */
   VFOSettings vfo_b;
+  /** Quick-set option. */
+  TRXQuickSet quick_set;
   /** Tuing stepsize. */
   TRXStepSize step;
   /** RIT */
@@ -105,6 +108,7 @@ TRXSettings _ee_trx EEMEM = {
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
   TRX_STEP_50,
+  TRX_DEFAULT_QUICK_SET,
   TRX_DEFAULT_RIT,
   1,
   TRX_DEFAULT_CW_TONE,
@@ -126,6 +130,7 @@ const TRXSettings _prog_trx PROGMEM = {
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
   TRX_STEP_50,
+  TRX_DEFAULT_QUICK_SET,
   TRX_DEFAULT_RIT,
   1,
   TRX_DEFAULT_CW_TONE,
@@ -187,6 +192,7 @@ void trx_init() {
   tone_set_frequency(_trx.cw_tone);
   tone_set_volume(_trx.cw_level);
   si5351_init();
+  si5351_set_correction(_trx.pll_correction);
 
   _display_state = _state = TRX_RX;
   _tx_hold_count = 0;
@@ -245,6 +251,17 @@ uint32_t trx_dial_freq() {
     return _trx.vfo_a.band_freq[_trx.vfo_a.band];
   }
   return _trx.vfo_b.band_freq[_trx.vfo_b.band];
+}
+
+TRXQuickSet trx_quickset() {
+  return _trx.quick_set;
+}
+
+void trx_set_quickset(TRXQuickSet quickset) {
+  _trx.quick_set = quickset;
+  cli();
+  eeprom_write_block(&(_trx.quick_set), &(_ee_trx.quick_set), sizeof(TRXQuickSet));
+  sei();
 }
 
 uint8_t trx_rit_sym() {
@@ -636,6 +653,19 @@ void trx_poll()
       uint8_t len = TRX_CWTEXT_MAXLEN;
       for (; (len>0) && (0==_trx.cwtext[len-1]); --len);
       keyer_send_text(_trx.cwtext, len);
+    } else if (ROT_BUTTON_HOLD_TUNE == button) {
+      // Handle quick-set
+      if (delta && (TRX_QS_RIT == _trx.quick_set)) {
+
+      } else if (delta && (TRX_QS_RIT == _trx.quick_set)) {
+
+      } else if (delta && (TRX_QS_STEP == _trx.quick_set)) {
+
+      } else if (delta && (TRX_QS_SPEED == _trx.quick_set)) {
+
+      } else if (delta && (TRX_QS_BAND == _trx.quick_set)) {
+
+      }
     } else if (delta) {
       trx_tune(delta);
       display_frequency();

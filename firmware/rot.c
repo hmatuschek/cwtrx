@@ -69,7 +69,7 @@ void rot_tick() {
       // click (hold less than 2s)
       _button = ROT_BUTTON_CLICK;
     } else if (ROT_BUTTON_HOLD_TUNE == _button) {
-      _button = ROT_BUTTON_NONE;
+      _button = ROT_BUTTON_HOLD_TUNE_DONE;
     }
   } else if (_button_down) {
     // While button down count

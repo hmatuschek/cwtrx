@@ -43,6 +43,14 @@ typedef enum {
   VFO_MODE_SPLIT
 } VFOMode;
 
+typedef enum {
+  TRX_QS_NONE,
+  TRX_QS_RIT,
+  TRX_QS_STEP,
+  TRX_QS_SPEED,
+  TRX_QS_BAND
+} TRXQuickSet;
+
 #define TRX_RIT_MIN -100
 #define TRX_RIT_MAX  100
 #define TRX_CWTEXT_MAXLEN 64
@@ -60,35 +68,53 @@ void trx_set_state(TRXState state);
 
 void trx_tune(int8_t delta);
 uint32_t trx_dial_freq();
+
+TRXQuickSet trx_quickset();
+void trx_set_quickset(TRXQuickSet quickset);
+
 int8_t trx_rit();
 uint8_t trx_rit_sym();
 void trx_set_rit(int8_t off);
+
 void trx_set_vfo();
+
 TRXStepSize trx_tune_step();
 void trx_set_tune_step(TRXStepSize step);
+
 Band trx_band();
 void trx_set_band(Band band);
+
 KeyerMode trx_cw_mode();
 void trx_set_cw_mode(KeyerMode mode);
+
 uint16_t trx_cw_tone();
 void trx_set_cw_tone(uint16_t freq);
+
 uint8_t trx_cw_level();
 void trx_set_cw_level(uint8_t level);
+
 uint8_t trx_cw_speed();
 void trx_set_cw_speed(uint8_t idx);
+
 uint8_t *trx_cwtext();
 void trx_clear_cwtext();
 void trx_update_cwtext();
+
 void trx_set_meter_type(MeterType type);
 MeterType trx_meter_type();
+
 uint16_t trx_tx_hold();
 void trx_set_tx_hold(uint16_t delay);
+
 uint8_t trx_tx_enabled();
 void trx_set_tx_enabled(uint8_t enabled);
+
 uint8_t *trx_greet();
 void trx_update_greet();
+
 EncoderType trx_rot_type();
 void trx_set_rot_type(EncoderType type);
+
 int32_t trx_pll_correction();
 void trx_set_pll_correction(int32_t pptm);
 
