@@ -113,6 +113,7 @@ void display_menu_meter();
 void display_menu_tx_hold();
 void display_menu_greet();
 void display_menu_reset();
+void display_rot_type();
 void display_menu_pll_correction();
 
 
@@ -184,6 +185,10 @@ void display_menu(MenuState state) {
     case MENU_RESET:
     case MENU_RESETTED:
       display_menu_reset();
+      break;
+    case MENU_ROT_TYPE:
+    case MENU_SET_ROT_TYPE:
+      display_rot_type();
       break;
     case MENU_PLL_CORRECTION:
     case MENU_SET_PLL_CORRECTION:
@@ -509,6 +514,32 @@ void display_menu_reset() {
     lcd_string(" -> Hold");
   else
     lcd_string("Ok > Rbt");
+}
+
+void display_rot_type() {
+  lcd_string("Enc.Type");
+  if (MENU_SET_ROT_TYPE == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  switch (trx_rot_type()) {
+  case ROT_TYPE_A:
+    lcd_setcursor(7,2);
+    lcd_string("A");
+    break;
+  case ROT_TYPE_A_Rev:
+    lcd_setcursor(2,2);
+    lcd_string("A rev.");
+    break;
+  case ROT_TYPE_B:
+    lcd_setcursor(7,2);
+    lcd_string("B");
+    break;
+  case ROT_TYPE_B_Rev:
+    lcd_setcursor(2,2);
+    lcd_string("B rev.");
+    break;
+  }
 }
 
 void display_menu_pll_correction() {

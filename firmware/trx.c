@@ -32,6 +32,7 @@
 #define TRX_DEFAULT_CW_LEVEL       255
 #define TRX_DEFAULT_CW_SPEED       10
 #define TRX_DEFAULT_CW_MODE        KEYER_MODE_STRAIGHT
+#define TRX_DEFAULT_ROT_TYPE       ROT_TYPE_B
 #define TRX_DEFAULT_METER_TYPE     METER_SIG
 #define TRX_DEFAULT_TX_HOLD        50
 #define TRX_DEFAULT_PLL_CORRECTION 0
@@ -73,6 +74,8 @@ typedef struct {
   VFOSettings vfo_b;
   /** Tuing stepsize. */
   TRXStepSize step;
+  /** Encoder type. */
+  EncoderType rot_type;
   /** RIT */
   int8_t      rit;
   /** If true, TX is enabled. */
@@ -102,6 +105,7 @@ TRXSettings _ee_trx EEMEM = {
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN} },
   TRX_STEP_50,
+  TRX_DEFAULT_ROT_TYPE,
   TRX_DEFAULT_RIT,
   1,
   TRX_DEFAULT_CW_TONE,
@@ -122,6 +126,7 @@ const TRXSettings _pp_trx PROGMEM = {
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN} },
   TRX_STEP_50,
+  TRX_DEFAULT_ROT_TYPE,
   TRX_DEFAULT_RIT,
   1,
   TRX_DEFAULT_CW_TONE,
@@ -157,11 +162,12 @@ void trx_init() {
   TRX_KEY_PORT &= ~(1 << TRX_KEY_BIT);
 
   lcd_init();
-  rot_init();
+  rot_init(TRX_DEFAULT_ROT_TYPE);
 
   // Load settings from eeprom
   eeprom_read_block(&_trx, &_ee_trx, sizeof(TRXSettings));
 
+  rot_set_type(_trx.rot_type);
   meter_init(_trx.meter_type);
 
   lcd_clear();
@@ -517,6 +523,10 @@ void trx_update_greet() {
   }
 }
 
+EncoderType trx_rot_type() {
+  return _trx.rot_type;
+}
+
 int32_t trx_pll_correction() {
   return _trx.pll_correction;
 }
@@ -530,6 +540,17 @@ void trx_set_meter_type(MeterType type) {
   meter_set_type(type);
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     eeprom_write_block(&(_trx.meter_type), &(_ee_trx.meter_type), sizeof(MeterType));
+  }
+}
+
+void trx_set_rot_type(EncoderType type) {
+  if (type<ROT_TYPE_A)
+    type = ROT_TYPE_A;
+  if (type>ROT_TYPE_B_Rev)
+    type = ROT_TYPE_B_Rev;
+  _trx.rot_type = type;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.rot_type), &(_ee_trx.rot_type), sizeof(EncoderType));
   }
 }
 

@@ -12,7 +12,16 @@
 #define ROT_B_BIT  PC2
 #define ROT_M_BIT  PC3
 
-void rot_init();
+
+typedef enum {
+  ROT_TYPE_A = 0,
+  ROT_TYPE_A_Rev,
+  ROT_TYPE_B,
+  ROT_TYPE_B_Rev
+} EncoderType;
+
+void rot_init(EncoderType type);
+void rot_set_type(EncoderType type);
 
 typedef enum {
   ROT_BUTTON_NONE = 0,

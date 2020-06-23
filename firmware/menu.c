@@ -284,19 +284,36 @@ void menu_update(RotButton button, int8_t delta)
       trx_eeprom_reset();
       _menu_state = MENU_RESETTED;
     } else if (delta>0) {
-      _menu_state = MENU_PLL_CORRECTION;
+      _menu_state = MENU_ROT_TYPE;
     } else {
       _menu_state = MENU_GREET;
     }
-  } else if (MENU_RESETTED) {
+  } else if (MENU_RESETTED == _menu_state) {
     // Trap. Needs reboot to exit.
+  } else if (MENU_ROT_TYPE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SET_ROT_TYPE;
+    } else if (delta > 0) {
+      _menu_state = MENU_PLL_CORRECTION;
+    } else {
+      _menu_state = MENU_RESET;
+    }
+  } else if (MENU_SET_ROT_TYPE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SETUP;
+      trx_set_state(TRX_RX);
+    } else if ((delta>0) && (trx_rot_type()<ROT_TYPE_B_Rev)) {
+      trx_set_rot_type(trx_rot_type()+1);
+    } else if ((delta<0) && (trx_rot_type()>ROT_TYPE_A)) {
+      trx_set_rot_type(trx_rot_type()-1);
+    }
   } else if (MENU_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_PLL_CORRECTION;
     } else if (delta > 0) {
       _menu_state = MENU_CW_MODE;
     } else {
-      _menu_state = MENU_RESET;
+      _menu_state = MENU_ROT_TYPE;
     }
   } else if (MENU_SET_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {

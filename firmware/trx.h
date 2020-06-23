@@ -6,6 +6,8 @@
 #include "band.h"
 #include "keyer.h"
 #include "meter.h"
+#include "rot.h"
+
 
 #define TRX_TX_PORT PORTD
 #define TRX_TX_DDR  DDRD
@@ -86,6 +88,8 @@ uint8_t trx_tx_enabled();
 void trx_set_tx_enabled(uint8_t enabled);
 uint8_t *trx_greet();
 void trx_update_greet();
+EncoderType trx_rot_type();
+void trx_set_rot_type(EncoderType type);
 int32_t trx_pll_correction();
 void trx_set_pll_correction(int32_t pptm);
 
