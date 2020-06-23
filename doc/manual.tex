@@ -50,7 +50,7 @@
 \begin{abstract}
 This document describes the assembly, alignment and usage of the second revision of my small, portable CW TRX. If you cannot find any \emph{rev 2} markings on your boards, this is the wrong document!
 
-The major difference to the first revision is the mixer. Instead of a 74HC4053, which has some significant damping on higher frequencies, the second revision relies on the famous FST3253 switch. This allows for using the TRX well into the 10m band. Additionally, the board layout has been changed to allow for board-to-board interconnects and proper connectors to ease the assembly of the final TRX. To this end there are only two boards (instead of three) left with a $10\time 8\,cm$ footprint that should squeeze nicely into a $10 \times 10\times 5\,cm$ Fischer-chassis (KOH-2100 + KOH-4100). 
+The major difference to the first revision is the mixer. Instead of a 74HC4053, which has some significant damping on higher frequencies, the second revision relies on the famous FST3253 switch. This allows for using the TRX well into the 10m band. Additionally, the board layout has been changed to allow for board-to-board interconnects and proper connectors to ease the assembly of the final TRX. To this end there are only two boards (instead of three) left with a $10\time 8\,cm$ footprint that could be squeezed into a $10 \times 10\times 5\,cm$ Fischer-chassis (KOH-2100 + KOH-4100). 
 \end{abstract}
 \thispagestyle{empty}
 
@@ -78,7 +78,7 @@ If you got one of the rare TO-220 variant of U10 that connects the metal tab to 
  You may also replace the resistor R43 with a push-button at the front panel to switch the back-light on when needed.
 \end{remark}
  
- Then, assemble the switch plug and (top right corner labeled \emph{SW}). Connect a 12V power-supply (ideally current-limited to not more than 100mA) to the pads of the supply connector (also top-right corner) labeled \emph{+ G}, where the \emph{+} pad is +12V and the \emph{G} pad is ground. 
+ Then, assemble the switch plug and (top right corner labeled \emph{SW}). Connect a $12\,V$ power-supply (ideally current-limited to not more than $100\,mA$) to the pads of the supply connector (also top-right corner) labeled \emph{+ G}, where the \emph{+} pad is $+12\,V$ and the \emph{G} pad is ground. 
 
 \begin{remember}
  The receiver board itself has no reverse-polarity protection. So be careful when connecting the RX board to the power-supply!
@@ -132,7 +132,7 @@ Before soldering the core, make sure the wires are aligned correctly using a mul
 \end{remember}
 
 \subsection{Receiver Test and Alignment}
-Once the receiver is completed, re-connect the top-right pads \emph{+ G} to the power-supply, prepare the volume and head-phone plug. Also connect a piece of coaxial cable to the \emph{RX/GN} pads in the top-left. This is the antenna input for the test. 
+Once the receiver is completed, re-connect the top-right pads \emph{+ G} to the power-supply, prepare the volume and head-phone plug. Also connect a piece of coaxial cable to the \emph{RX/GN} pads in the top-left. This is the antenna input for the test. Depending on the selected band, you may need to increase the current-limit of the power supply to about $120\,mA$. 
 
 \subsubsection{Frequency Alignment}
 If a accurate frequency-counter is at hand, you may start your alignment by fixing the PLL offset. Select the 20m band and tune to $14.0003 MHz$. Then measure the frequency at the USB pad. You should read exactly $14.001 MHz$ (if the CW side-tone frequency is set to $700\,Hz$). If not, enter the Setup menu and select the \emph{PLL correction} option. Now adjust the correction until you read $14.001 MHz$ in the frequency counter.
@@ -249,6 +249,7 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
 11 & C1, C10, C19, C20, C22, C23, C24, C27, C28, C29, C30 & 100n & \\
 1 & C25 & 1u & \\
 1 & C26 & 220u & \\
+1 & L14 & 22u & 07HCP \\
 1 & L13 & 100u & MICC \\
 3 & L1, L5, L9 & 330n & 11T on T37-6 \\
 3 & L2, L6, L10 & 480n & 13T on T37-6 \\
@@ -256,11 +257,11 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
 3 & L4, L8, L12 & 1700n & 21T on T37-2 \\
 1 & T1 & -- & 8T + 8T on FT37-43 \\
 4 & K1, K2, K3, K4 & G6S-2 & \\
-4 & D1, D2, D3, D5 & 1N4148 & \\
+6 & D1, D2, D3, D5, D6, D7 & 1N4148 & \\
 1 & D4 & 1N4001 & \\	
 4 & Q1, Q2, Q3, Q10 & 2N3904 & \\
 6 & Q4, Q6, Q7, Q8, Q9, Q11 & BS170 & \\
-1 & Q5 & BD140 & \\
+1 & Q5 & BD140-16 & \\
 1 & U1 & 74HCT00 & \\
 1 & J1 & BNC & \\
 1 & J2 & 1 x 8 pin-socket & \\
@@ -271,9 +272,13 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
 
 \clearpage
 \section{Final Assembly} \label{sec:box}
-Finally, the board-to-board interconnects are installed. The way these connectors are installed, depends on the chassis and distance between the boards you chose. The example I give here applies to the Fischer KOH-2100 + KOH-4100 kit. This is a nice and compact $10 \times 10 \times 5\,cm$ chassis. The boards slide into the chassis with $2\,cm$ distance. Unfortunately, I was not able to find stackers or long pin-headers with a matching length here in Germany. Have a look at Ebay or at Mouser. Pin headers with insertion lengths of about 18mm should do the trick. I, however, went with stackers of 38mm total length which is is to long and therefore needed to be shortened.
+Finally, the board-to-board interconnects are installed. The way these connectors are installed, depends on the chassis and distance between the boards you chose. The example I give here applies to the Fischer KOH-2100 + KOH-4100 kit. This is a nice and compact $10 \times 10 \times 5\,cm$ chassis. The boards slide into the chassis with $1.5\,cm$ distance. Unfortunately, I was not able to find stackers or long pin-headers with a matching length here in Germany. Have a look at Ebay or at Mouser. Pin headers with insertion lengths of about 18mm should do the trick. I, however, went with stackers of $38\,mm$ total length which is is too long and therefore needed to be shortened.
 
-The easiest way to do that, is to install the pin-sockets on the PA/LP board first and stick the stackers into the sockets. That put the RX board on top. Now carefully heat each of these stackers on the underside of the RX board and gently push the RX board down. Repeat this process until the desired height is achieved. Verify the board-spacing with the chassis. If everything fits nicely, solder the stackers onto the RX board. 
+The easiest way to do that, is to install the pin-sockets on the PA/LP board first. Then cut the top-space away (for stackers)  and stick them into the sockets. Than put the RX board on top. Now carefully insert both bords in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
+
+\begin{warning}
+Do not overheat the stackers/pin headers as the socket may melt. Just tag them in-place and reflow the header connections once the PA-board is removed.
+\end{warning}
 
 \subsection{Final Testing}
 With these stacked boards, it is now time to test the PA and RX/TX switching. Reconnect everything and connect a dummy-load to the output. Measure the RF voltage-drop across the dummy-load (oscilloscope). Alternatively, connect a power/SWR meter between the TRX and dummy-load. You should get about $22\,Vp$ across the dummy-load or about $5\,W$ on transmit, depending on the supply voltage (assuming about $13.8\,V$). On the lower band (e.g., up to $30\,m$) it might even be a little bit more. 
@@ -497,11 +502,12 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 3 & $\square$ & 10u & RAD 10/35 & 0,02 \euro & 0,06 \euro \\
 3 & $\square$ & 100u & RAD 100/16 & 0,03 \euro & 0,09 \euro \\
 1 & $\square$ & 220u & RND 150ECR AY & 0,06 \euro & 0,06 \euro \\ \hline
+1 & $\square$ & 22u & & \euro & \euro \\
 7 & $\square$ & 100u & L-MICC 100µ & 0,27 \euro & 1,89 \euro \\ \hline
 2 & $\square$ & FT37-43 & FT 37-43 & 0,58 \euro & 1,16 \euro \\
 6 & $\square$ & T 37-6 & T 37-6 & 0,78 \euro & 4,68 \euro \\
 6 & $\square$ & T 37-2 & T 37-2 & 0,54 \euro & 3,24 \euro \\ \hline
-5 & $\square$ & 1N4148 & 1N 4148 & 0,02 \euro & 0,10 \euro \\
+7 & $\square$ & 1N4148 & 1N 4148 & 0,02 \euro & 0,14 \euro \\
 1 & $\square$ & 1N4001 & 1N 4001 & 0,02 \euro & 0,02 \euro \\
 7 & $\square$ & BS170 & BS 170 & 0,10 \euro & 0,70 \euro \\
 5 & $\square$ & 2N3904 & 2N 3904 & 0,04 \euro & 0,20 \euro \\
@@ -546,7 +552,7 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 2 & $\square$ & fuse holder (optional) & RND 170-00170 & 0,19 \euro & 0,38 \euro \\
 2 & $\square$ & 2A flink (optional) & ESKA 520.020 & 0,09 \euro & 0,18 \euro \\
 1 & $\square$ & speaker (optional) & LSM-S20K & 2,70 \euro & 2,70 \euro \\ \hline \hline
-\multicolumn{4}{|l}{Total\footnote{Prices may change over time.}} & \multicolumn{2}{r|}{\textbf{85,26 \euro}} \\ \hline
+\multicolumn{4}{|l}{Total\footnote{Prices may change over time.}} & \multicolumn{2}{r|}{\textbf{85,30 \euro}} \\ \hline
 \end{longtable}
 
 \subsection{Shave off some \euro\ from the BOM}

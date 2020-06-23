@@ -3,7 +3,7 @@
 #include "menu.h"
 #include "lcd.h"
 #include "button.h"
-
+#include "config.h"
 
 void display_update() {
   lcd_clear();
@@ -103,6 +103,7 @@ void display_menu_vfo();
 void display_menu_band();
 void display_menu_setup();
 void display_menu_tx_enabled();
+void display_menu_quickset();
 void display_menu_cw_mode();
 void display_menu_cw_speed();
 void display_menu_cw_tone();
@@ -113,6 +114,7 @@ void display_menu_meter();
 void display_menu_tx_hold();
 void display_menu_greet();
 void display_menu_rot_type();
+void display_menu_version();
 void display_menu_pll_correction();
 void display_menu_reset();
 
@@ -138,6 +140,10 @@ void display_menu(MenuState state) {
     break;
   case MENU_SETUP:
     display_menu_setup();
+    break;
+  case MENU_QUICK_SET:
+  case MENU_SET_QUICK_SET:
+    display_menu_quickset();
     break;
   case MENU_CW_MODE:
   case MENU_SET_CW_MODE:
@@ -185,6 +191,9 @@ void display_menu(MenuState state) {
   case MENU_ROT_TYPE:
   case MENU_SET_ROT_TYPE:
     display_menu_rot_type();
+    break;
+  case MENU_VERSION:
+    display_menu_version();
     break;
   case MENU_PLL_CORRECTION:
   case MENU_SET_PLL_CORRECTION:
@@ -353,6 +362,36 @@ void display_menu_tx_enabled() {
   } else {
     lcd_setcursor(5,2);
     lcd_string("OFF");
+  }
+}
+
+void display_menu_quickset() {
+  lcd_string("QuickSet");
+  if (MENU_SET_QUICK_SET == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  switch (trx_quickset()) {
+  case TRX_QS_NONE:
+    lcd_setcursor(4,2);
+    lcd_string("None");
+    break;
+  case TRX_QS_RIT:
+    lcd_setcursor(5,2);
+    lcd_string("RIT");
+    break;
+  case TRX_QS_STEP:
+    lcd_setcursor(4,2);
+    lcd_string("Step");
+    break;
+  case TRX_QS_SPEED:
+    lcd_setcursor(3,2);
+    lcd_string("Speed");
+    break;
+  case TRX_QS_BAND:
+    lcd_setcursor(4,2);
+    lcd_string("Band");
+    break;
   }
 }
 
@@ -542,6 +581,11 @@ void display_menu_rot_type() {
   }
 }
 
+void display_menu_version() {
+  lcd_string("Version:");
+  lcd_setcursor(5,2);
+  lcd_string(VERSION_STRING);
+}
 void display_menu_pll_correction() {
   lcd_string("PLL cor:");
   if (MENU_SET_PLL_CORRECTION == menu_state()) {
@@ -554,12 +598,12 @@ void display_menu_pll_correction() {
 
 void display_menu_reset() {
   lcd_string("Reset?");
-  if (MENU_RESET_DONE == menu_state()) {
+  if (MENU_RESET == menu_state()) {
     lcd_setcursor(0,2);
     lcd_string("Lng Prss");
   } else {
     lcd_setcursor(0,2);
-    lcd_string("OK > Off");
+    lcd_string(" Reboot!");
   }
 }
 

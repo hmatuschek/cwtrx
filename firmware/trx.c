@@ -348,15 +348,13 @@ void trx_set_vfo() {
 
   uint32_t vfo = 4*(dialf-((int16_t)_trx.cw_tone)+10*((int16_t)_trx.rit));
   if ((TRX_TX == _state)) {
-    //si5351_set_freq(0,     SI5351_PLL_FIXED, SI5351_CLK1);
+    si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK2);
     si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK0);
-    si5351_clock_enable(SI5351_CLK2, 0);
     si5351_clock_enable(SI5351_CLK0, 1);
   } else {
-    si5351_set_freq(vfo, SI5351_PLL_FIXED, SI5351_CLK2);
-    //si5351_set_freq(0,   SI5351_PLL_FIXED, SI5351_CLK2);
-    si5351_clock_enable(SI5351_CLK2, 1);
     si5351_clock_enable(SI5351_CLK0, 0);
+    si5351_set_freq(vfo, SI5351_PLL_FIXED, SI5351_CLK2);
+    si5351_clock_enable(SI5351_CLK2, 1);
   }
 }
 
@@ -653,20 +651,31 @@ void trx_poll()
       uint8_t len = TRX_CWTEXT_MAXLEN;
       for (; (len>0) && (0==_trx.cwtext[len-1]); --len);
       keyer_send_text(_trx.cwtext, len);
-    } else if (ROT_BUTTON_HOLD_TUNE == button) {
+    } else if ((ROT_BUTTON_HOLD_TUNE == button) && (TRX_QS_NONE != _trx.quick_set)) {
       // Handle quick-set
       if (delta && (TRX_QS_RIT == _trx.quick_set)) {
-
-      } else if (delta && (TRX_QS_RIT == _trx.quick_set)) {
-
+        if ((delta>0) && (trx_rit() != TRX_RIT_MAX))
+          trx_set_rit(trx_rit()+1);
+        else if ((delta<0) && (trx_rit() != TRX_RIT_MIN))
+          trx_set_rit(trx_rit()-1);
       } else if (delta && (TRX_QS_STEP == _trx.quick_set)) {
-
+        if ((delta > 0) && (trx_tune_step() != TRX_STEP_10k))
+          trx_set_tune_step(trx_tune_step()+1);
+        else if ((delta < 0) && (trx_tune_step() != TRX_STEP_10))
+          trx_set_tune_step(trx_tune_step()-1);
       } else if (delta && (TRX_QS_SPEED == _trx.quick_set)) {
-
+        if ((delta > 0) && (trx_cw_speed() != (KEYER_NUM_SPEED-1)))
+          trx_set_cw_speed(trx_cw_speed()+1);
+        else if ((delta < 0) && (trx_cw_speed() != 0))
+          trx_set_cw_speed(trx_cw_speed()-1);
       } else if (delta && (TRX_QS_BAND == _trx.quick_set)) {
-
+        if ((delta > 0) && (trx_band() != BAND_10))
+          trx_set_band(trx_band()+1);
+        else if ((delta < 0) && (trx_band() != BAND_80))
+          trx_set_band(trx_band()-1);
       }
-    } else if (delta) {
+      display_update();
+    } else if (delta && (ROT_BUTTON_NONE == button)) {
       trx_tune(delta);
       display_frequency();
     } else if (_trx_save_freq) {

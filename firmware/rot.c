@@ -74,6 +74,7 @@ void rot_tick() {
   } else if (_button_down) {
     // While button down count
     if (_button_count < 2000) {
+      // Was turned
       if (_delta) {
         _button = ROT_BUTTON_HOLD_TUNE;
       }
