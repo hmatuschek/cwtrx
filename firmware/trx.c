@@ -549,6 +549,7 @@ void trx_set_rot_type(EncoderType type) {
   if (type>ROT_TYPE_B_Rev)
     type = ROT_TYPE_B_Rev;
   _trx.rot_type = type;
+  rot_set_type(type);
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
     eeprom_write_block(&(_trx.rot_type), &(_ee_trx.rot_type), sizeof(EncoderType));
   }

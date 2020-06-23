@@ -50,9 +50,9 @@ void rot_tick() {
   } else {
     if ((0 == _last_a) && (1 == a)) {
       if (ROT_TYPE_B == _type)
-        _delta += ( (1 == b) ? -1 : +1 );
-      else
         _delta += ( (1 == b) ? +1 : -1 );
+      else
+        _delta += ( (1 == b) ? -1 : +1 );
     }
   }
 
