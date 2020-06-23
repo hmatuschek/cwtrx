@@ -1,11 +1,10 @@
-\documentclass[10pt, a4paper]{scrartcl}
+\documentclass[10pt, a4paper,twoside,openright]{scrartcl}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{float}
-\usepackage{geometry}
-\usepackage[utf8]{inputenc}
+\usepackage[top=2cm,bottom=3cm,outer=2cm,inner=3cm]{geometry}\usepackage[utf8]{inputenc}
 \usepackage{hyperref}
 \usepackage[multiple]{footmisc}
 \usepackage{parskip}
@@ -43,7 +42,6 @@
 \author{Hannes Matuschek -- DM3MAT\\\texttt{<dm3mat [at] darc [dot] de>}\\\texttt{https://dm3mat.darc.de/cw2019}}
 \date{\today}
 
-
 \begin{document}
 \maketitle
 
@@ -53,16 +51,23 @@ This document describes the assembly, alignment and usage of the second revision
 The major difference to the first revision is the mixer. Instead of a 74HC4053, which has some significant damping on higher frequencies, the second revision relies on the famous FST3253 switch. This allows for using the TRX well into the 10m band. Additionally, the board layout has been changed to allow for board-to-board interconnects and proper connectors to ease the assembly of the final TRX. To this end there are only two boards (instead of three) left with a $10\time 8\,cm$ footprint that could be squeezed into a $10 \times 10\times 5\,cm$ Fischer-chassis (KOH-2100 + KOH-4100). 
 \end{abstract}
 \thispagestyle{empty}
+\vfill
+\begin{center}
+ \includegraphics[width=0.7\linewidth]{fig/complete_small.png}
+\end{center}
 
 
-\pagebreak
+
+\cleardoublepage
 \tableofcontents
 \thispagestyle{empty}
 
-\clearpage
+\cleardoublepage
 \section{Receiver \& Controller Board} \label{sec:rx}
- [TODO RX Description]
-
+ The receiver and controller board houses the majority of the TRX circuitry. The receiver is a direct conversion receiver using the \texttt{FST3253} CMOS switch as a sample-hold mixer (in conjunction with \texttt{C4-C7}). The latter takes two VFO input signals with $90^\circ$ phase difference and produces four mixing products with $0^\circ$, $90^\circ$, $180^\circ$ and $270^\circ$ phase shifts. These signal pairs ($0^\circ$ + $180^\circ$) and ($90^\circ$ + $270^\circ$) are fed into two independent difference-amplifiers (\texttt{U6A}, \texttt{U6B}) producing two $90^\circ$ phase-shifted audio signals (for USB, $-90^\circ$ for LSB). The following phase-shift-network \texttt{U7} \& \texttt{U8} then shifts back the audio phase by $-90^\circ$ at $700\,Hz$. Finally the resulting signals are added at \texttt{RV3}. Here the USB signals will interfere constructively while the LSB signals will cancel out. This phasing method allows for an unwanted side-band suppression in a direct conversion receiver. The next stages (\texttt{U3} \& \texttt{U5}) will filter and amplify audio signals near $700\,Hz$, which are then fed into the audio PA \texttt{U4}. 
+ 
+ The controller and VFO section of the board consists of a \texttt{ATMega 328P} MCU controlling the \texttt{SI5351} PLL oscillator. The \texttt{CLK2} signal of the PLL drives the two flip-flops \texttt{U9}, which divide the \texttt{CLK2} frequency by four and produce a proper $90^\circ$ phase-shifted signal for the mixer.
+ 
 \subsection{Controller Assembly}
  In a first step, the controller section of the receiver board is assembled. Install C2, C26, J7 connector, L2, C40, C41, C42, U10, J10, C14, J3, R3, C46, R4, U11 + Socket, LCD1 connector, R43, R5, RV4, J9 connector, R41, R40, C39 \& U9 first. 
 
@@ -115,15 +120,17 @@ Before starting to assemble the receiver, disconnect everything from the board. 
 
 In a first step, install the SMD SOIC-16 FST3253 mixer. 
 
+\begin{warning}
+ Be careful! The SI5351 as well as the FST3253 are \textbf{very} sensitive to electrostatic discharge (ESD). Wear an antistatic wrist wrap and use an antistatic mat (if available) and avoid wearing whoole or sythetic fibers. I personally destroyed two FST3253 that way. 
+\end{warning}
+
 \paragraph{If you never soldered SMD components before} It is surprisingly simple. Get a sharp soldering-iron tip and thin solder (e.g., $0.75mm$) as well as plenty of flux. Put a lot of flux on the pads. Then put a small amount of solder on one of the pins, for example pin 1 in the bottom-right corner. Pick up the IC with pointy tweezers and place it on the board. Verify the orientation and alignment of the IC. Solder only pin 1 to the board by heating the pad and pushing the IC on the board. Then take a magnifying glass and verify the alignment of all pins with their pads. If needed, reheat pad 1 and improve the alignment. Once the alignment is right, you can start to solder the remaining pads. You do not need much solder! And remember: The flux will do all the work for you. If you got a solder-bridge between two pins, grab some desoldering-wig and remove the solder. 
 
-Once the mixer is installed, it does not matter in which order the next components are installed. Complete the assembly of the board but leave the board-to-board interconnects (labeled \emph{TX, RX, +G} and the unlabeled 10-pin connector at the bottom) of the board for now. They will added in the final assembly step later.
+Once the mixer is installed, it does not matter in which order the next components are installed. Complete the assembly of the board but leave the board-to-board interconnects (labeled \emph{TX, RX, +G} and the unlabeled 10-pin connector at the bottom) as well as the RCA plug labeled \emph{TX-OC } unpopulated for now. They will added in the final assembly step later.
 
 \begin{remark}
 The audio PA (LM386, U4) has plenty of amplification. If you want to use head-phones, you may leave R13 and C16 off the board. You may add them later if more audio amplification is needed.
 \end{remark}
-
-The RCA-Jack J13 is also optional. It provides an open-collector output to switch external power-amplifiers. If you plan to use this rig as a pure QRP rig, you may omit that part (one hole less to drill in the back-pane).
 
 When winding the input transformer T1, cut 3 about 15-16cm long pieces of magnet wire and start the winding by pushing the three wires tough the core \textbf{from the back}. Hold them. Then make the next winding counter-clock wise by pushing the other end of the wires though the core from the front and continue to wind 8 turns on the core counter-clock wise. Every time the wires pass through the core, counts as a turn. 
 
@@ -149,7 +156,7 @@ If an signal generator is at hand, tune the generator to $14.000 MHz$. Then sele
 
 With these steps, the alignment of the RX is completed and you may take the RX on a short ride through the bands.
 
-
+\clearpage
 \subsection{RX Component List}  \label{sec:rxcomp}
 \begin{longtable}{|l|p{6cm}|l|l|} \hline 
 \# & Component & Value & Remarks \\ \hline 
@@ -211,7 +218,7 @@ With these steps, the alignment of the RX is completed and you may take the RX o
 1 & J5 & Key & 3.5mm stereo jack\\ \hline
 \end{longtable}
 
-\clearpage
+\cleardoublepage
 \section{PA \& Low-Pass Board} \label{sec:pa}
 The majority of the PA/LP board consists of four 7-pole Chebyshev low-pass filters. The Chebyshev-type filters are needed to get away with only four filters to cover all RF bands from 80m to 10m. The right-most filter covers the 80m and 60m band and should have a cutoff frequency near $5.6\,MHz$. The next filter covers 40m and 30m and should have a cutoff frequency near $10.5\,MHz$. The second-to-last filter covers 20m and 17m and should have a cutoff frequency near $20\,MHz$. Finally the leftmost filter will cover 15m, 12m and 10m with a cutoff frequency near $30\,.MHz$. The low-pass filters are switched by 4 sub-miniature relays controlled by the RX-board via the board-to-board (b2b) connector J2.
 
@@ -231,6 +238,7 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
  
  Finally install the b2b \textbf{sockets} on the PA/LP board, that is J2, J6, J7 and J11.
  
+\clearpage
 \subsection{PA/LP Component List}  \label{sec:pacomp}
 \begin{longtable}{|l|p{6cm}|l|l|} \hline 
 \# & Component & Value & Remarks \\ \hline 
@@ -270,15 +278,23 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
 \end{longtable}
 
 
-\clearpage
+\cleardoublepage
 \section{Final Assembly} \label{sec:box}
 Finally, the board-to-board interconnects are installed. The way these connectors are installed, depends on the chassis and distance between the boards you chose. The example I give here applies to the Fischer KOH-2100 + KOH-4100 kit. This is a nice and compact $10 \times 10 \times 5\,cm$ chassis. The boards slide into the chassis with $1.5\,cm$ distance. Unfortunately, I was not able to find stackers or long pin-headers with a matching length here in Germany. Have a look at Ebay or at Mouser. Pin headers with insertion lengths of about 18mm should do the trick. I, however, went with stackers of $38\,mm$ total length which is is too long and therefore needed to be shortened.
 
-The easiest way to do that, is to install the pin-sockets on the PA/LP board first. Then cut the top-space away (for stackers)  and stick them into the sockets. Than put the RX board on top. Now carefully insert both bords in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
+\begin{figure}[!ht]
+ \centering
+ \includegraphics[width=0.3\linewidth]{fig/stackers_small.png}
+ \caption{Cut stackers before inserting them into the socket of the PA board} \label{fig:stackers}
+\end{figure}
+
+The easiest way to do that, is to install the pin-sockets on the PA/LP board first. Then cut the top-part away from these stackers (see figure \ref{fig:stackers}) and stick them into the sockets. Than put the RX board on top. Now carefully insert both boards in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
 
 \begin{warning}
 Do not overheat the stackers/pin headers as the socket may melt. Just tag them in-place and reflow the header connections once the PA-board is removed.
 \end{warning}
+
+
 
 \subsection{Final Testing}
 With these stacked boards, it is now time to test the PA and RX/TX switching. Reconnect everything and connect a dummy-load to the output. Measure the RF voltage-drop across the dummy-load (oscilloscope). Alternatively, connect a power/SWR meter between the TRX and dummy-load. You should get about $22\,Vp$ across the dummy-load or about $5\,W$ on transmit, depending on the supply voltage (assuming about $13.8\,V$). On the lower band (e.g., up to $30\,m$) it might even be a little bit more. 
@@ -286,8 +302,9 @@ With these stacked boards, it is now time to test the PA and RX/TX switching. Re
 If your output is way less, measure the peak voltages at the PA-output and LP-input and double-check the low-pass filters. If the output matches, the assembly is complete. 
 
 \subsection{Hot fixes}
-The second revision was to some extend a redesign. Hence not everything is perfect yet. For example, the 74AC74 produces a lot of high-frequency ripple on the 5V rail. To suppress them stronger, a $470\,pF$ capacitor should be soldered directly from pin 16 (5V) to pin 8 (GND).  
+The second revision was a redesign to some extend. Hence not everything is perfect yet. For example, the 74AC74 produces a lot of high-frequency ripple on the 5V rail. To suppress them stronger, a $470\,pF$ capacitor should be soldered directly from pin 16 (5V) to pin 8 (GND).  
 
+\clearpage
 \subsection{Mechanical Parts}
 \begin{longtable}{|l|p{6cm}|l|l|} \hline 
 \# & Component & Remarks \\ \hline 
@@ -306,7 +323,7 @@ The second revision was to some extend a redesign. Hence not everything is perfe
 \end{longtable}
 
 
-\clearpage
+\cleardoublepage
 \section{Usage} \label{sec:user}
 Handling a feature-rich TRX using a single rotary encoder with a single push-button is kind of challenging. I've designed a two-level menu navigation that puts everything, that is needed frequently, in the first level (blue in figure \ref{fig:menu}) and everything else in a second level. This keeps the navigation fast for frequently used options. 
 
@@ -460,7 +477,7 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 
 
 
-\clearpage
+\cleardoublepage
 \section{Bill-of-Material (BOM)}
 \begin{longtable}{|p{0.02\textwidth}|p{0.02\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|p{0.07\textwidth}|p{0.07\textwidth}|}\hline
 \# & & Value & Reichelt & Cost & Sum \\ \hline\hline
@@ -489,14 +506,14 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 2 & $\square$ & 100p & NPO-2,5 100P & 0,07 \euro & 0,14 \euro \\
 4 & $\square$ & 220p & NPO-2,5 220P & 0,08 \euro & 0,32 \euro \\
 4 & $\square$ & 470p & NPO-2,5 470P & 0,09 \euro & 0,36 \euro \\
-2 & $\square$ & 820p & C: 1578706 & 0,16 \euro & 0,32 \euro \\
+2 & $\square$ & 820p & Conrad: 1578706 & 0,16 \euro & 0,32 \euro \\
 3 & $\square$ & 1n & X7R-2,5 1,0N & 0,07 \euro & 0,21 \euro \\
 2 & $\square$ & 1n & NPO-2,5 1,0N & 0,09 \euro & 0,18 \euro \\
 2 & $\square$ & 1.5n & X7R-2,5 1,5N & 0,07 \euro & 0,14 \euro \\
 2 & $\square$ & 3.3n & X7R-2,5 3,3N & 0,07 \euro & 0,14 \euro \\
 3 & $\square$ & 10n & X7R-2,5 10N & 0,07 \euro & 0,21 \euro \\
 5 & $\square$ & 47n & X7R-2,5 47N & 0,11 \euro & 0,55 \euro \\
-34 & $\square$ & 100n & Z5U-2,5 100N & 0,05 \euro & 1,70 \euro \\
+35 & $\square$ & 100n & Z5U-2,5 100N & 0,05 \euro & 1,75 \euro \\
 5 & $\square$ & 470n & Z5U-5 470N & 0,19 \euro & 0,95 \euro \\
 3 & $\square$ & 1u & Z5U-5 1,0µ & 0,26 \euro & 0,78 \euro \\ \hline		
 3 & $\square$ & 10u & RAD 10/35 & 0,02 \euro & 0,06 \euro \\
@@ -558,7 +575,7 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 \subsection{Shave off some \euro\ from the BOM}
 The single most expensive item on the BOM is the chasis. You can certainly find some extruded aluminium chassis for less than \EUR{5} on Ebay. You can also get chap rip-offs of the Adafruit SI5351 break-out board for around \EUR{3}, cheap rotary encoders (\EUR{1}) and 2x8 LCD displays (\EUR{3}) there. I shoud announce a competition for the cheapest BOM for this TRX.
 
-
+\cleardoublepage
 \includepdf[pages={1,2,4,3,5,6},landscape=true, addtotoc={
  1, section, 1, RX Circuit, rxscm,
  2, subsection, 1, RX Mixer, rxmix,
@@ -567,9 +584,15 @@ The single most expensive item on the BOM is the chasis. You can certainly find 
  5, subsection, 1, PLL, rxpll,
  6, subsection, 1, Controller, rxctrl}]{fig/rx_scm.pdf}
 \includepdf[pages={1,2,3},landscape=true, addtotoc={
- 1, section, 1, RX Board, rxbrd}]{fig/rx_brd.pdf}
+ 1, section, 1, RX Board, rxbrdtop,
+ 2, subsection, 1, Bottom, rxbrdbottom,
+ 3, subsection, 1, Silkscreen, rxbrdsilk}]{fig/rx_brd.pdf}
 \includepdf[landscape=true, addtotoc={
  1, section, 1, PA/LP Circuit, pascm}]{fig/pa_scm.pdf}
 \includepdf[pages={1,2,3},landscape=true, addtotoc={
- 1, section, 1, PA/LP Board, pabrd}]{fig/pa_brd.pdf}
+ 1, section, 1, PA/LP Board, pabrdtop,
+ 2, subsection, 1, Bottom, pabrdbottom,
+ 3, subsection, 1, Silkscreen, pabrdsilk}]{fig/pa_brd.pdf}
+\includepdf[landscape=true, addtotoc={
+ 1, subsection, 1, Component Placement \& Values, pacomp}]{fig/pa_values.pdf}
 \end{document}
