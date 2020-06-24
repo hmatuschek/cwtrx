@@ -431,10 +431,10 @@ To use this feature, you have to specify the settings you want to \emph{quick-se
 \emph{Setup} hides all settings that are usually not touch during regular operation and are therefore hidden in the second menu-level. You can access these settings by selecting \texttt{Menu} $\rightarrow$ \texttt{Setup}.
 
 \paragraph{Quick-set}
-(Planned Feature) The Quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
+The Quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
 
 \paragraph{Keyer mode}
-The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key}, \emph{iambic}, (planned) \emph{iambic reverse} (dits and dots interchanged) and (planned) \emph{auto detect} (try to detect the type on startup by means of detecting a mono or stereo jack). 
+The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key} and \emph{iambic}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
 
 \paragraph{CW side-tone level}
 Specifies the volume of the CW side-tone. This is a value between 1 and 255.
@@ -442,7 +442,7 @@ Specifies the volume of the CW side-tone. This is a value between 1 and 255.
 \paragraph{Keyer memory \texttt{CW Text}}
 Specifies the text to be send automatically (e.g., a CQ call) when the rotary encoder is long-pressed. If no text is set, nothing will happen.
 
-To edit the CW text head to \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{CW Text} and \emph{click} the encoder to enter the editor. You should see a cursor beneath the first character. You can rotate the encoder to select the character you want to set. \emph{click} again and the character should start to blink. You can now change the selected character. Once the desired character is found, \emph{click} again to set it. You are now back at the editor level and the next character is automatically selected. You may change the selection. Once the text is edited, leave the editor by \emph{long-pressing} the encoder.
+To edit the CW text head to \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{CW Text} and \emph{click} the encoder to enter the editor. You should see a cursor beneath the first character. You can use the encoder to select the character you want to edit. \emph{click} again and the character should start to blink. You can now change the selected character. Once the desired character is found, \emph{click} again to set it. You are now back at the editor level and the next character is automatically selected. Once the text is edited, leave the editor by \emph{long-pressing} the encoder.
 
 \paragraph{Clear keyer memory}
 Simply clears the keyer memory.
@@ -464,7 +464,7 @@ An editor that allows you to change the \emph{greeting} at startup. The editing 
 These settings can be found under the \emph{Setup} sub-menu and are usually only changed during the alignment of the TRX. 
 
 \paragraph{CW side-tone frequency}
-Specifies the CW side-tone frequency as well as the RX frequency shift. This frequency should be identical to the center frequency of the narrow audio CW filter.
+Specifies the CW side-tone frequency as well as the RX frequency shift. This frequency should be identical to the center frequency of the narrow CW audio filter.
 
 \paragraph{Encoder type}
 Specifies the encoder type used. There are two different generic encoder-types \texttt{A} \& \texttt{B}. If you ordered exactly the encoder listed in the BOM, you should have a type-A encoder (default). If you encounter problems with the encoder (e.g., double-steps) you may change this setting to type B. If you wired the encoder in the wrong way (wrong tuning direction) you may simply change this setting to \texttt{A rev} or \texttt{B rev}. 
