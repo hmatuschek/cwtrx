@@ -1,4 +1,4 @@
-\documentclass[10pt, a4paper,twoside,openright]{scrartcl}
+\documentclass[10pt, a4paper,twoside]{scrartcl}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -48,7 +48,7 @@
 \begin{abstract}
 This document describes the assembly, alignment and usage of the second revision of my small, portable CW TRX. If you cannot find any \emph{rev 2} markings on your boards, this is the wrong document!
 
-The major difference to the first revision is the mixer. Instead of a 74HC4053, which has some significant damping on higher frequencies, the second revision relies on the famous FST3253 switch. This allows for using the TRX well into the 10m band. Additionally, the board layout has been changed to allow for board-to-board interconnects and proper connectors to ease the assembly of the final TRX. To this end there are only two boards (instead of three) left with a $10\time 8\,cm$ footprint that could be squeezed into a $10 \times 10\times 5\,cm$ Fischer-chassis (KOH-2100 + KOH-4100). 
+The main difference to the first revision is the mixer. Instead of a \texttt{74HC4053}, which has some significant damping on higher frequencies, the second revision relies on the famous \texttt{FST3253} switch. This allows for using the TRX well into the 10m band. Additionally, the board layout has been changed to allow for board-to-board interconnects and proper connectors to ease the assembly of the final TRX. To this end there are only two boards (instead of three) with a $10\times 8\,cm$ footprint that can be squeezed into a $10 \times 10\times 5\,cm$ Fischer-chassis (\texttt{KOH-2100} + \texttt{KOH-4100} + \texttt{DPL 2-4}).  Using this chassis, the receiver will weight about $580\,g$ (without batteries \& key).
 \end{abstract}
 \thispagestyle{empty}
 \vfill
@@ -69,18 +69,18 @@ The major difference to the first revision is the mixer. Instead of a 74HC4053, 
  The controller and VFO section of the board consists of a \texttt{ATMega 328P} MCU controlling the \texttt{SI5351} PLL oscillator. The \texttt{CLK2} signal of the PLL drives the two flip-flops \texttt{U9}, which divide the \texttt{CLK2} frequency by four and produce a proper $90^\circ$ phase-shifted signal for the mixer.
  
 \subsection{Controller Assembly}
- In a first step, the controller section of the receiver board is assembled. Install C2, C26, J7 connector, L2, C40, C41, C42, U10, J10, C14, J3, R3, C46, R4, U11 + Socket, LCD1 connector, R43, R5, RV4, J9 connector, R41, R40, C39 \& U9 first. 
+ In a first step, the controller section of the receiver board is assembled. Install \texttt{C2}, \texttt{C26}, \texttt{J7} connector, \texttt{L2}, \texttt{C40}, \texttt{C41}, \texttt{C42}, \texttt{U10}, \texttt{J10}, \texttt{C14}, \texttt{J3}, \texttt{R3}, \texttt{C46}, \texttt{R4}, \texttt{U11} + Socket, \texttt{LCD1} connector, \texttt{R43}, \texttt{R5}, \texttt{RV4}, \texttt{J9} connector, \texttt{R41}, \texttt{R40}, \texttt{C39} \& \texttt{U9} first. 
 
 \begin{warning}
-The metal tab of the TO-220 package of U10 is usually connected directly to the center pin (GND). Please check beforehand if this is the case for your variant. Some rare packages connect this pad to \emph{+5V} leading to a nice \& solid short-circuit that will blow either U10 or L3 or both.
+The metal tab of the TO-220 package of \texttt{U10} is usually connected directly to the center pin (GND). Please check beforehand if this is the case for your variant. Some rare packages connect this pad to \emph{+5V} leading to a nice \& solid short-circuit that will blow either \texttt{U10} or \texttt{L3} or both.
 \end{warning}
 
-If you got one of the rare TO-220 variant of U10 that connects the metal tab to +5V, use a mica-insulator between U10 and the PCB. If you have enough head-room, you could also install U10 vertically, heat-sinking to the PCB is not necessary.
+If you got one of the rare TO-220 variant of U10 that connects the metal tab to +5V, use a mica-insulator between \texttt{U10} and the PCB. If you have enough head-room, you could also install \texttt{U10} vertically, heat-sinking to the PCB is not necessary.
 
- R43 limits the current to the LCD back-light. By default a $220\,\Omega$ resistor is installed. This limits the current to about $23\,mA$. This results in a very dim back-light but reduces the current consumption from max. $120\, mA$ (R43 shorted). I personally consider this dim setting the most useful: During daylight a back light makes no sense, as the LCD is perfectly readable. During night without any external light-sources, a very dim back light is still sufficient to read the LCD. There is simply no need to drain the battery for unused or too-bright back lights. If you use the TRX only at home and current consumption is not an issue, you may choose a smaller value for R43 or even bridge it for maximum brightness.
+ \texttt{R43} limits the current to the LCD back-light. By default a $220\,\Omega$ resistor is installed. This limits the current to about $23\,mA$. This results in a very dim back-light but reduces the current consumption from max. $120\, mA$ (\texttt{R43} shorted). I personally consider this dim setting the most useful: During daylight a back light makes no sense, as the LCD is perfectly readable. During night without any external light-sources, a very dim back light is still sufficient to read the LCD. There is simply no need to drain the battery for unused or too-bright back lights. If you use the TRX only at home and current consumption is not an issue, you may choose a smaller value for \texttt{R43} or even bridge it for maximum brightness.
  
 \begin{remark} 
- You may also replace the resistor R43 with a push-button at the front panel to switch the back-light on when needed.
+ You may also replace the resistor \texttt{R43} with a push-button at the front panel to switch the back-light on when needed.
 \end{remark}
  
  Then, assemble the switch plug and (top right corner labeled \emph{SW}). Connect a $12\,V$ power-supply (ideally current-limited to not more than $100\,mA$) to the pads of the supply connector (also top-right corner) labeled \emph{+ G}, where the \emph{+} pad is $+12\,V$ and the \emph{G} pad is ground. 
@@ -95,18 +95,18 @@ If you got one of the rare TO-220 variant of U10 that connects the metal tab to 
 
  The LCD-plug has the following connections (read left-to-right): \emph{5V} pin 2 on LCD, \emph{contrast} pin 3 on LCD, \emph{LED backlight} pin 15 on LCD, \emph{GND} pin 1 on LCD, \emph{RS (register selection)} pin 4 on LCD, \emph{D4-D7} pins 11-14 on LCD, \emph{chip-enable (EN)} pin 6 on LCD. You also need to connect pins 5 and 16 on the LCD-board directly to ground (pin 1 on LCD).
  
- Plug the LCD \& rotary encoder into the board and install the ATMega328 MCU. Then connect the board to the power-supply. If you got a pre-programmed MCU you should see a brief greeting on the LCD. If you do not see anything at all or a series of back blocks on the screen, you may have to set the LCD supply/contrast setting using RV4. If you still don't see anything on the LCD, double-check your connects to the LCD! 
+ Plug the LCD \& rotary encoder into the board and install the \texttt{ATMega328} MCU. Then connect the board to the power-supply. If you got a pre-programmed MCU you should see a brief greeting on the LCD. If you do not see anything at all or a series of back blocks on the screen, you may have to set the LCD supply/contrast setting using RV4. If you still don't see anything on the LCD, double-check your connects to the LCD! 
 
 \subsection{Testing PLL}
-In a next step, verify the SI5351 PLL. First, install the SI5351 break-out board. 
+In a next step, verify the \texttt{SI5351} PLL. First, install the \texttt{SI5351} break-out board. 
 
 \begin{warning}
- Be careful when inserting the SI5351 beakout-board, there is no protection in the socket to plug it in the wrong way: The board should overlap with the LCD connector not U9!
+ Be careful when inserting the \texttt{SI5351} beakout-board, there is no protection in the socket to plug it in the wrong way: The board should overlap with the LCD connector not U9!
 \end{warning}
  
-Then switch on the RX and verify that there is a $3.5MHz$ signal at pins 8, 9, 11 and 12 of U9. If not, verify that there is a $14.0Mhz$ signal at the CLK2 output of the SI5351 break-out board. 
+Then switch on the RX and verify that there is a $3.5MHz$ signal at pins 8, 9, 11 and 12 of \texttt{U9}. If not, verify that there is a $14.0Mhz$ signal at the \texttt{CLK2} output of the \texttt{SI5351} break-out board. 
 
-You may also verify the $90^\circ$ phase-shift between pins 9 and 12 of U9.
+You may also verify the $90^\circ$ phase-shift between pins 9 and 12 of \texttt{U9}.
 
 \begin{remark}
 By default, the RX is wired to receive on the upper side-band (USB). If you prefer LSB-reception, you may break the jumper labeled \emph{USB} and put a solder-bride on jumper \emph{LSB}. You also need to set the side-band in the firmware.
@@ -116,12 +116,12 @@ If everything works fine for you so far, continue with assembling the rest of th
 
 
 \subsection{Receiver Assembly}
-Before starting to assemble the receiver, disconnect everything from the board. That is, remove the SI5351, LCD and encoder wires and also remove the power-supply wires.
+Before starting to assemble the receiver, disconnect everything from the board. That is, remove the \texttt{SI5351}, LCD and encoder wires and also remove the power-supply wires.
 
-In a first step, install the SMD SOIC-16 FST3253 mixer. 
+In a first step, install the SMD SOIC-16 \texttt{FST3253} mixer. 
 
 \begin{warning}
- Be careful! The SI5351 as well as the FST3253 are \textbf{very} sensitive to electrostatic discharge (ESD). Wear an antistatic wrist wrap and use an antistatic mat (if available) and avoid wearing whoole or sythetic fibers. I personally destroyed two FST3253 that way. 
+ Be careful! The \texttt{SI5351} as well as the \texttt{FST3253} are \textbf{very} sensitive to electrostatic discharge (ESD). Wear an antistatic wrist wrap and use an antistatic mat (if available) and avoid wearing wool or synthetic fibers. I personally destroyed two \texttt{FST3253} that way. 
 \end{warning}
 
 \paragraph{If you never soldered SMD components before} It is surprisingly simple. Get a sharp soldering-iron tip and thin solder (e.g., $0.75mm$) as well as plenty of flux. Put a lot of flux on the pads. Then put a small amount of solder on one of the pins, for example pin 1 in the bottom-right corner. Pick up the IC with pointy tweezers and place it on the board. Verify the orientation and alignment of the IC. Solder only pin 1 to the board by heating the pad and pushing the IC on the board. Then take a magnifying glass and verify the alignment of all pins with their pads. If needed, reheat pad 1 and improve the alignment. Once the alignment is right, you can start to solder the remaining pads. You do not need much solder! And remember: The flux will do all the work for you. If you got a solder-bridge between two pins, grab some desoldering-wig and remove the solder. 
@@ -129,10 +129,10 @@ In a first step, install the SMD SOIC-16 FST3253 mixer.
 Once the mixer is installed, it does not matter in which order the next components are installed. Complete the assembly of the board but leave the board-to-board interconnects (labeled \emph{TX, RX, +G} and the unlabeled 10-pin connector at the bottom) as well as the RCA plug labeled \emph{TX-OC } unpopulated for now. They will added in the final assembly step later.
 
 \begin{remark}
-The audio PA (LM386, U4) has plenty of amplification. If you want to use head-phones, you may leave R13 and C16 off the board. You may add them later if more audio amplification is needed.
+The audio PA (\texttt{LM386}, \texttt{U4}) has plenty of amplification. If you want to use head-phones, you may leave \texttt{R13} and \texttt{C16} off the board. You may add them later if more audio amplification is needed.
 \end{remark}
 
-When winding the input transformer T1, cut 3 about 15-16cm long pieces of magnet wire and start the winding by pushing the three wires tough the core \textbf{from the back}. Hold them. Then make the next winding counter-clock wise by pushing the other end of the wires though the core from the front and continue to wind 8 turns on the core counter-clock wise. Every time the wires pass through the core, counts as a turn. 
+When winding the input transformer \texttt{T1}, cut 3 about 15-16cm long pieces of magnet wire and start the winding by pushing the three wires tough the core \textbf{from the back}. Hold them. Then make the next winding counter-clock wise by pushing the other end of the wires though the core from the front and continue to wind 8 turns on the core counter-clock wise. Every time the wires pass through the core, counts as a turn. 
 
 \begin{remember}
 Before soldering the core, make sure the wires are aligned correctly using a multi-meter. That is, top-left connects to bottom left, top-center to bottom-center and top right to bottom right pads on the board. 
@@ -152,7 +152,7 @@ The displayed frequency is the frequency, the TRX will transmit on. It is not th
 \end{remember}
 
 \subsubsection{Side-band Suppression}
-If an signal generator is at hand, tune the generator to $14.000 MHz$. Then select the 20m Band and tune to $14.0012 MHz$. You may hear a low-frequency tone (about $500Hz$). Tune RV2 \& RV 3 to minimize the unwanted side-band tone. Then tune to $14.0016 MHz$. You may hear a high-frequency tone (about $900 Hz$). Tune RV1 \& RV3 to minimize the unwanted side-band tone. You may repeat the previous steps several times to obtain the optimal result. In my experience, the unwanted side-band suppression will work satisfactorily on all bands once aligned properly on 20m. 
+If an signal generator is at hand, tune the generator to $14.000 MHz$. Then select the 20m Band and tune to $14.0012 MHz$. You may hear a low-frequency tone (about $500Hz$). Tune \texttt{RV2} \& \texttt{RV3} to minimize the unwanted side-band tone. Then tune to $14.0016 MHz$. You may hear a high-frequency tone (about $900 Hz$). Tune \texttt{RV1} \& \texttt{RV3} to minimize the unwanted side-band tone. You may repeat the previous steps several times to obtain the optimal result. In my experience, the unwanted side-band suppression will work satisfactorily on all bands once aligned properly on 20m. 
 
 With these steps, the alignment of the RX is completed and you may take the RX on a short ride through the bands.
 
@@ -218,15 +218,16 @@ With these steps, the alignment of the RX is completed and you may take the RX o
 1 & J5 & Key & 3.5mm stereo jack\\ \hline
 \end{longtable}
 
+
 \cleardoublepage
 \section{PA \& Low-Pass Board} \label{sec:pa}
-The majority of the PA/LP board consists of four 7-pole Chebyshev low-pass filters. The Chebyshev-type filters are needed to get away with only four filters to cover all RF bands from 80m to 10m. The right-most filter covers the 80m and 60m band and should have a cutoff frequency near $5.6\,MHz$. The next filter covers 40m and 30m and should have a cutoff frequency near $10.5\,MHz$. The second-to-last filter covers 20m and 17m and should have a cutoff frequency near $20\,MHz$. Finally the leftmost filter will cover 15m, 12m and 10m with a cutoff frequency near $30\,.MHz$. The low-pass filters are switched by 4 sub-miniature relays controlled by the RX-board via the board-to-board (b2b) connector J2.
+The majority of the PA/LP board consists of four 7-pole Chebyshev low-pass filters. The Chebyshev-type filters are needed to get away with only four filters to cover all RF bands from 80m to 10m. The right-most filter covers the 80m and 60m band and should have a cutoff frequency near $5.6\,MHz$. The next filter covers 40m and 30m and should have a cutoff frequency near $10.5\,MHz$. The second-to-last filter covers 20m and 17m and should have a cutoff frequency near $20\,MHz$. Finally the leftmost filter will cover 15m, 12m and 10m with a cutoff frequency near $30\,.MHz$. The low-pass filters are switched by 4 sub-miniature relays controlled by the RX-board via the board-to-board (b2b) connector \texttt{J2}.
 
-The Q4 mosfet acts as the TX/RX switch passing the LP-filtered RF from the input to the RX via b2b J6.
+The \texttt{Q4} mosfet acts as the TX/RX switch passing the LP-filtered RF from the input to the RX via b2b \texttt{J6}.
 
-The PA section consist of a 74HCT00 as driver, four BS170 mosfets as PA transistors and a BD140 for key-shaping. The TX oscillator signal arrives from the RX-board via b2b J7.
+The PA section consist of a \texttt{74HCT00} as driver, four \texttt{BS170} mosfets as PA transistors and a \texttt{BD140-16} for key-shaping. The TX oscillator signal arrives from the RX-board via b2b \texttt{J7}.
 
-The complete TRX is powered from the barrel-jack J3 and the supply voltage is passed to the RX-board via b2b J11. 
+The complete TRX is powered from the barrel-jack \texttt{J3} and the supply voltage is passed to the RX-board via b2b \texttt{J11}. 
 
 \begin{remark}
  Before assembling the low-pass filers on the board. Please assemble them ugly-style on a piece of PCB material and measure their properties using a network analyzer or spectrum analyzer. Being Chebyshev low-pass filter, the exact component values are critical!
@@ -234,9 +235,9 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
 
  If no measurement equipment is present. Please subtract one winding from the given values below. The number of turns for each core was determined using the AL-value provided by the manufacturer. In my experience, this leads to an slightly overestimation of the number of turns by about one. Moreover, you are probably more willing to risk a lower stop-band suppression rather than an increased damping in the pass band.
  
- The diode D4 is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} or 1A \emph{träge} fuse will do.
+ The diode \texttt{D4} is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} or 1A \emph{träge} fuse will do.
  
- Finally install the b2b \textbf{sockets} on the PA/LP board, that is J2, J6, J7 and J11.
+ Finally install the b2b \textbf{sockets} on the PA/LP board, that is \texttt{J2}, \texttt{J6}, \texttt{J7} and \texttt{J11}.
  
 \clearpage
 \subsection{PA/LP Component List}  \label{sec:pacomp}
@@ -280,7 +281,7 @@ The complete TRX is powered from the barrel-jack J3 and the supply voltage is pa
 
 \cleardoublepage
 \section{Final Assembly} \label{sec:box}
-Finally, the board-to-board interconnects are installed. The way these connectors are installed, depends on the chassis and distance between the boards you chose. The example I give here applies to the Fischer KOH-2100 + KOH-4100 kit. This is a nice and compact $10 \times 10 \times 5\,cm$ chassis. The boards slide into the chassis with $1.5\,cm$ distance. Unfortunately, I was not able to find stackers or long pin-headers with a matching length here in Germany. Have a look at Ebay or at Mouser. Pin headers with insertion lengths of about 18mm should do the trick. I, however, went with stackers of $38\,mm$ total length which is is too long and therefore needed to be shortened.
+Finally, the board-to-board interconnects are installed. The way these connectors are installed, depends on the chassis and distance between the boards you chose. The example I give here applies to the Fischer \texttt{KOH-2100} + \texttt{KOH-4100} + \texttt{DPL 2-4} kit. This is a nice and compact $10 \times 10 \times 5\,cm$ chassis. The boards slide into the chassis with $\approx 1.5\,cm$ distance. Unfortunately, I was not able to find stackers or long pin-headers with a matching length here in Germany. Have a look at Ebay or at Mouser. Pin headers with insertion lengths of about $12\,mm$ should do the trick. I, however, went with stackers of $38\,mm$ total length which is is way too long and therefore needed to be shortened.
 
 \begin{figure}[!ht]
  \centering
@@ -288,21 +289,20 @@ Finally, the board-to-board interconnects are installed. The way these connector
  \caption{Cut stackers before inserting them into the socket of the PA board} \label{fig:stackers}
 \end{figure}
 
-The easiest way to do that, is to install the pin-sockets on the PA/LP board first. Then cut the top-part away from these stackers (see figure \ref{fig:stackers}) and stick them into the sockets. Than put the RX board on top. Now carefully insert both boards in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
+The easiest way to do that, is to cut the top-part away from these stackers (see figure \ref{fig:stackers}) and stick them into the sockets on the PA board. Than put the RX board on top. Now carefully insert both boards in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
 
 \begin{warning}
-Do not overheat the stackers/pin headers as the socket may melt. Just tag them in-place and reflow the header connections once the PA-board is removed.
+Do not overheat the stackers/pin-headers as the socket may melt. Just tag them in-place and reflow the header connections once the PA-board is removed.
 \end{warning}
 
 
-
 \subsection{Final Testing}
-With these stacked boards, it is now time to test the PA and RX/TX switching. Reconnect everything and connect a dummy-load to the output. Measure the RF voltage-drop across the dummy-load (oscilloscope). Alternatively, connect a power/SWR meter between the TRX and dummy-load. You should get about $22\,Vp$ across the dummy-load or about $5\,W$ on transmit, depending on the supply voltage (assuming about $13.8\,V$). On the lower band (e.g., up to $30\,m$) it might even be a little bit more. 
+With these final steps completed, it is now time to test the PA and RX/TX switching. Reconnect everything and connect a dummy-load to the output. Measure the RF voltage-drop across the dummy-load (oscilloscope). Alternatively, connect a power/SWR meter between the TRX and dummy-load. You should get about $22\,Vp$ across the dummy-load or about $5\,W$ on transmit, depending on the supply voltage (assuming about $13.8\,V$). On the lower band (e.g., up to $30\,m$) it might even be a little bit more. 
 
 If your output is way less, measure the peak voltages at the PA-output and LP-input and double-check the low-pass filters. If the output matches, the assembly is complete. 
 
 \subsection{Hot fixes}
-The second revision was a redesign to some extend. Hence not everything is perfect yet. For example, the 74AC74 produces a lot of high-frequency ripple on the 5V rail. To suppress them stronger, a $470\,pF$ capacitor should be soldered directly from pin 16 (5V) to pin 8 (GND).  
+The second revision was a redesign to some extend. Hence not everything is perfect yet. For example, the \texttt{74AC74} produces a lot of high-frequency ripple on the 5V rail. To suppress them stronger, a $470\,pF$ capacitor should be soldered directly from pin 16 (5V) to pin 8 (GND).  
 
 \clearpage
 \subsection{Mechanical Parts}
@@ -325,7 +325,7 @@ The second revision was a redesign to some extend. Hence not everything is perfe
 
 \cleardoublepage
 \section{Usage} \label{sec:user}
-Handling a feature-rich TRX using a single rotary encoder with a single push-button is kind of challenging. I've designed a two-level menu navigation that puts everything, that is needed frequently, in the first level (blue in figure \ref{fig:menu}) and everything else in a second level. This keeps the navigation fast for frequently used options. 
+Handling a feature-rich TRX using a single rotary encoder with a single push-button is kind of challenging. I've designed a two-level menu navigation that puts everything that is needed frequently in the first level (blue in figure \ref{fig:menu}) and everything else in a second level. This keeps the navigation fast for frequently used options. 
 
 The second menu level (red in figure \ref{fig:menu}) contains all settings that are usually not touched during the operation. They concern the basic setup and alignment of the TRX. 
 
@@ -386,7 +386,7 @@ The second menu level (red in figure \ref{fig:menu}) contains all settings that 
  \caption{Menu navigation} \label{fig:menu}
 \end{figure}
 
-To enter the menu, just click the center button on the rotary encoder. You will land on either the RIT setting or on the last modified setting. Using the rotary-encoder you can navigate through the first menu level. To change a settings, click the center button again. You can now change the selected setting using the rotary encoder. To finish the setting and leave the menu, click on the center button again.
+To enter the menu, just click the button on the rotary encoder. You will land on either the RIT setting or on the last modified setting. Using the rotary-encoder you can navigate through the first menu level. To change a settings, click the center button again. You can now change the selected setting using the rotary encoder. To finish the setting and leave the menu, click the center button again.
 
 To enter the second menu-level, enter the first level by clicking on the center button and select the menu entry \texttt{Setup}. Click on the center button again to enter the second-level menu. You will land on the \texttt{Quick-set} setting. You may now navigate the second menu-level using the rotary encoder. Changing and leaving the second-level menu works in the same way as the first-level menu. 
 
@@ -481,9 +481,9 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 \section{Bill-of-Material (BOM)}
 \begin{longtable}{|p{0.02\textwidth}|p{0.02\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|p{0.07\textwidth}|p{0.07\textwidth}|}\hline
 \# & & Value & Reichelt & Cost & Sum \\ \hline\hline
-1 & $\square$ & 10R & METALL 10,0 & 0,05 € & 0,05 \euro \\
+1 & $\square$ & 10R & METALL 10,0 & 0,05 \euro & 0,05 \euro \\
 6 & $\square$ & 100R & METALL 100 & 0,05 \euro & 0,29 \euro \\
-1 & $\square$ & 220R & METALL 220 & 0,05 € & 0,05 \euro \\ 
+1 & $\square$ & 220R & METALL 220 & 0,05 \euro & 0,05 \euro \\ 
 1 & $\square$ & 470R & METALL 470 & 0,05 \euro & 0,05 \euro \\
 4 & $\square$ & 1k & METALL 1,00K & 0,05 \euro & 0,20 \euro \\
 1 & $\square$ & 2.2k & METALL 2,20K & 0,05 \euro & 0,05 \euro \\
@@ -519,7 +519,7 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 3 & $\square$ & 10u & RAD 10/35 & 0,02 \euro & 0,06 \euro \\
 3 & $\square$ & 100u & RAD 100/16 & 0,03 \euro & 0,09 \euro \\
 1 & $\square$ & 220u & RND 150ECR AY & 0,06 \euro & 0,06 \euro \\ \hline
-1 & $\square$ & 22u & & \euro & \euro \\
+1 & $\square$ & 22u & L-07HCP 22µ & 0,38 \euro & 0,38 \euro \\
 7 & $\square$ & 100u & L-MICC 100µ & 0,27 \euro & 1,89 \euro \\ \hline
 2 & $\square$ & FT37-43 & FT 37-43 & 0,58 \euro & 1,16 \euro \\
 6 & $\square$ & T 37-6 & T 37-6 & 0,78 \euro & 4,68 \euro \\
@@ -569,7 +569,7 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 2 & $\square$ & fuse holder (optional) & RND 170-00170 & 0,19 \euro & 0,38 \euro \\
 2 & $\square$ & 2A flink (optional) & ESKA 520.020 & 0,09 \euro & 0,18 \euro \\
 1 & $\square$ & speaker (optional) & LSM-S20K & 2,70 \euro & 2,70 \euro \\ \hline \hline
-\multicolumn{4}{|l}{Total\footnote{Prices may change over time.}} & \multicolumn{2}{r|}{\textbf{85,30 \euro}} \\ \hline
+\multicolumn{4}{|l}{Total\footnote{Prices may change over time.}} & \multicolumn{2}{r|}{\textbf{85,73 \euro}} \\ \hline
 \end{longtable}
 
 \subsection{Shave off some \euro\ from the BOM}
@@ -587,6 +587,8 @@ The single most expensive item on the BOM is the chasis. You can certainly find 
  1, section, 1, RX Board, rxbrdtop,
  2, subsection, 1, Bottom, rxbrdbottom,
  3, subsection, 1, Silkscreen, rxbrdsilk}]{fig/rx_brd.pdf}
+\includepdf[landscape=true, addtotoc={
+ 1, subsection, 1, Component Placement \& Values, rxval}]{fig/rx_values.pdf}
 \includepdf[landscape=true, addtotoc={
  1, section, 1, PA/LP Circuit, pascm}]{fig/pa_scm.pdf}
 \includepdf[pages={1,2,3},landscape=true, addtotoc={

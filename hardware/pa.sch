@@ -4,9 +4,9 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title "CW TRX 4W (PA)"
-Date "2018-11-29"
-Rev "1"
+Title "CW TRX 5W (PA)"
+Date "2020-06-24"
+Rev "2"
 Comp "DM3MAT"
 Comment1 "based on QCX Transceiver"
 Comment2 ""

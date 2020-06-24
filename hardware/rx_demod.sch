@@ -5,11 +5,11 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 4 6
 Title "QRP CW TRX"
-Date "2020-05-15"
+Date "2020-06-24"
 Rev "2"
 Comp "DM3MAT"
 Comment1 "Demodulator"
-Comment2 ""
+Comment2 "based on QCX"
 Comment3 ""
 Comment4 ""
 $EndDescr
