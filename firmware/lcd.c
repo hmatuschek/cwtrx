@@ -1,4 +1,5 @@
 #include "lcd.h"
+#include "trx.h"
 
 #define LCD_BOOTUP_MS           45
 #define LCD_ENABLE_US           20
@@ -349,7 +350,7 @@ void lcd_string( const char *data )
 }
 
 /*
- * Schreibt die Frequenz auf das Display (Länge 8)
+ * Schreibt die Frequenz auf das Display (Laenge 8)
  */
 void lcd_freq(uint32_t freq) {
   uint8_t leading=0, num=0;

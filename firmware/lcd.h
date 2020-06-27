@@ -43,7 +43,7 @@ void lcd_data(uint8_t data);
 /* Ausgabe eines Strings an der aktuellen Cursorposition */
 void lcd_string(const char *data);
 
-/* Ausgabe eines Strings an der aktuellen Cursorposition */
+/* Print frequency in Hz */
 void lcd_freq(uint32_t freq);
 
 void lcd_print_uint16(uint16_t value, uint8_t width);

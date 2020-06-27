@@ -115,6 +115,7 @@ void display_menu_tx_hold();
 void display_menu_greet();
 void display_menu_rot_type();
 void display_menu_version();
+void display_menu_sideband();
 void display_menu_pll_correction();
 void display_menu_reset();
 
@@ -194,6 +195,10 @@ void display_menu(MenuState state) {
     break;
   case MENU_VERSION:
     display_menu_version();
+    break;
+  case MENU_SIDEBAND:
+  case MENU_SET_SIDEBAND:
+    display_menu_sideband();
     break;
   case MENU_PLL_CORRECTION:
   case MENU_SET_PLL_CORRECTION:
@@ -514,10 +519,6 @@ void display_menu_meter() {
       lcd_setcursor(4,2);
       lcd_string("Off");
       break;
-    case METER_SIG:
-      lcd_setcursor(1,2);
-      lcd_string("S-Mtr.");
-      break;
     case METER_VOLTAGE:
       lcd_setcursor(2,2);
       lcd_string("Volt.");
@@ -586,6 +587,20 @@ void display_menu_version() {
   lcd_setcursor(5,2);
   lcd_string(VERSION_STRING);
 }
+
+void display_menu_sideband() {
+  lcd_string("Sideband");
+  if (MENU_SET_SIDEBAND == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  lcd_setcursor(5,2);
+  if (TRX_USB == trx_sideband())
+    lcd_string("USB");
+  else
+    lcd_string("LSB");
+}
+
 void display_menu_pll_correction() {
   lcd_string("PLL cor:");
   if (MENU_SET_PLL_CORRECTION == menu_state()) {

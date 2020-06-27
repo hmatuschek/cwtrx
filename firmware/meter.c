@@ -51,8 +51,6 @@ void meter_poll() {
 
   if (TRX_RX != trx_state())
     return;
-  if (METER_SIG == _meter_type)
-    display_smeter(_meter_value);
   else if (METER_VOLTAGE == _meter_type)
     display_voltage(_meter_value);
   else if (METER_TEMP == _meter_type)
@@ -61,20 +59,7 @@ void meter_poll() {
 
 ISR(ADC_vect) {
   uint16_t v = ADC;
-  if (METER_SIG == _meter_type) {
-    if (_meter_count >= S_METER_COUNT) {
-      _meter_value = (_meter_value_max-_meter_value_min)/2;
-      _meter_count = 0;
-      _meter_value_max = 0;
-      _meter_value_min = 1024;
-    } else {
-      if (_meter_value_max < v)
-        _meter_value_max = v;
-      if (_meter_value_min > v)
-        _meter_value_min = v;
-      _meter_count++;
-    }
-  } else if (METER_VOLTAGE == _meter_type) {
+  if (METER_VOLTAGE == _meter_type) {
     int32_t temp = v;
     // Assuming voltage divider -> 47k + 4.7k to GND.
     temp *= 554; temp /= 1024;
@@ -83,7 +68,7 @@ ISR(ADC_vect) {
     // Vref = 1.1V, 314mV @ 25C, 1mV/C
     int32_t temp = v; temp -= 292; // (== -314mV)
     // temp in 100 mC
-    temp = 250 + (100*temp)/931;
+    temp = 250 + (1000*temp)/931;
     _meter_value = temp;
   }
 }

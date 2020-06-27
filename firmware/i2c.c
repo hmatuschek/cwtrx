@@ -26,10 +26,9 @@
 
 void i2c_init(void)
 {
-	//set SCL to ~100 kHz for 20 MHz CPU clock
+  //set SCL to ~200 kHz for 8 MHz CPU clock
 	TWSR = (0<<TWPS1) || (0<<TWPS0); /* Prescale /1 */
-  // TWBR = 01011100
-	TWBR = 0x5c;
+  TWBR = 8; // <- 200kHz //64; // <- 100kHz
 }
 
 void i2c_start(void)

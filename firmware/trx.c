@@ -14,6 +14,7 @@
 #include <util/delay.h>
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
+#include <util/atomic.h>
 #include <string.h>
 
 // AVR comp for QtCreator
@@ -25,6 +26,10 @@
 #endif
 
 #define TRX_DEFAULT_QUICK_SET      TRX_QS_NONE
+#define TRX_DEFAULT_STEPSIZE       TRX_STEP_50
+#define TRX_DEFAULT_SIDEBAND       TRX_USB
+#define TRX_DEFAULT_RIT            0
+#define TRX_DEFUALT_TXENABLED      1
 #define TRX_DEFAULT_CW_TONE        700
 #define TRX_DEFAULT_CW_LEVEL       255
 #define TRX_DEFAULT_CW_SPEED       10
@@ -33,7 +38,6 @@
 #define TRX_DEFAULT_TX_HOLD        50
 #define TRX_DEFAULT_PLL_CORRECTION 0
 #define TRX_DEFAULT_ROT_TYPE       ROT_TYPE_A
-#define TRX_DEFAULT_RIT            0
 #define TRX_UPDATE_PERIOD          500
 #define TRX_SAVE_PERIOD            10000UL
 
@@ -77,6 +81,8 @@ typedef struct {
   TRXQuickSet quick_set;
   /** Tuing stepsize. */
   TRXStepSize step;
+  /** Sideband **/
+  TRXSideband sideband;
   /** RIT */
   int8_t      rit;
   /** If true, TX is enabled. */
@@ -107,10 +113,11 @@ TRXSettings _ee_trx EEMEM = {
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
-  TRX_STEP_50,
   TRX_DEFAULT_QUICK_SET,
+  TRX_DEFAULT_STEPSIZE,
+  TRX_DEFAULT_SIDEBAND,
   TRX_DEFAULT_RIT,
-  1,
+  TRX_DEFUALT_TXENABLED,
   TRX_DEFAULT_CW_TONE,
   TRX_DEFAULT_CW_LEVEL,
   TRX_DEFAULT_CW_SPEED,
@@ -129,10 +136,11 @@ const TRXSettings _prog_trx PROGMEM = {
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
   { BAND_80,
     {TRX_80_MIN, TRX_60_MIN, TRX_40_MIN, TRX_30_MIN, TRX_20_MIN, TRX_17_MIN, TRX_15_MIN, TRX_12_MIN, TRX_10_MIN} },
-  TRX_STEP_50,
+  TRX_DEFAULT_STEPSIZE,
   TRX_DEFAULT_QUICK_SET,
+  TRX_DEFAULT_SIDEBAND,
   TRX_DEFAULT_RIT,
-  1,
+  TRX_DEFUALT_TXENABLED,
   TRX_DEFAULT_CW_TONE,
   TRX_DEFAULT_CW_LEVEL,
   TRX_DEFAULT_CW_SPEED,
@@ -240,10 +248,10 @@ void trx_init() {
 
 
 void trx_factory_reset() {
-  cli();
-  memcpy_P(&_trx, &_prog_trx, sizeof(TRXSettings));
-  eeprom_write_block(&_trx, &_ee_trx, sizeof(TRXSettings));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    memcpy_P(&_trx, &_prog_trx, sizeof(TRXSettings));
+    eeprom_write_block(&_trx, &_ee_trx, sizeof(TRXSettings));
+  }
 }
 
 uint32_t trx_dial_freq() {
@@ -259,9 +267,9 @@ TRXQuickSet trx_quickset() {
 
 void trx_set_quickset(TRXQuickSet quickset) {
   _trx.quick_set = quickset;
-  cli();
-  eeprom_write_block(&(_trx.quick_set), &(_ee_trx.quick_set), sizeof(TRXQuickSet));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.quick_set), &(_ee_trx.quick_set), sizeof(TRXQuickSet));
+  }
 }
 
 uint8_t trx_rit_sym() {
@@ -279,9 +287,9 @@ int8_t trx_rit() {
 void trx_set_rit(int8_t off) {
   _trx.rit = MINMAX(off, TRX_RIT_MIN, TRX_RIT_MAX);
   trx_set_vfo();
-  cli();
-  eeprom_write_block(&(_trx.rit), &(_ee_trx.rit), sizeof(int8_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.rit), &(_ee_trx.rit), sizeof(int8_t));
+  }
 }
 
 TRXState trx_state() {
@@ -329,9 +337,9 @@ void trx_rx() {
 
 
 inline void trx_save_settings() {
-  cli();
-  eeprom_write_block(&_trx, &_ee_trx, sizeof(TRXSettings));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&_trx, &_ee_trx, sizeof(TRXSettings));
+  }
 }
 
 
@@ -345,10 +353,12 @@ void trx_set_vfo() {
     band     = _trx.vfo_b.band;
     dialf    = _trx.vfo_b.band_freq[band];
   }
-
-  uint32_t vfo = 4*(dialf-((int16_t)_trx.cw_tone)+10*((int16_t)_trx.rit));
+  uint16_t bfo = (int16_t)_trx.cw_tone;
+  if (TRX_LSB == trx_sideband())
+    bfo = -bfo;
+  uint32_t vfo = 4*(dialf-bfo+10*((int16_t)_trx.rit));
   if ((TRX_TX == _state)) {
-    si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK2);
+    si5351_clock_enable(SI5351_CLK2, 0);
     si5351_set_freq(dialf, SI5351_PLL_FIXED, SI5351_CLK0);
     si5351_clock_enable(SI5351_CLK0, 1);
   } else {
@@ -428,9 +438,9 @@ TRXStepSize trx_tune_step() {
 
 void trx_set_tune_step(TRXStepSize step) {
   _trx.step = step;
-  cli();
-  eeprom_write_block(&(_trx.step), &(_ee_trx.step), sizeof(TRXStepSize));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.step), &(_ee_trx.step), sizeof(TRXStepSize));
+  }
 }
 
 Band trx_band() {
@@ -444,15 +454,15 @@ void trx_set_band(Band band) {
   // Enable tx (mute)
   TRX_TX_PORT |= (1 << TRX_TX_BIT);
   // Select band and store in EEPROM
-  cli();
-  if ((VFO_MODE_A == _trx.vfo_mode) || ((TRX_RX == _state) && (VFO_MODE_SPLIT == _trx.vfo_mode))) {
-    _trx.vfo_a.band = band;
-    eeprom_write_block(&(_trx.vfo_a.band), &(_ee_trx.vfo_a.band), sizeof(Band));
-  } else {
-    _trx.vfo_b.band = band;
-    eeprom_write_block(&(_trx.vfo_b.band), &(_ee_trx.vfo_b.band), sizeof(Band));
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    if ((VFO_MODE_A == _trx.vfo_mode) || ((TRX_RX == _state) && (VFO_MODE_SPLIT == _trx.vfo_mode))) {
+      _trx.vfo_a.band = band;
+      eeprom_write_block(&(_trx.vfo_a.band), &(_ee_trx.vfo_a.band), sizeof(Band));
+    } else {
+      _trx.vfo_b.band = band;
+      eeprom_write_block(&(_trx.vfo_b.band), &(_ee_trx.vfo_b.band), sizeof(Band));
+    }
   }
-  sei();
   // Set band
   band_set(band);
   // Update VFO freq
@@ -469,9 +479,9 @@ void trx_set_tx_hold(uint16_t delay) {
   if (delay > 1000)
     delay=1000;
   _trx.tx_hold = delay;
-  cli();
-  eeprom_write_block(&(_trx.tx_hold), &(_ee_trx.tx_hold), sizeof(uint16_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.tx_hold), &(_ee_trx.tx_hold), sizeof(uint16_t));
+  }
 }
 
 uint8_t trx_tx_enabled() {
@@ -480,9 +490,9 @@ uint8_t trx_tx_enabled() {
 
 void trx_set_tx_enabled(uint8_t enable) {
   _trx.tx_enabled = enable;
-  cli();
-  eeprom_write_block(&(_trx.tx_enabled), &(_ee_trx.tx_enabled), sizeof(uint8_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.tx_enabled), &(_ee_trx.tx_enabled), sizeof(uint8_t));
+  }
 }
 
 KeyerMode trx_cw_mode() {
@@ -492,9 +502,9 @@ KeyerMode trx_cw_mode() {
 void trx_set_cw_mode(KeyerMode mode) {
   _trx.cw_mode = mode;
   keyer_set_mode(_trx.cw_mode);
-  cli();
-  eeprom_write_block(&(_trx.cw_mode), &(_ee_trx.cw_mode), sizeof(KeyerMode));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.cw_mode), &(_ee_trx.cw_mode), sizeof(KeyerMode));
+  }
 }
 
 uint16_t trx_cw_tone() {
@@ -508,9 +518,9 @@ void trx_set_cw_tone(uint16_t freq) {
   // Update VFO frequency from dial, BFO and CW tone frequency
   trx_set_vfo();
   // Store CW tone freq in EEPROM
-  cli();
-  eeprom_write_block(&(_trx.cw_tone), &(_ee_trx.cw_tone), sizeof(uint16_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.cw_tone), &(_ee_trx.cw_tone), sizeof(uint16_t));
+  }
 }
 
 uint8_t trx_cw_level() {
@@ -522,9 +532,9 @@ void trx_set_cw_level(uint8_t level) {
   _trx.cw_level = level;
   tone_set_volume(_trx.cw_level);
   // Store CW level in EEPROM
-  cli();
-  eeprom_write_block(&(_trx.cw_level), &(_ee_trx.cw_level), sizeof(uint8_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.cw_level), &(_ee_trx.cw_level), sizeof(uint8_t));
+  }
 }
 
 uint8_t trx_cw_speed() {
@@ -534,9 +544,9 @@ uint8_t trx_cw_speed() {
 void trx_set_cw_speed(uint8_t idx) {
   _trx.cw_speed = (idx>=KEYER_NUM_SPEED) ? (KEYER_NUM_SPEED-1) : idx;
   keyer_set_speed_idx(_trx.cw_speed);
-  cli();
-  eeprom_write_block(&(_trx.cw_speed), &(_ee_trx.cw_speed), sizeof(uint8_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.cw_speed), &(_ee_trx.cw_speed), sizeof(uint8_t));
+  }
 }
 
 uint8_t *trx_cwtext() {
@@ -548,9 +558,9 @@ void trx_clear_cwtext() {
 }
 
 void trx_update_cwtext() {
-  cli();
-  eeprom_write_block(&(_trx.cwtext), &(_ee_trx.cwtext), TRX_CWTEXT_MAXLEN);
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.cwtext), &(_ee_trx.cwtext), TRX_CWTEXT_MAXLEN);
+  }
 }
 
 uint8_t *trx_greet() {
@@ -558,9 +568,20 @@ uint8_t *trx_greet() {
 }
 
 void trx_update_greet() {
-  cli();
-  eeprom_write_block(&(_trx.greet), &(_ee_trx.greet), TRX_GREET_MAXLEN);
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.greet), &(_ee_trx.greet), TRX_GREET_MAXLEN);
+  }
+}
+
+TRXSideband trx_sideband() {
+  return _trx.sideband;
+}
+
+void trx_set_sideband(TRXSideband sideband) {
+  _trx.sideband = sideband;
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.sideband), &(_ee_trx.sideband), sizeof(TRXSideband));
+  }
 }
 
 EncoderType trx_rot_type() {
@@ -569,9 +590,9 @@ EncoderType trx_rot_type() {
 void trx_set_rot_type(EncoderType type) {
   _trx.rot_type = type;
   rot_set_type(type);
-  cli();
-  eeprom_write_block(&(_trx.rot_type), &(_ee_trx.rot_type), sizeof(uint8_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.rot_type), &(_ee_trx.rot_type), sizeof(uint8_t));
+  }
 }
 int32_t trx_pll_correction() {
   return _trx.pll_correction;
@@ -584,9 +605,9 @@ MeterType trx_meter_type() {
 void trx_set_meter_type(MeterType type) {
   _trx.meter_type = type;
   meter_set_type(type);
-  cli();
-  eeprom_write_block(&(_trx.meter_type), &(_ee_trx.meter_type), sizeof(MeterType));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.meter_type), &(_ee_trx.meter_type), sizeof(MeterType));
+  }
 }
 
 void trx_set_pll_correction(int32_t val) {
@@ -595,22 +616,22 @@ void trx_set_pll_correction(int32_t val) {
   if (val < -1000000L)
     val = -1000000L;
   _trx.pll_correction = val;
-  cli();
-  si5351_set_correction(val);
-  trx_set_vfo();
-  eeprom_write_block(&(_trx.pll_correction), &_ee_trx.pll_correction, sizeof(int32_t));
-  sei();
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    si5351_set_correction(val);
+    trx_set_vfo();
+    eeprom_write_block(&(_trx.pll_correction), &_ee_trx.pll_correction, sizeof(int32_t));
+  }
 }
 
 void trx_save_frequency() {
   if (_trx_save_freq) {
     // Store dial frequency in EEPROM
-    cli();
-    eeprom_write_block(&(_trx.vfo_a.band_freq[_trx.vfo_a.band]),
-        &(_ee_trx.vfo_a.band_freq[_trx.vfo_a.band]), sizeof(uint32_t));
-    eeprom_write_block(&(_trx.vfo_b.band_freq[_trx.vfo_b.band]),
-        &(_ee_trx.vfo_b.band_freq[_trx.vfo_b.band]), sizeof(uint32_t));
-    sei();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      eeprom_write_block(&(_trx.vfo_a.band_freq[_trx.vfo_a.band]),
+          &(_ee_trx.vfo_a.band_freq[_trx.vfo_a.band]), sizeof(uint32_t));
+      eeprom_write_block(&(_trx.vfo_b.band_freq[_trx.vfo_b.band]),
+          &(_ee_trx.vfo_b.band_freq[_trx.vfo_b.band]), sizeof(uint32_t));
+    }
     _trx_save_freq = 0;
   }
 }
@@ -654,27 +675,38 @@ void trx_poll()
     } else if ((ROT_BUTTON_HOLD_TUNE == button) && (TRX_QS_NONE != _trx.quick_set)) {
       // Handle quick-set
       if (delta && (TRX_QS_RIT == _trx.quick_set)) {
-        if ((delta>0) && (trx_rit() != TRX_RIT_MAX))
+        if ((delta>0) && (trx_rit() != TRX_RIT_MAX)) {
           trx_set_rit(trx_rit()+1);
-        else if ((delta<0) && (trx_rit() != TRX_RIT_MIN))
+          display_update();
+        } else if ((delta<0) && (trx_rit() != TRX_RIT_MIN)) {
           trx_set_rit(trx_rit()-1);
+          display_update();
+        }
       } else if (delta && (TRX_QS_STEP == _trx.quick_set)) {
-        if ((delta > 0) && (trx_tune_step() != TRX_STEP_10k))
+        if ((delta > 0) && (trx_tune_step() != TRX_STEP_10k)) {
           trx_set_tune_step(trx_tune_step()+1);
-        else if ((delta < 0) && (trx_tune_step() != TRX_STEP_10))
+          display_update();
+        } else if ((delta < 0) && (trx_tune_step() != TRX_STEP_10)) {
           trx_set_tune_step(trx_tune_step()-1);
+          display_update();
+        }
       } else if (delta && (TRX_QS_SPEED == _trx.quick_set)) {
-        if ((delta > 0) && (trx_cw_speed() != (KEYER_NUM_SPEED-1)))
+        if ((delta > 0) && (trx_cw_speed() != (KEYER_NUM_SPEED-1))) {
           trx_set_cw_speed(trx_cw_speed()+1);
-        else if ((delta < 0) && (trx_cw_speed() != 0))
+          display_update();
+        } else if ((delta < 0) && (trx_cw_speed() != 0)) {
           trx_set_cw_speed(trx_cw_speed()-1);
+          display_update();
+        }
       } else if (delta && (TRX_QS_BAND == _trx.quick_set)) {
-        if ((delta > 0) && (trx_band() != BAND_10))
+        if ((delta > 0) && (trx_band() != BAND_10)) {
           trx_set_band(trx_band()+1);
-        else if ((delta < 0) && (trx_band() != BAND_80))
+          display_update();
+        } else if ((delta < 0) && (trx_band() != BAND_80)) {
           trx_set_band(trx_band()-1);
+          display_update();
+        }
       }
-      display_update();
     } else if (delta && (ROT_BUTTON_NONE == button)) {
       trx_tune(delta);
       display_frequency();

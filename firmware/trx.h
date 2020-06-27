@@ -24,6 +24,11 @@ typedef enum {
 } TRXState;
 
 typedef enum {
+  TRX_USB = 0,
+  TRX_LSB = 1
+} TRXSideband;
+
+typedef enum {
   TRX_STEP_10,
   TRX_STEP_25,
   TRX_STEP_50,
@@ -111,6 +116,9 @@ void trx_set_tx_enabled(uint8_t enabled);
 
 uint8_t *trx_greet();
 void trx_update_greet();
+
+TRXSideband trx_sideband();
+void trx_set_sideband(TRXSideband sideband);
 
 EncoderType trx_rot_type();
 void trx_set_rot_type(EncoderType type);

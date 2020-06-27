@@ -318,10 +318,27 @@ void menu_update(RotButton button, int8_t delta)
       trx_set_rot_type(trx_rot_type()-1);
     }
   } else if (MENU_VERSION == _menu_state) {
-    if (delta>0) {
+    if (delta > 0) {
+      _menu_state = MENU_SIDEBAND;
+    } else if (delta < 0) {
+      _menu_state = MENU_ROT_TYPE;
+    }
+  } else if (MENU_SIDEBAND == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SET_SIDEBAND;
+    } else if (delta > 0) {
       _menu_state = MENU_PLL_CORRECTION;
     } else {
-      _menu_state = MENU_ROT_TYPE;
+      _menu_state = MENU_VERSION;
+    }
+  } else if (MENU_SET_SIDEBAND == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SETUP;
+      trx_set_state(TRX_RX);
+    } else if ((delta > 0) && (TRX_USB == trx_sideband())){
+      trx_set_sideband(TRX_LSB);
+    } else if ((delta < 0) && (TRX_LSB == trx_sideband())){
+      trx_set_sideband(TRX_USB);
     }
   } else if (MENU_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
@@ -329,7 +346,7 @@ void menu_update(RotButton button, int8_t delta)
     } else if (delta > 0) {
       _menu_state = MENU_RESET;
     } else {
-      _menu_state = MENU_VERSION;
+      _menu_state = MENU_SIDEBAND;
     }
   } else if (MENU_SET_PLL_CORRECTION == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {

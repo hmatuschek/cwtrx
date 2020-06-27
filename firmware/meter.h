@@ -7,7 +7,6 @@
 
 typedef enum {
   METER_NONE,
-  METER_SIG,
   METER_VOLTAGE,
   METER_TEMP
 } MeterType;
