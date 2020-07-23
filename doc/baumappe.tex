@@ -229,14 +229,14 @@ Der MOSFET \texttt{Q4} fungiert als RX/TX-Schalter, der das Tiefpass-gefilterte 
  Bevor Sie die Tiefpassfilter auf die Platine löten, bauen Sie diese zuerst auf einem Stück Leiterplattenmaterial auf und messen Sie diesen durch. Chebyschev Tiefpassfilter sind etwas empfindlich bezüglich der Komponentenwerte.
 \end{remark}
 
- If no measurement equipment is present. Please subtract one winding from the given values below. The number of turns for each core was determined using the AL-value provided by the manufacturer. In my experience, this leads to an slightly overestimation of the number of turns by about one. Moreover, you are probably more willing to risk a lower stop-band suppression rather than an increased damping in the pass band.
+ Wenn keine Messgeräte vorhanden sind, ziehen Sie bitte jeweils eine Windung von den gegebenen Werten ab. Die Anzahl der Windungen wurden aus den Al-Werten des Herstellers bestimmte. Meiner Erfahrung nach führt dies zu leicht zu großen Induktivitäten. Außerdem gehen Sie sicher lieber das Risiko einer zu hohen als einer zu niedrigen Grenzfrequenz der Tiefpassfilter ein. 
  
- The diode \texttt{D4} is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} or 1A \emph{träge} fuse will do.
- 
- Finally install the b2b \textbf{sockets} on the PA/LP board, that is \texttt{J2}, \texttt{J6}, \texttt{J7} and \texttt{J11}.
- 
+ Die Diode \texttt{D4} ist parallel in Sperrrichtung zur Spannungsversorgungsbuchse geschaltet. Zusammen mit einer Sicherung im Kabel dient diese Diode dem Verpolschutz. Wenn die Spannungsversorgung falsch herum angeschlossen wird, schließt diese Diode die Spannungsversorgung kurz, was die Sicherung in der Versorgungsleitung durchbrennen lässt. Eine 2A Sicherung \emph{flink} sollte es schon sein. 
+
+ Zuletzt löten Sie die Platinensteckverbindersockel \texttt{J2}, \texttt{J6}, \texttt{J7} ein \texttt{J11}.
+´ 
 \clearpage
-\subsection{PA/LP Component List}  \label{sec:pacomp}
+\subsection{PA/Tiefpass Bauelemente}  \label{sec:pacomp}
 \begin{longtable}{|l|p{6cm}|l|l|} \hline 
 \# & Component & Value & Remarks \\ \hline 
 2 & R12, R13 & 100 & \\
@@ -276,31 +276,27 @@ Der MOSFET \texttt{Q4} fungiert als RX/TX-Schalter, der das Tiefpass-gefilterte 
 
 
 \cleardoublepage
-\section{Final Assembly} \label{sec:box}
-Finally, the board-to-board interconnects are installed. The way these connectors are installed, depends on the chassis and distance between the boards you chose. The example I give here applies to the Fischer \texttt{KOH-2100} + \texttt{KOH-4100} + \texttt{DPL 2-4} kit. This is a nice and compact $10 \times 10 \times 5\,cm$ chassis. The boards slide into the chassis with $\approx 1.5\,cm$ distance. Unfortunately, I was not able to find stackers or long pin-headers with a matching length here in Germany. Have a look at Ebay or at Mouser. Pin headers with insertion lengths of about $12\,mm$ should do the trick. I, however, went with stackers of $38\,mm$ total length which is is way too long and therefore needed to be shortened.
+\section{Endmontage} \label{sec:box}
+Schließlich folgt die Endmontage. In diesem schritt werden die Platinensteckverbinder montiert. Wie dies geschieht hängt ein wenig von dem Verwendeten Gehäuse ab. Die Beschreibung die ich hier gebe, betrifft den Fischer-Gehäusebausatz \texttt{KOH-2100} + \texttt{KOH-4100} + \texttt{DPL 2-4}. Dieses ist ein kompaktes $10 \times 10 \times 5\,cm$ Gehäuse. Die Platinen werden mit c.a. $\approx 1.5\,cm$ Abstand in die untere Halbschale geschoben. Leider habe ich keine passenden Stapelleisten für diesen Abstand gefunden und verwende daher welche mit $38\,mm$ Gesamtlänge und daher die viel zu lang sind.
 
 \begin{figure}[!ht]
  \centering
  \includegraphics[width=0.3\linewidth]{fig/stackers_small.png}
- \caption{Cut stackers to get long pin-headers, before inserting them into the socket of the PA board.} \label{fig:stackers}
+ \caption{Schneiden Sie das obere Ende der Stapelleisten ab, bevor Sie sie in die Sockel auf der PA Platine stecken.} \label{fig:stackers}
 \end{figure}
 
-The easiest way to do that, is to cut the top-part away from these stackers (see figure \ref{fig:stackers}) and stick them into the sockets on the PA board. Than put the RX board on top. Now carefully insert both boards in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
+Der einfachste Weg ist es die oberen Enden der Stapelleisten abzuschneiden (siehe Abbildung \ref{fig:stackers}) und diese dann in die entsprechenden Sockel der PA Platine zu stecken. Führen Sie dann die langen Enden durch die entsprechenden Löcher der RX Platine und schieben Sie beide in das Gehäuse. Löten Sie nun die Stapelleisten auf der RX Platine fest und kürzen Sie die überstehenden Enden.
 
-\begin{warning}
-Do not overheat the stackers/pin-headers as the socket may melt. Just tag them in-place and reflow the header connections once the PA-board is removed.
-\end{warning}
-
-When the TRX is installed into the Fischer chassis mentioned above, the RCA connector at the back of the RX board to key an external PA will not fit. The boards are way to close together. If a different chassis is used, the connector can be installed right now.
+Wenn Sie das oben erwähnte Fischergehäuse verwenden, wird die RCA Buchse zur Steuerung einer externen PA nicht mehr passen. Die RX und PA Platinen sind einfach zu dicht beieinander. Wenn Sie ein größeres Gehäuse verwenden, können Sie nun die RCA Buchse installieren.
 
 
-\subsection{Final Testing}
-With these final steps completed, it is now time to test the PA and RX/TX switching. Reconnect everything and connect a dummy-load to the output. Measure the RF voltage-drop across the dummy-load (oscilloscope). Alternatively, connect a power/SWR meter between the TRX and dummy-load. You should get about $22\,Vp$ across the dummy-load or about $5\,W$ on transmit, depending on the supply voltage (assuming about $13.8\,V$). On the lower band (e.g., up to $30\,m$) it might even be a little bit more. 
+\subsection{Finaler Test}
+Mit der abgeschlossenen Endmontage ist es nun an der Zeit die PA und die Sende-Empfangsumschaltung zu testen. Verbinden Sie alles miteinander und schließen Sie ein Dummyload and den Ausgang an. Messen Sie die HF Spannung über dem Dummyload oder schleifen Sie ein HF-Leistungsmeter zwischen TRX und Dummyload ein. Sie sollte etwa $22\,Vp$ oder ca. $5\,W$ am Ausgang messen. Die Leistung hängt auch von der Betriebsspannung ab. Hier werden $13.8\,V$ angenommen.
 
-If your output is way less, measure the peak voltages at the PA-output and LP-input and double-check the low-pass filters. If the output matches, the assembly is complete. 
+Wenn Sie deutlich weniger Messen, messen Sie bitte die Spitzenspannungen am PA-Ausgang und Tiefpassfiltereingang. Überprüfen Sie bitte auch nochmals die Tiefpassfilter. Wenn alles zu Ihrer Zufriedenheit ist, ist der Aufbau abgeschlossen.
 
 \subsection{Hot fixes}
-The second revision was a redesign to some extend. Hence not everything is perfect yet. For example, the \texttt{74AC74} produces a lot of high-frequency ripple on the 5V rail. To suppress them stronger, a $470\,pF$ capacitor should be soldered directly from pin 16 (5V) to pin 8 (GND).  
+Die zweite Revision war beinahe ein Redesign. Daher ist noch nicht alles Perfekt. Zum Beispiel produziert der \texttt{74AC74} recht hohe Hochfrequenzspannungen auf der $5\,V$ Spannungsversorgung. Um diese stärker zu dämpfen löten Sie bitte einen $470\,pF$ Kondensator direkt von Pin 16 (5V) zu Pin 8 (GND).
 
 \clearpage
 \subsection{Mechanical Parts}
