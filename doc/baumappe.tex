@@ -318,10 +318,8 @@ Die zweite Revision war beinahe ein Redesign. Daher ist noch nicht alles Perfekt
 
 
 \cleardoublepage
-\section{Usage} \label{sec:user}
-Handling a feature-rich TRX using a single rotary encoder with a single push-button is kind of challenging. I've designed a two-level menu navigation that puts everything that is needed frequently in the first level (blue in figure \ref{fig:menu}) and everything else in a second level. This keeps the navigation fast for frequently used options. 
-
-The second menu level (red in figure \ref{fig:menu}) contains all settings that are usually not touched during the operation. They concern the basic setup and alignment of the TRX. 
+\section{Bedienung} \label{sec:user}
+Einen komplexen TRX mit einem Drehimpulsgeber zu bedienen ist recht schwierig. Ich habe daher ein zwei-ebenen Menu entworfen, dass alles Wichtige in die erste Ebene (blau in Abb. \ref{fig:menu}) und alles weniger Wichtige in die Zweite ebene (rot in Abb. \ref{fig:menu}) verbannt. Das erlaubt eine schnelle Handhabung für häufig verwendete Menüpunkte.
 
 \begin{figure}[!ht]
  \centering
@@ -384,95 +382,84 @@ The second menu level (red in figure \ref{fig:menu}) contains all settings that 
  \caption{Menu navigation} \label{fig:menu}
 \end{figure}
 
-To enter the menu, just click the button on the rotary encoder. You will land on either the RIT setting or on the last modified setting. Using the rotary-encoder you can navigate through the first menu level. To change a settings, click the center button again. You can now change the selected setting using the rotary encoder. To finish the setting and leave the menu, click the center button again.
+Um in das Menu zu gelangen, drücken Sie einfach kurz auf den Achsentaster des Impulsgebers. Sie werden dann auf der RIT Einstellung oder der zuletzt verwendeten Einstellung landen. Drehen Sie nun den Impulsgeber um in der ersten Ebene des Menüs zu navigieren. Um eine Einstellung zu ändern, drücken Sie nochmals kurz auf den Achsentaster. Sie können nun die ausgewählte Einstellung ändern. Um die Änderung zu speichern und das Menü zu verlassen, drücken Sie nochmals kurz auf den Achsentaster.
 
-To enter the second menu-level, enter the first level by clicking on the center button and select the menu entry \texttt{Setup}. Click on the center button again to enter the second-level menu. You will land on the \texttt{Quick-set} setting. You may now navigate the second menu-level using the rotary encoder. Changing and leaving the second-level menu works in the same way as the first-level menu. 
+Um die zweite Menüebene zu erreichen, drücken Sie zunächst kurz auf den Achsentaster um in die erste Ebene zu gelangen. Wählen Sie dann den Menüpunkt \texttt{Setup} aus und drücken Sie nochmals kurz den Achsentaster. Sie befinden sich nun in der zweiten Menüebene. Das Navigieren, Bearbeiten und Verlassen der zweiten Ebene erfolgt genauso wie in der ersten Menüebene.
 
-
-\subsection{Gestures}
-The firmware distinguishes four different \emph{gestures} of the rotary encoder:
+\subsection{Gesten}
+Die Firmware unterscheidet zwischen 4 verschiedenen \emph{Gesten} den Sie mit dem Drehimpulsgeber ausführen können:
 \begin{enumerate}
- \item \emph{tune} - just rotate the encoder.
- \item \emph{click} - press and release the center button of the encoder.
- \item \emph{long-press} - press and hold the center button for at least 2 seconds.
- \item \emph{press-rotate} - press and rotate the encoder.
+ \item \emph{drehen} - Einfach den Impulsgeber drehen.
+ \item \emph{klick} - Kurzes drücken und wieder loslassen des Achsentasters.
+ \item \emph{gedrückt halten} - Langes (mind. $2\,s$) gedrückt halten des Achsentasters.
+ \item \emph{drücken \& drehen} - Halten die den Achsentaster gedrückt und drehen Sie gleichzeitig den Impulsgeber.
 \end{enumerate}
 
-During RX, a \emph{tune} gesture will simply tune the frequency (of cause), a \emph{click} gesture will enter the menu, a \emph{long-press} gesture will send the keyer memory (if set) and a \emph{press-rotate} gesture will quick-set a property (if specified).
+Während des Empfangs wird durch die \emph{drehen} Geste die Frequenz eingestellt (natürlich), eine \emph{klick} Geste wird das Menü öffnen, die \emph{gedrückt halten} Geste wird den gespeicherten Text senden (falls konfiguriert) und die \emph{drücken \& drehen} Geste wird die sogenannte \emph{quick-set} Einstellung ändern (falls konfiguriert).
 
 
-\subsection{Settings}
-The \emph{settings} are all settings that might be changed during normal operation of the TRX. Hence they are located at the first level of the menu for the sake of quick access.
+\subsection{Einstellungen}
+Als \emph{Einstellungen} wird alles Bezeichnet, was während des Betriebs geändert werden kann. Diese Einstellungen sind daher auch alle in der ersten Menüebene zu finden. 
  
 \paragraph{Receive/Transmit offset (RIT)}
-Allows to fine-tune the RX frequency while keeping the TX frequency constant. A non-zero RIT will be indicated by a \texttt{+} or \texttt{-} symbol in the bottom-right corner of the display during RX. 
+Erlaubt es die Empfangsfrequenz relativ zur Sendefrequenz zu verstimmen. Eine von null verschiedene RIT wird durch ein \texttt{+} oder \texttt{-} Symbol in der rechten unteren Ecke angezeigt.
 
 \paragraph{CW speed}
-Specifies the speed in WPM for the iambic and automatic keyer.
+Die Gebegeschwindigkeit in WPM.
 
 \paragraph{Tuning step-size}
-Specifies the step-size when tuning the TRX.
+Die Abstimmschrittweite.
 
 \paragraph{VFO}
-Specifies the current VFO and VFO-mode. That is \texttt{VFO A}, \texttt{VFO B} or \texttt{Split}.
+Der aktuelle VFO. Entweder \texttt{VFO A}, \texttt{VFO B} oder \texttt{Split}.
 
 \paragraph{Band}
-Specifies the current band. 
+Das aktuelle Band.
 
-
-\subsection{Quick-Set}
-The \emph{quick-set} feature allows you to modify a selected setting without entering the menu at all. Just press \& rotate the  encoder.
-
-To use this feature, you have to specify the settings you want to \emph{quick-set} under \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{QuickSet} (see below).
 
 \subsection{Setup}
-\emph{Setup} hides all settings that are usually not touch during regular operation and are therefore hidden in the second menu-level. You can access these settings by selecting \texttt{Menu} $\rightarrow$ \texttt{Setup}.
+Im \emph{Setup} werden alle Einstellungen versteckt, die üblicherweise nicht während des Betriebs geändert werden. Sie sind daher in die zweite Menüebene verband.
 
 \paragraph{Quick-set}
-The Quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
+Das \emph{quick-set} Feature erlaubt es Ihnen eine bestimmte Einstellung (siehe oben) während des Empfangs zu ändern ohne dazu erst das Menü aufrufen zu müssen. Hier können Sie diese Einstellung auswählen: RIT, Gebegeschwindigkeit, Schrittweite, Band oder eben \texttt{none}. Letzteres deaktiviert \emph{quick-set}.
 
 \paragraph{Keyer mode}
-The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key} and \emph{iambic}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
+Stellt die Art der Taste ein. Entweder \emph{straight key} oder \emph{iambic}.
 
 \paragraph{CW side-tone level}
-Specifies the volume of the CW side-tone. This is a value between 1 and 255.
+Stellt die Lautstärke des CW Seitentons ein. Dies ist ein Wert zwischen 1 und 255.
 
 \paragraph{Keyer memory \texttt{CW Text}}
-Specifies the text to be send automatically (e.g., a CQ call) when the rotary encoder is long-pressed. If no text is set, nothing will happen.
+Legt den Text fest, der gesendet wird, wenn der Achsentaster lange gedrückt wird. Wenn kein Text gespeichert ist wird nichts passieren.
 
-To edit the CW text head to \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{CW Text} and \emph{click} the encoder to enter the editor. You should see a cursor beneath the first character. You can use the encoder to select the character you want to edit. \emph{click} again and the character should start to blink. You can now change the selected character. Once the desired character is found, \emph{click} again to set it. You are now back at the editor level and the next character is automatically selected. Once the text is edited, leave the editor by \emph{long-pressing} the encoder.
+Um den Text zu editieren drücken sie nun kurz den Achsentaster. Sie sollten nun einen Kursor unter dem ersten Zeichen des Textes sehen. Wenn Sie nun am Impulsgeber drehen, können Sie das Zeichen auswählen, das sie editieren wollen. Drücken sie nochmals kurz den Achsentaster um das ausgewählte Zeichen zu ändern. Das gewählte Zeichen sollte nun blinken. Wenn die das Zeichen geändert haben drücken Sie nochmals kurz auf den Achsentaster. Der Kursor sollte nun eine Stelle weiter gesprungen sein. Fahren Sie nun so fort bis der gewünschte Text erstellt ist (z.B. ein CQ Ruf). Um den Text zu speichern und das Menu zu verlassen, drücken und halten Sie den Achsentaster für mindestens 2 Sekunden.
 
 \paragraph{Clear keyer memory}
-Simply clears the keyer memory.
+Dieser Menüpunkt löscht den gespeicherten Text.
 
 \paragraph{Meter selection}
-Selects a meter to display during RX. This can be \texttt{Volt} to display the supply voltage or \texttt{Temp} to display the core-temperature of the MCU.
+Wählt die Anzeige während des Empfangs aus. Dies kann \texttt{Volt}, \texttt{Temp} oder \texttt{None} sein. Wenn Sie \texttt{Volt} wählen wird die Versorgungsspannung kontinuierlich gemessen und angezeigt. Wenn Sie \texttt{Temp} wählen wird die Kerntemperatur der MCU gemessen und angezeigt. Wenn Sie \texttt{None} gewählt haben, wird nichts angezeigt.
 
 \paragraph{TX-hold time}
-Specifies the delay between TX and RX in $ms$. By default a value of $50\,ms$ is selected. This small value allows for quasi-QSK but is sufficiently long to avoid ugly clicks in the audio path when switching from TX to RX.
+Legt die Länge der Umschaltpause im $ms$ fest. Standardmäßig ist sie auf $50\,ms$ festgelegt. Dieser kleine Wert erlaubt quasi-QSK. 
 \begin{remark}
-When operating a PA or operating in split mode, a longer delay should be chosen to allow the relays to switch properly.
+Wenn Sie eine externe PA verwenden oder im Split Modus operieren, sollten Sie eine längere Umschaltpause wählen um den Relais genügend Zeit um Umschalten zu gewähren.
 \end{remark}
 
 \paragraph{Greet text}
-An editor that allows you to change the \emph{greeting} at startup. The editing is similar to the \emph{keyer memory} editor above.
+Dieser Editor erlaubt es den Begrüßungstext beim booten zu ändern. Dieser Editor funktioniert genau so wie der CW-Texteditor.
 
-
-\subsection{Alignment}
-These settings can be found under the \emph{Setup} sub-menu and are usually only changed during the alignment of the TRX. 
-
-\paragraph{CW side-tone frequency}
-Specifies the CW side-tone frequency as well as the RX frequency shift. This frequency should be identical to the center frequency of the narrow CW audio filter.
+\paragraph{CW Seitenton}
+Stellt die Frequenz des CW Seitentons ein. Diese Frequenz legt auch den Shift zwischen der Sende und Empfangsfrequenz fest und sollte daher der Mittenfrequenz des CW Audiofilters ($\approx 700\,Hz$) entsprechen.
 
 \paragraph{Encoder type}
-Specifies the encoder type used. There are two different generic encoder-types \texttt{A} \& \texttt{B}. If you ordered exactly the encoder listed in the BOM, you should have a type-A encoder (default). If you encounter problems with the encoder (e.g., double-steps) you may change this setting to type B. If you wired the encoder in the wrong way (wrong tuning direction) you may simply change this setting to \texttt{A rev} or \texttt{B rev}. 
+Legt den Typ des Drehimpulsgebers fest. Es gibt zwei verbreitete Typen \texttt{A} \& \texttt{B}. Wenn Sie genau den Encoder aus der BOM bestellt haben, haben Sie Typ A. Wenn Sie Probleme mit dem Encoder haben (Doppelschritte), sollten Sie hier Typ B einstellen.
 
 \paragraph{PLL correction}
-This setting specifies the PLL clock frequency correction in PPM. See \texttt{RX Alignment} above.
+Diese Einstellung legt die PLL Frequenzkorrektur in PPM fest.
 
 \paragraph{Factory reset}
-The previous version of the TRX encountered some issues with the EEPROM memory, leading to corrupted settings which turn the TRX unusable. This option allows to reset the entire EEPROM memory to \emph{factory settings} fixing the corrupted memory issue.
-
+Vorherige Versionen hatten einige Probleme mit korrumpierten EEPROM Speicher. Dieser Menüpunkt erlaubt es Ihnen den EEPROM auf den Auslieferungszustand zurückzusetzen.
 
 
 \cleardoublepage
@@ -570,8 +557,8 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 \multicolumn{4}{|l}{Total\footnote{Prices may change over time.}} & \multicolumn{2}{r|}{\textbf{85,73 \euro}} \\ \hline
 \end{longtable}
 
-\subsection{Shave off some \euro\ from the BOM}
-The single most expensive item on the BOM is the chasis. You can certainly find some extruded aluminium chassis for less than \EUR{5} on Ebay. You can also get chap rip-offs of the Adafruit SI5351 break-out board for around \EUR{3}, cheap rotary encoders (\EUR{1}) and 2x8 LCD displays (\EUR{3}) there. I shoud announce a competition for the cheapest BOM for this TRX.
+\subsection{Ein paar \euro\ sparen}
+Der teuerste Einzelposten auf der BOM ist das Gehäuse. Sie können sicher ein Alugehäuse für unter \EUR{5} bei ebay finden. Sie finden auch billige Clone der SI5351 break-out Platine für um die \EUR{3}, billige Drehimpulsgeber und 2x8 LCD Displays dort. So können Sie die BOM Kosten noch deutlich senken.
 
 \cleardoublepage
 \includepdf[pages={1,2,4,3,5,6},landscape=true, addtotoc={
