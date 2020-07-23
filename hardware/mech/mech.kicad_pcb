@@ -1,8 +1,8 @@
-(kicad_pcb (version 20171130) (host pcbnew 5.1.6-c6e7f7d~86~ubuntu18.04.1)
+(kicad_pcb (version 20171130) (host pcbnew 5.1.5+dfsg1-2build2)
 
   (general
     (thickness 1.6)
-    (drawings 72)
+    (drawings 73)
     (tracks 0)
     (zones 0)
     (modules 8)
@@ -271,6 +271,9 @@
       (net 1 GND))
   )
 
+  (gr_text "Drillplan for front panel using Fisher chassis." (at 133.01 36.5) (layer Cmts.User)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
   (gr_text "4 x M2.5" (at 148.5 54.5) (layer Cmts.User)
     (effects (font (size 1 1) (thickness 0.15)))
   )
@@ -330,7 +333,7 @@
     (arrow2b (pts (xy 98 60) (xy 96.873496 60.586421)))
   )
   (dimension 40 (width 0.15) (layer F.Fab)
-    (gr_text "40,000 mm" (at 130.7 80 270) (layer F.Fab) (tstamp 5EED2B92)
+    (gr_text "40,000 mm" (at 130.7 80 270) (layer F.Fab)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (feature1 (pts (xy 132 100) (xy 131.413579 100)))
@@ -405,7 +408,7 @@
     (arrow2b (pts (xy 181.5 67) (xy 182.086421 68.126504)))
   )
   (dimension 10 (width 0.15) (layer F.Fab)
-    (gr_text "10,000 mm" (at 72.2 95 270) (layer F.Fab) (tstamp 5EED2B14)
+    (gr_text "10,000 mm" (at 72.2 95 270) (layer F.Fab)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (feature1 (pts (xy 75 100) (xy 72.913579 100)))

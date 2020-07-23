@@ -221,7 +221,7 @@ With these steps, the alignment of the RX is completed and you may take the RX o
 
 \cleardoublepage
 \section{PA \& Low-Pass Board} \label{sec:pa}
-The majority of the PA/LP board consists of four 7-pole Chebyshev low-pass filters. The Chebyshev-type filters are needed to get away with only four filters to cover all RF bands from 80m to 10m. The right-most filter covers the 80m and 60m band and should have a cutoff frequency near $5.6\,MHz$. The next filter covers 40m and 30m and should have a cutoff frequency near $10.5\,MHz$. The second-to-last filter covers 20m and 17m and should have a cutoff frequency near $20\,MHz$. Finally the leftmost filter will cover 15m, 12m and 10m with a cutoff frequency near $30\,.MHz$. The low-pass filters are switched by 4 sub-miniature relays controlled by the RX-board via the board-to-board (b2b) connector \texttt{J2}.
+The majority of the PA/LP board consists of four 7-pole Chebyshev low-pass filters. The Chebyshev-type filters are needed to get away with only four filters to cover all RF bands from 80m to 10m. The right-most filter covers the 80m and 60m band and should have a cutoff frequency near $5.6\,MHz$. The next filter covers 40m and 30m and should have a cutoff frequency near $10.5\,MHz$. The second-to-last filter covers 20m and 17m and should have a cutoff frequency near $20\,MHz$. Finally the leftmost filter will cover 15m, 12m and 10m with a cutoff frequency near $30\,MHz$. The low-pass filters are switched by 4 sub-miniature relays controlled by the RX-board via the board-to-board (b2b) connector \texttt{J2}.
 
 The \texttt{Q4} mosfet acts as the TX/RX switch passing the LP-filtered RF from the input to the RX via b2b \texttt{J6}.
 
@@ -286,7 +286,7 @@ Finally, the board-to-board interconnects are installed. The way these connector
 \begin{figure}[!ht]
  \centering
  \includegraphics[width=0.3\linewidth]{fig/stackers_small.png}
- \caption{Cut stackers before inserting them into the socket of the PA board} \label{fig:stackers}
+ \caption{Cut stackers to get long pin-headers, before inserting them into the socket of the PA board.} \label{fig:stackers}
 \end{figure}
 
 The easiest way to do that, is to cut the top-part away from these stackers (see figure \ref{fig:stackers}) and stick them into the sockets on the PA board. Than put the RX board on top. Now carefully insert both boards in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
@@ -294,6 +294,8 @@ The easiest way to do that, is to cut the top-part away from these stackers (see
 \begin{warning}
 Do not overheat the stackers/pin-headers as the socket may melt. Just tag them in-place and reflow the header connections once the PA-board is removed.
 \end{warning}
+
+When the TRX is installed into the Fischer chassis mentioned above, the RCA connector at the back of the RX board to key an external PA will not fit. The boards are way to close together. If a different chassis is used, the connector can be installed right now.
 
 
 \subsection{Final Testing}
@@ -352,11 +354,13 @@ The second menu level (red in figure \ref{fig:menu}) contains all settings that 
   \node (text) [submenu, left of=level] {CW Text}; 
   \node (clr) [submenu, left of=text] {Clr. CWT};
   \node (meter) [submenu, below of=clr] {Meter};
-  \node (hold) [submenu, right of=meter] {TX Hold}; 
+  \node (hold) [submenu, below of=meter] {TX Hold}; 
   \node (greet) [submenu, right of=hold] {Greet};
   \node (enc) [submenu, right of=greet] {Enc.Type};
-  \node (pll) [submenu, right of=enc] {PLL Cor.};
-  \node (reset) [submenu, right of=pll] {Reset};
+  \node (version) [submenu, right of=enc] {Version};
+  \node (sideband) [submenu, right of=version] {USB/LSB};
+  \node (pll) [submenu, right of=sideband] {PLL Cor.};
+  \node (reset) [submenu, above of=pll] {Reset};
   
   
   \path[->,thick]
@@ -379,7 +383,9 @@ The second menu level (red in figure \ref{fig:menu}) contains all settings that 
     	(meter) edge (hold)
     	(hold) edge (greet) 
     	(greet) edge (enc)
-    	(enc) edge (pll)
+    	(enc) edge (version)
+    	(version) edge (sideband)
+    	(sideband) edge (pll)
     	(pll) edge (reset) 
     	(reset) edge (quick);
  \end{tikzpicture}
@@ -597,4 +603,6 @@ The single most expensive item on the BOM is the chasis. You can certainly find 
  3, subsection, 1, Silkscreen, pabrdsilk}]{fig/pa_brd.pdf}
 \includepdf[landscape=true, addtotoc={
  1, subsection, 1, Component Placement \& Values, pacomp}]{fig/pa_values.pdf}
+\includepdf[landscape=true, addtotoc={
+ 1, section, 1, Drill Plan, drillfront}]{fig/drill_front.pdf}
 \end{document}
