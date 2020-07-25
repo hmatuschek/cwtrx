@@ -212,7 +212,7 @@ Mit diesem Abgleich ist der Abgleich des RX nun vollständig.
 1 & -- & 10k log & potentiometer \\
 1 & J10 & 1x4 90deg & \\
 1 & -- & Rotary encoder & \\
-1 & LCD1 & 1x8 90deg & \\
+1 & LCD1 & 1x10 90deg & \\
 1 & -- & LCD & 2 x 8 symbols \\
 1 & J13 & TX-OC & RCA-jack (optional) \\
 1 & J5 & Key & 3.5mm stereo jack\\ \hline
@@ -281,8 +281,15 @@ Schließlich folgt die Endmontage. In diesem schritt werden die Platinensteckver
 
 \begin{figure}[!ht]
  \centering
- \includegraphics[width=0.3\linewidth]{fig/stackers_small.png}
- \caption{Schneiden Sie das obere Ende der Stapelleisten ab, bevor Sie sie in die Sockel auf der PA Platine stecken.} \label{fig:stackers}
+ \begin{subfigure}{0.49\linewidth}
+  \includegraphics[width=\linewidth]{fig/stackers_small.png}
+  \caption{Schneiden Sie das obere Ende der Stapelleisten ab, bevor Sie sie in die Sockel auf der PA Platine stecken.}  \label{fig:stackers}
+ \end{subfigure}
+ \begin{subfigure}{0.49\linewidth}
+  \includegraphics[width=\linewidth]{fig/final_small.png}
+  \caption{Stecken Sie die RX Platine auf die Stapelleisten, schieben Sie das Gebilde in die Gehäuseschale, löten Sie die Stapelleisten an der Empfängerplatine fest und schneiden Sie schließlich die Stapelleisten zu.}  \label{fig:final}
+ \end{subfigure}
+ \caption{Endmontage der Platinen.}
 \end{figure}
 
 Der einfachste Weg ist es die oberen Enden der Stapelleisten abzuschneiden (siehe Abbildung \ref{fig:stackers}) und diese dann in die entsprechenden Sockel der PA Platine zu stecken. Führen Sie dann die langen Enden durch die entsprechenden Löcher der RX Platine und schieben Sie beide in das Gehäuse. Löten Sie nun die Stapelleisten auf der RX Platine fest und kürzen Sie die überstehenden Enden.
@@ -534,8 +541,8 @@ Vorherige Versionen hatten einige Probleme mit korrumpierten EEPROM Speicher. Di
 1 & $\square$ & 1x3 plug & PSK 254/3W & 0,02 \euro & 0,02 \euro \\
 1 & $\square$ & 1x4 90deg & PSS 254/4W & 0,09 \euro & 0,09 \euro \\
 1 & $\square$ & 1x4 plug & PSK 254/4W & 0,02 \euro & 0,02 \euro \\
-1 & $\square$ & 1x8 90deg & PSS 254/8W & 0,10 \euro & 0,10 \euro \\
-1 & $\square$ & 1x8 plug & PSK 254/8W & 0,08 \euro & 0,08 \euro \\
+1 & $\square$ & 1x10 90deg & PSS 254/10W & 0,10 \euro & 0,10 \euro \\
+1 & $\square$ & 1x10 plug & PSK 254/10W & 0,08 \euro & 0,08 \euro \\
 2 & $\square$ & contacts & PSK-KONTAKTE & 0,29 \euro & 0,58 \euro \\
 2 & $\square$ & head-phone socket & EBS 35 & 0,30 \euro & 0,60 \euro\\
 1 & $\square$ & TX-OC & RND 205-00698 & 0,57 \euro & 0,57 \euro \\
