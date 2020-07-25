@@ -98,7 +98,7 @@ If you got one of the rare TO-220 variant of U10 that connects the metal tab to 
  Plug the LCD \& rotary encoder into the board and install the \texttt{ATMega328} MCU. Then connect the board to the power-supply. If you got a pre-programmed MCU you should see a brief greeting on the LCD. If you do not see anything at all or a series of back blocks on the screen, you may have to set the LCD supply/contrast setting using RV4. If you still don't see anything on the LCD, double-check your connects to the LCD! 
 
 \subsection{Testing PLL}
-In a next step, verify the \texttt{SI5351} PLL. First, install the \texttt{SI5351} break-out board. 
+In a next step, verify the proper operation of the \texttt{SI5351} PLL. First, install the \texttt{SI5351} break-out board. 
 
 \begin{warning}
  Be careful when inserting the \texttt{SI5351} beakout-board, there is no protection in the socket to plug it in the wrong way: The board should overlap with the LCD connector not U9!
@@ -106,7 +106,7 @@ In a next step, verify the \texttt{SI5351} PLL. First, install the \texttt{SI535
  
 Then switch on the RX and verify that there is a $3.5MHz$ signal at pins 8, 9, 11 and 12 of \texttt{U9}. If not, verify that there is a $14.0Mhz$ signal at the \texttt{CLK2} output of the \texttt{SI5351} break-out board. 
 
-You may also verify the $90^\circ$ phase-shift between pins 9 and 12 of \texttt{U9}.
+You may also verify the $90^\circ$ phase-shift between pins 9 and 12 of \texttt{U9} using a dual-channel oscilloscope.
 
 \begin{remark}
 By default, the RX is wired to receive on the upper side-band (USB). If you prefer LSB-reception, you may break the jumper labeled \emph{USB} and put a solder-bride on jumper \emph{LSB}. You also need to set the side-band in the firmware.
@@ -142,10 +142,10 @@ Before soldering the core, make sure the wires are aligned correctly using a mul
 Once the receiver is completed, re-connect the top-right pads \emph{+ G} to the power-supply, prepare the volume and head-phone plug. Also connect a piece of coaxial cable to the \emph{RX/GN} pads in the top-left. This is the antenna input for the test. Depending on the selected band, you may need to increase the current-limit of the power supply to about $120\,mA$. 
 
 \subsubsection{Frequency Alignment}
-If a accurate frequency-counter is at hand, you may start your alignment by fixing the PLL offset. Select the 20m band and tune to $14.0003 MHz$. Then measure the frequency at the USB pad. You should read exactly $14.001 MHz$ (if the CW side-tone frequency is set to $700\,Hz$). If not, enter the Setup menu and select the \emph{PLL correction} option. Now adjust the correction until you read $14.001 MHz$ in the frequency counter.
+If a accurate frequency-counter is at hand, you may start your alignment by fixing the PLL offset. Select the 20m band and tune to $14.0007 MHz$. Then measure the frequency at the USB pad. You should read exactly $14.000 MHz$ (if the CW side-tone frequency is set to $700\,Hz$). If not, enter the Setup menu and select the \emph{PLL correction} option. Now adjust the correction until you read $14.000 MHz$ in the frequency counter.
 
 \subsubsection{CW Filter Alignment}
-Although the CW filter cannot be \emph{tuned}, variations in component values may lead to small variations in the center frequency of the narrow CW audio filter. For a proper alignment of the RX frequency-shift, the CW-tone must be set to the center frequency of the CW filter. Hence, measure the spectrum (e.g., using your PC sound card an an application that can display the audio spectrum) of the audio signal. Determine the center frequency of the CW filter and set the CW side-tone frequency (under \texttt{Menu}\ $\rightarrow$\ \texttt{Setup}\ $\rightarrow$\ \texttt{CW Tone}) to that value. This will also adjust the RX frequency-shift.
+Although the CW filter cannot be \emph{tuned}, variations in component values may lead to small variations in the center frequency of the narrow CW audio filter. For a proper alignment of the RX frequency-shift, the CW-tone must be set to the center frequency of the CW filter. Hence, measure the spectrum (e.g., using your PC sound card and an application that can display the audio spectrum) of the audio signal. Determine the center frequency of the CW filter and set the CW side-tone frequency (under \texttt{Menu}\ $\rightarrow$\ \texttt{Setup}\ $\rightarrow$\ \texttt{CW Tone}) to that value. This will also adjust the RX frequency-shift.
 
 \begin{remember}
 The displayed frequency is the frequency, the TRX will transmit on. It is not the beat-frequency the TRX is receiving on.
@@ -233,9 +233,9 @@ The complete TRX is powered from the barrel-jack \texttt{J3} and the supply volt
  Before assembling the low-pass filers on the board. Please assemble them ugly-style on a piece of PCB material and measure their properties using a network analyzer or spectrum analyzer. Being Chebyshev low-pass filter, the exact component values are critical!
 \end{remark}
 
- If no measurement equipment is present. Please subtract one winding from the given values below. The number of turns for each core was determined using the AL-value provided by the manufacturer. In my experience, this leads to an slightly overestimation of the number of turns by about one. Moreover, you are probably more willing to risk a lower stop-band suppression rather than an increased damping in the pass band.
+ If no measurement equipment is present. Please subtract one winding from the given values below. The number of turns for each core was determined using AL-values provided by the manufacturer. In my experience, this leads to an slightly overestimation of the number of turns by about one. Moreover, you are probably more willing to risk a lower stop-band suppression rather than an increased damping in the pass band.
  
- The diode \texttt{D4} is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} or 1A \emph{träge} fuse will do.
+ The diode \texttt{D4} is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} fuse will do.
  
  Finally install the b2b \textbf{sockets} on the PA/LP board, that is \texttt{J2}, \texttt{J6}, \texttt{J7} and \texttt{J11}.
  
@@ -285,8 +285,15 @@ Finally, the board-to-board interconnects are installed. The way these connector
 
 \begin{figure}[!ht]
  \centering
- \includegraphics[width=0.3\linewidth]{fig/stackers_small.png}
- \caption{Cut stackers to get long pin-headers, before inserting them into the socket of the PA board.} \label{fig:stackers}
+ \begin{subfigure}{0.49\linewidth} 
+  \includegraphics[width=\linewidth]{fig/stackers_small.png}
+  \caption{Cut stackers to get long pin-headers, before inserting them into the socket of the PA board.} \label{fig:stackers}
+ \end{subfigure} 
+ \begin{subfigure}{0.49\linewidth} 
+  \includegraphics[width=\linewidth]{fig/final_small.png}
+  \caption{Put RX board on top, insert into chassis, solder pins to RX board and cut pins to length.} \label{fig:final}
+ \end{subfigure}
+ \caption{Final assembly of the board-to-board interconnects.}
 \end{figure}
 
 The easiest way to do that, is to cut the top-part away from these stackers (see figure \ref{fig:stackers}) and stick them into the sockets on the PA board. Than put the RX board on top. Now carefully insert both boards in the chassis. Make sure that you can close the chassis. Finally solder the stackers/long pin-headers into the RX board. 
@@ -434,10 +441,10 @@ The \emph{quick-set} feature allows you to modify a selected setting without ent
 To use this feature, you have to specify the settings you want to \emph{quick-set} under \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{QuickSet} (see below).
 
 \subsection{Setup}
-\emph{Setup} hides all settings that are usually not touch during regular operation and are therefore hidden in the second menu-level. You can access these settings by selecting \texttt{Menu} $\rightarrow$ \texttt{Setup}.
+\emph{Setup} hides all settings that are usually not touched during regular operation and are therefore hidden in the second menu-level. You can access these settings by selecting \texttt{Menu} $\rightarrow$ \texttt{Setup}.
 
 \paragraph{Quick-set}
-The Quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
+The quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
 
 \paragraph{Keyer mode}
 The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key} and \emph{iambic}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
@@ -448,7 +455,7 @@ Specifies the volume of the CW side-tone. This is a value between 1 and 255.
 \paragraph{Keyer memory \texttt{CW Text}}
 Specifies the text to be send automatically (e.g., a CQ call) when the rotary encoder is long-pressed. If no text is set, nothing will happen.
 
-To edit the CW text head to \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{CW Text} and \emph{click} the encoder to enter the editor. You should see a cursor beneath the first character. You can use the encoder to select the character you want to edit. \emph{click} again and the character should start to blink. You can now change the selected character. Once the desired character is found, \emph{click} again to set it. You are now back at the editor level and the next character is automatically selected. Once the text is edited, leave the editor by \emph{long-pressing} the encoder.
+To edit the CW text head to \texttt{Menu} $\rightarrow$ \texttt{Setup} $\rightarrow$ \texttt{CW Text} and \emph{click} the encoder to enter the editor. You should see a cursor beneath the first character. You can use the encoder to select the character you want to edit. \emph{Click} again and the character should start to blink. You can now change the selected character. Once the desired character is found, \emph{click} again to set it. You are now back at the editor level and the next character is automatically selected. Once the text is edited, leave the editor by \emph{long-pressing} the encoder.
 
 \paragraph{Clear keyer memory}
 Simply clears the keyer memory.
@@ -459,7 +466,7 @@ Selects a meter to display during RX. This can be \texttt{Volt} to display the s
 \paragraph{TX-hold time}
 Specifies the delay between TX and RX in $ms$. By default a value of $50\,ms$ is selected. This small value allows for quasi-QSK but is sufficiently long to avoid ugly clicks in the audio path when switching from TX to RX.
 \begin{remark}
-When operating a PA or operating in split mode, a longer delay should be chosen to allow the relays to switch properly.
+When operating a PA or in split mode, a longer delay should be chosen to allow the relays to switch properly.
 \end{remark}
 
 \paragraph{Greet text}
@@ -473,7 +480,7 @@ These settings can be found under the \emph{Setup} sub-menu and are usually only
 Specifies the CW side-tone frequency as well as the RX frequency shift. This frequency should be identical to the center frequency of the narrow CW audio filter.
 
 \paragraph{Encoder type}
-Specifies the encoder type used. There are two different generic encoder-types \texttt{A} \& \texttt{B}. If you ordered exactly the encoder listed in the BOM, you should have a type-A encoder (default). If you encounter problems with the encoder (e.g., double-steps) you may change this setting to type B. If you wired the encoder in the wrong way (wrong tuning direction) you may simply change this setting to \texttt{A rev} or \texttt{B rev}. 
+Specifies the encoder type used. There are two different generic encoder-types \texttt{A} \& \texttt{B}. If you ordered exactly the encoder listed in the BOM, you should have a type-A encoder (default). If you encounter problems with the encoder (e.g., double-steps) you may change this setting to type B. If you wired the encoder in the wrong way (wrong tuning direction) you may simply change this setting to \texttt{A~rev} or \texttt{B~rev}. 
 
 \paragraph{PLL correction}
 This setting specifies the PLL clock frequency correction in PPM. See \texttt{RX Alignment} above.
@@ -555,8 +562,8 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 1 & $\square$ & 1x3 plug & PSK 254/3W & 0,02 \euro & 0,02 \euro \\
 1 & $\square$ & 1x4 90deg & PSS 254/4W & 0,09 \euro & 0,09 \euro \\
 1 & $\square$ & 1x4 plug & PSK 254/4W & 0,02 \euro & 0,02 \euro \\
-1 & $\square$ & 1x8 90deg & PSS 254/8W & 0,10 \euro & 0,10 \euro \\
-1 & $\square$ & 1x8 plug & PSK 254/8W & 0,08 \euro & 0,08 \euro \\
+1 & $\square$ & 1x10 90deg & PSS 254/10W & 0,10 \euro & 0,10 \euro \\
+1 & $\square$ & 1x10 plug & PSK 254/10W & 0,08 \euro & 0,08 \euro \\
 2 & $\square$ & contacts & PSK-KONTAKTE & 0,29 \euro & 0,58 \euro \\
 2 & $\square$ & head-phone socket & EBS 35 & 0,30 \euro & 0,60 \euro\\
 1 & $\square$ & TX-OC & RND 205-00698 & 0,57 \euro & 0,57 \euro \\
@@ -579,7 +586,7 @@ The previous version of the TRX encountered some issues with the EEPROM memory, 
 \end{longtable}
 
 \subsection{Shave off some \euro\ from the BOM}
-The single most expensive item on the BOM is the chasis. You can certainly find some extruded aluminium chassis for less than \EUR{5} on Ebay. You can also get chap rip-offs of the Adafruit SI5351 break-out board for around \EUR{3}, cheap rotary encoders (\EUR{1}) and 2x8 LCD displays (\EUR{3}) there. I shoud announce a competition for the cheapest BOM for this TRX.
+The single most expensive item on the BOM is the chasis. You can certainly find some extruded aluminium chassis for less than \EUR{5} on Ebay. You can also get cheap clones of the Adafruit SI5351 break-out board for around \EUR{3}, cheap rotary encoders (\EUR{1}) and 2x8 LCD displays (\EUR{3}) there. I shoud announce a competition for the cheapest BOM for this TRX.
 
 \cleardoublepage
 \includepdf[pages={1,2,4,3,5,6},landscape=true, addtotoc={
