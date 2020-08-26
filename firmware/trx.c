@@ -659,6 +659,7 @@ void trx_poll()
   // quick exit
   if ((0 == delta) && (ROT_BUTTON_NONE == button) && (TRX_RX==_state)) {
     meter_poll();
+    // Go to sleep mode
     return;
   }
 
