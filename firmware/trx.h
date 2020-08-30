@@ -63,7 +63,6 @@ typedef enum {
 
 void trx_init();
 void trx_factory_reset();
-sideband
 void trx_tx();
 void trx_rx();
 VFOMode  trx_vfo_mode();
