@@ -72,6 +72,10 @@ Der Hauptunterschied zwischen dieser und der ersten Revision ist der Mischer. An
 \subsection{Aufbau des Controllers}
  In einem ersten Schritt wird der Controllerteil der Platine aufgebaut. Löten Sie \texttt{C2}, \texttt{C26}, \texttt{J7} Steckverbinder, \texttt{L2}, \texttt{C40}, \texttt{C41}, \texttt{C42}, \texttt{U10}, \texttt{J10}, \texttt{C14}, \texttt{J3}, \texttt{R3}, \texttt{C46}, \texttt{R4}, \texttt{U11} + Socket, \texttt{LCD1} Steckverbinder, \texttt{R43}, \texttt{R5}, \texttt{RV4}, \texttt{J9} Steckverbinder, \texttt{R41}, \texttt{R40}, \texttt{C39} \& \texttt{U9} ein. 
 
+\begin{remark}
+ Durch das kompakte Design sind die Bauteilreferenzen leider teilweise schlecht zu lesen. I habe dafür, mit Hilfe eines sehr netten KiCAD Plugins, eine \href{https://dm3mat.darc.de/cw2019/rx_rev2_ibom.html}{interaktive BOM} für diese Platine exportiert. Damit sollte es recht einfach sein, bestimmte Bauteile auf der Platine zu finden.
+\end{remark}
+
 \begin{warning}
 Das Metallfähnchen des TO-220 Gehäuses von \texttt{U10} ist üblicherweise direkt mit dem Mittelpin (GND) verbunden. Bitte prüfen Sie das vor dem Einbau. Einige sehr seltene Varianten verbinden dieses Fähnchen mit $+5\,V$, was einen soliden Kurzschluss verursacht.
 \end{warning}
@@ -231,6 +235,10 @@ Der MOSFET \texttt{Q4} fungiert als RX/TX-Schalter, der das Tiefpass-gefilterte 
 
  Wenn keine Messgeräte vorhanden sind, ziehen Sie bitte jeweils eine Windung von den gegebenen Werten ab. Die Anzahl der Windungen wurden aus den Al-Werten des Herstellers bestimmte. Meiner Erfahrung nach führt dies zu leicht zu großen Induktivitäten. Außerdem gehen Sie sicher lieber das Risiko einer zu hohen als einer zu niedrigen Grenzfrequenz der Tiefpassfilter ein. 
  
+\begin{remark}
+ Wie für die Empfängerplatine, gibt es auch für die PA-Platine eine \href{https://dm3mat.darc.de/cw2019/pa_rev2_ibom.html}{interaktive BOM}.
+\end{remark}
+
  Die Diode \texttt{D4} ist parallel in Sperrrichtung zur Spannungsversorgungsbuchse geschaltet. Zusammen mit einer Sicherung im Kabel dient diese Diode dem Verpolschutz. Wenn die Spannungsversorgung falsch herum angeschlossen wird, schließt diese Diode die Spannungsversorgung kurz, was die Sicherung in der Versorgungsleitung durchbrennen lässt. Eine 2A Sicherung \emph{flink} sollte es schon sein. 
 
  Zuletzt löten Sie die Platinensteckverbindersockel \texttt{J2}, \texttt{J6}, \texttt{J7} ein \texttt{J11}.

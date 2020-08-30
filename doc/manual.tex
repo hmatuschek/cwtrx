@@ -71,6 +71,10 @@ The main difference to the first revision is the mixer. Instead of a \texttt{74H
 \subsection{Controller Assembly}
  In a first step, the controller section of the receiver board is assembled. Install \texttt{C2}, \texttt{C26}, \texttt{J7} connector, \texttt{L2}, \texttt{C40}, \texttt{C41}, \texttt{C42}, \texttt{U10}, \texttt{J10}, \texttt{C14}, \texttt{J3}, \texttt{R3}, \texttt{C46}, \texttt{R4}, \texttt{U11} + Socket, \texttt{LCD1} connector, \texttt{R43}, \texttt{R5}, \texttt{RV4}, \texttt{J9} connector, \texttt{R41}, \texttt{R40}, \texttt{C39} \& \texttt{U9} first. 
 
+\begin{remark}
+ Due to the compact layout of the PCB, the component references might be hard to read. I therefore used a very nice plugin for KiCad to export an \href{https://dm3mat.darc.de/cw2019/rx_rev2_ibom.html}{interactive BOM} for this board. This certainly helps to find the spots where all components are placed, even if the silk-screen is hard to read.
+\end{remark}
+
 \begin{warning}
 The metal tab of the TO-220 package of \texttt{U10} is usually connected directly to the center pin (GND). Please check beforehand if this is the case for your variant. Some rare packages connect this pad to \emph{+5V} leading to a nice \& solid short-circuit that will blow either \texttt{U10} or \texttt{L3} or both.
 \end{warning}
@@ -234,7 +238,11 @@ The complete TRX is powered from the barrel-jack \texttt{J3} and the supply volt
 \end{remark}
 
  If no measurement equipment is present. Please subtract one winding from the given values below. The number of turns for each core was determined using AL-values provided by the manufacturer. In my experience, this leads to an slightly overestimation of the number of turns by about one. Moreover, you are probably more willing to risk a lower stop-band suppression rather than an increased damping in the pass band.
- 
+
+\begin{remark}
+ Like for the RX board, the PA board has its own \href{https://dm3mat.darc.de/cw2019/pa_rev2_ibom.html}{interactive BOM}.
+\end{remark}
+
  The diode \texttt{D4} is connected in parallel to the barrel-jack and acts together with a fuse as a reverse-polarity protection. If the supply is connected to the TRX in reverse-polarity, the diode will short the input which will cause a huge current that blows the fuse. A 2A \emph{flink} fuse will do.
  
  Finally install the b2b \textbf{sockets} on the PA/LP board, that is \texttt{J2}, \texttt{J6}, \texttt{J7} and \texttt{J11}.
