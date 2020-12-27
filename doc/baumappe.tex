@@ -138,9 +138,23 @@ Die Audio-PA (\texttt{LM386}, \texttt{U4}) hat sehr viel Verstärkung. Wenn Sie 
 
 Um den Eingangstransformator zu wickeln, schneiden sie drei 15-16 cm lange CuL-Drahtstücke zurecht. Starten Sie die Windungen indem Sie die drei Drähte \textbf{von Hinten} durch den Kern stecken. Halten Sie diese nun fest und machen Sie die nächste Windung indem Sie die Drähte gegen den Uhrzeigersinn \textbf{von vorn} durch den Kern stecken. Fahren Sie nun fort bis sie 8 Findungen gegen den Uhrzeigersinn auf den Kern gebracht haben. Jedes mal, wenn die Drähte durch den Kern gesteckt werden, gilt als eine Windung.
 
-\begin{remember}
-Bevor Sie den Transformator einlöten, überprüfen Sie bitte korrekte Ausrichtung der Anschlüsse. Das Bedeutet das oben-linke wird mit dem unten-linken, oben-mitte mit dem unten-mitte und das oben-rechte mit dem unten-rechten Pad verbunden.
-\end{remember}
+\begin{figure}[ht!]
+ \begin{subfigure}[t]{0.49\textwidth}
+   \centering
+   \includegraphics[width=0.9\textwidth]{fig/RX_T1.png}
+   \caption{Footprint von T1}
+ \end{subfigure}
+ \begin{subfigure}[t]{0.49\textwidth}
+   \centering
+   \includegraphics[width=0.9\textwidth]{fig/RX_T1_IMG_small.png}
+   \caption{Gewickelter T1 mit Beschriftung.}
+ \end{subfigure}
+ \caption{Bevor Sie den Transformator einlöten, überprüfen Sie bitte korrekte Ausrichtung der Anschlüsse. Das Bedeutet das oben-linke wird mit dem unten-linken (d.h., A1 mit A2), oben-mitte mit dem unten-mitte (d.h., B1 mit B2) und das oben-rechte mit dem unten-rechten Pad (d.h., C1 mit C2) verbunden ist.}
+\end{figure}
+
+\begin{warning}
+Die Audioendstufe neigt leider zum Schwingen, vor allem wenn ein kleiner Lautsprecher verwendet wird. Wenn das passiert, wird der gesamte Audiopfad in die Sättigung getrieben. Dabei kann bis zu 12V an den Mixer geführt werden, was diesen dann zerstört! Um das zu verhindern, \textbf{sollten} vier 5.1V Zenerdioden parallel zu den Kondensatoren C4-C7 fliegend gelötet werden. 
+\end{warning}
 
 \subsection{Empfängertest und Abstimmung}
 Sobald der Empfänger vollständig aufgebaut ist, verbinden Sie die Spannungsversorgung und bereiten Sie die Stecker für die Lautstärke und den Kopfhörerausgang vor. Verbinden Sie nun auch ein Stück Koaxialkabel mit den \texttt{RX}/\texttt{GN} Pads links-oben auf der Platine. Dies ist der Antenneneingang für den Test. Je nachdem welches Band Sie gewählt haben, sollten Sie die Strombegrenzung der Spannungsversorgung nun auf $120\,mA$ erhöhen.
@@ -196,6 +210,7 @@ Mit diesem Abgleich ist der Abgleich des RX nun vollständig.
 6 & L1, L3, L4, L5, L6, L7, L8, L9 & 100u & \\
 1 & T1 & 3 x 8 @ FT37-43 & \\
 1 & D1 & 1N4148 & \\
+4 & parallel zu C4-C7 & 5.1V Zener & \\
 1 & Q1 & BS170 & \\
 1 & Q2 & 2N3904 & \\
 1 & U1 & FST3253 & \\
@@ -312,6 +327,8 @@ Wenn Sie deutlich weniger Messen, messen Sie bitte die Spitzenspannungen am PA-A
 
 \subsection{Hot fixes}
 Die zweite Revision war beinahe ein Redesign. Daher ist noch nicht alles Perfekt. Zum Beispiel produziert der \texttt{74AC74} recht hohe Hochfrequenzspannungen auf der $5\,V$ Spannungsversorgung. Um diese stärker zu dämpfen löten Sie bitte einen $470\,pF$ Kondensator direkt von Pin 16 (5V) zu Pin 8 (GND).
+
+Die Audioendstufe neigt leider zum Schwingen, vor allem wenn ein kleiner Lautsprecher verwendet wird. Wenn das passiert, wird der gesamte Audiopfad in die Sättigung getrieben. Dabei kann bis zu 12V an den Mixer geführt werden, was diesen dann zerstört! Um das zu verhindern, \textbf{sollten} vier 5.1V Zenerdioden parallel zu den Kondensatoren C4-C7 auf dem RX-Board fliegend gelötet werden. 
 
 \clearpage
 \subsection{Mechanical Parts}
@@ -479,98 +496,7 @@ Vorherige Versionen hatten einige Probleme mit korrumpierten EEPROM Speicher. Di
 
 \cleardoublepage
 \section{Bill-of-Material (BOM)}
-\begin{longtable}{|p{0.02\textwidth}|p{0.02\textwidth}|p{0.3\textwidth}|p{0.3\textwidth}|p{0.07\textwidth}|p{0.07\textwidth}|}\hline
-\# & & Value & Reichelt & Cost & Sum \\ \hline\hline
-1 & $\square$ & 10R & METALL 10,0 & 0,05 \euro & 0,05 \euro \\
-6 & $\square$ & 100R & METALL 100 & 0,05 \euro & 0,29 \euro \\
-1 & $\square$ & 220R & METALL 220 & 0,05 \euro & 0,05 \euro \\ 
-1 & $\square$ & 470R & METALL 470 & 0,05 \euro & 0,05 \euro \\
-4 & $\square$ & 1k & METALL 1,00K & 0,05 \euro & 0,20 \euro \\
-1 & $\square$ & 2.2k & METALL 2,20K & 0,05 \euro & 0,05 \euro \\
-9 & $\square$ & 3.3k & METALL 3,30K & 0,05 \euro & 0,44 \euro \\
-1 & $\square$ & 4.3k & METALL 4,30K & 0,05 \euro & 0,05 \euro \\
-2 & $\square$ & 4.7k & METALL 4,70K & 0,05 \euro & 0,10 \euro \\
-1 & $\square$ & 5.1k & METALL 5,10K & 0,05 \euro & 0,05 \euro \\
-1 & $\square$ & 7.5k & METALL 7,50K & 0,05 \euro & 0,05 \euro \\
-17 & $\square$ & 10k & METALL 10,0K & 0,05 \euro & 0,83 \euro \\
-2 & $\square$ & 30k & METALL 30,0K & 0,05 \euro & 0,10 \euro \\
-2 & $\square$ & 33k & METALL 33,0K & 0,05 \euro & 0,10 \euro \\
-2 & $\square$ & 36k & METALL 36,0K & 0,05 \euro & 0,10 \euro \\
-2 & $\square$ & 47k & METALL 47,0K & 0,05 \euro & 0,10 \euro \\
-4 & $\square$ & 100k & METALL 100K & 0,05 \euro & 0,20 \euro \\
-1 & $\square$ & 120k & METALL 120K & 0,05 \euro & 0,05 \euro \\
-1 & $\square$ & 470k & METALL 470K & 0,05 \euro & 0,05 \euro \\
-2 & $\square$ & 50k & 64W-50K & 0,31 \euro & 0,62 \euro \\
-1 & $\square$ & 500R & 64W-500 & 0,27 \euro & 0,27 \euro \\
-1 & $\square$ & 10k & ACP 6-L 10K & 0,21 \euro & 0,21 \euro \\ \hline
-2 & $\square$ & 100p & NPO-2,5 100P & 0,07 \euro & 0,14 \euro \\
-4 & $\square$ & 220p & NPO-2,5 220P & 0,08 \euro & 0,32 \euro \\
-4 & $\square$ & 470p & NPO-2,5 470P & 0,09 \euro & 0,36 \euro \\
-2 & $\square$ & 820p & Conrad: 1578706 & 0,16 \euro & 0,32 \euro \\
-3 & $\square$ & 1n & X7R-2,5 1,0N & 0,07 \euro & 0,21 \euro \\
-2 & $\square$ & 1n & NPO-2,5 1,0N & 0,09 \euro & 0,18 \euro \\
-2 & $\square$ & 1.5n & X7R-2,5 1,5N & 0,07 \euro & 0,14 \euro \\
-2 & $\square$ & 3.3n & X7R-2,5 3,3N & 0,07 \euro & 0,14 \euro \\
-3 & $\square$ & 10n & X7R-2,5 10N & 0,07 \euro & 0,21 \euro \\
-5 & $\square$ & 47n & X7R-2,5 47N & 0,11 \euro & 0,55 \euro \\
-35 & $\square$ & 100n & Z5U-2,5 100N & 0,05 \euro & 1,75 \euro \\
-5 & $\square$ & 470n & Z5U-5 470N & 0,19 \euro & 0,95 \euro \\
-3 & $\square$ & 1u & Z5U-5 1,0µ & 0,26 \euro & 0,78 \euro \\ \hline		
-3 & $\square$ & 10u & RAD 10/35 & 0,02 \euro & 0,06 \euro \\
-3 & $\square$ & 100u & RAD 100/16 & 0,03 \euro & 0,09 \euro \\
-1 & $\square$ & 220u & RND 150ECR AY & 0,06 \euro & 0,06 \euro \\ \hline
-1 & $\square$ & 22u & L-07HCP 22µ & 0,38 \euro & 0,38 \euro \\
-7 & $\square$ & 100u & L-MICC 100µ & 0,27 \euro & 1,89 \euro \\ \hline
-2 & $\square$ & FT37-43 & FT 37-43 & 0,58 \euro & 1,16 \euro \\
-6 & $\square$ & T 37-6 & T 37-6 & 0,78 \euro & 4,68 \euro \\
-6 & $\square$ & T 37-2 & T 37-2 & 0,54 \euro & 3,24 \euro \\ \hline
-7 & $\square$ & 1N4148 & 1N 4148 & 0,02 \euro & 0,14 \euro \\
-1 & $\square$ & 1N4001 & 1N 4001 & 0,02 \euro & 0,02 \euro \\
-7 & $\square$ & BS170 & BS 170 & 0,10 \euro & 0,70 \euro \\
-5 & $\square$ & 2N3904 & 2N 3904 & 0,04 \euro & 0,20 \euro \\
-1 & $\square$ & BD140 & BD 140-16 STM & 0,19 \euro & 0,19 \euro \\
-1 & $\square$ & FST3253 & Ebay & 2,00 \euro & 2,00 \euro \\
-5 & $\square$ & LM833 & LM 833 & 0,90 \euro & 4,50 \euro \\
-1 & $\square$ & LM386 & LM 386 DIP & 0,22 \euro & 0,22 \euro \\
-6 & $\square$ & DIP-8 socket (optional) & GS 8 & 0,04 \euro & 0,24 \euro \\
-1 & $\square$ & 74AC74 & Kessler: 522421 & 0,36 \euro & 0,36 \euro \\
-1 & $\square$ & 74HCT00 & 74HCT 00 & 0,33 \euro & 0,33 \euro \\
-1 & $\square$ & L7805 & L 7805 CV & 0,25 \euro & 0,25 \euro \\
-1 & $\square$ & ATmega328-PU & ATMEGA 328P-PU & 2,50 \euro & 2,50 \euro \\
-1 & $\square$ & DIP-28 socket (optional) & GS 28-S & 0,10 \euro & 0,10 \euro \\
-1 & $\square$ & SI5351 breakout & Adafruit & 7,35 \euro & 7,35 \euro \\ \hline
-4 & $\square$ & G6S-2 & NA 12W K & 0,96 \euro & 3,84 \euro \\ \hline
-2 & $\square$ & 1x10 pin-header long & STAPELLEISTE 10 & 0,38 \euro & 0,76 \euro \\
-1 & $\square$ & 2x3 pin-header & RND 205-00634 & 0,03 \euro & 0,03 \euro \\
-1 & $\square$ & 1x7 pin-socket & RND 205-00647 & 0,10 \euro & 0,10 \euro \\
-2 & $\square$ & 1x2 90deg & PSS 254/2W & 0,02 \euro & 0,04 \euro \\
-2 & $\square$ & 1x2 plug & PSK 254/2W & 0,02 \euro & 0,04 \euro \\
-1 & $\square$ & 1x3 90deg & PSS 254/3W & 0,04 \euro & 0,04 \euro \\
-1 & $\square$ & 1x3 plug & PSK 254/3W & 0,02 \euro & 0,02 \euro \\
-1 & $\square$ & 1x4 90deg & PSS 254/4W & 0,09 \euro & 0,09 \euro \\
-1 & $\square$ & 1x4 plug & PSK 254/4W & 0,02 \euro & 0,02 \euro \\
-1 & $\square$ & 1x10 90deg & PSS 254/10W & 0,10 \euro & 0,10 \euro \\
-1 & $\square$ & 1x10 plug & PSK 254/10W & 0,08 \euro & 0,08 \euro \\
-2 & $\square$ & contacts & PSK-KONTAKTE & 0,29 \euro & 0,58 \euro \\
-2 & $\square$ & head-phone socket & EBS 35 & 0,30 \euro & 0,60 \euro\\
-1 & $\square$ & TX-OC & RND 205-00698 & 0,57 \euro & 0,57 \euro \\
-1 & $\square$ & BNC & UG 1094W1 & 0,99 \euro & 0,99 \euro \\
-1 & $\square$ & 1 x 8 socket & RND 205-00648 & 0,10 \euro & 0,10 \euro \\
-1 & $\square$ & barrel jack & CLIFF FCR681465P & 0,77 \euro & 0,77 \euro \\
-3 & $\square$ & 1 x 2 socket & RND 205-00642 & 0,02 \euro & 0,06 \euro \\ \hline
-1 & $\square$ & chassis top & KOH-2100 & 5,40 \euro & 5,40 \euro \\
-1 & $\square$ & chassis bottom & KOH-4100 & 5,80 \euro & 5,80 \euro \\
-1 & $\square$ & chassis front/back & DPL 2-4 & 7,99 \euro & 7,99 \euro \\
-1 & $\square$ & 10k log pot & RK11K112-LOG10K & 1,35 \euro & 1,35 \euro \\
-1 & $\square$ & rotary encoder & STEC11B03 & 3,70 \euro & 3,70 \euro \\
-1 & $\square$ & LCD display & LCD-PM 2X8-5 A & 7,30 \euro & 7,30 \euro \\
-1 & $\square$ & switch & KIPP 1A11 & 1,20 \euro & 1,20 \euro \\
-1 & $\square$ & barrel plug & HS 21-13 & 0,20 \euro & 0,20 \euro \\
-2 & $\square$ & fuse holder (optional) & RND 170-00170 & 0,19 \euro & 0,38 \euro \\
-2 & $\square$ & 2A flink (optional) & ESKA 520.020 & 0,09 \euro & 0,18 \euro \\
-1 & $\square$ & speaker (optional) & LSM-S20K & 2,70 \euro & 2,70 \euro \\ \hline \hline
-\multicolumn{4}{|l}{Total\footnote{Prices may change over time.}} & \multicolumn{2}{r|}{\textbf{85,73 \euro}} \\ \hline
-\end{longtable}
+\input{bom.tex}
 
 \subsection{Ein paar \euro\ sparen}
 Der teuerste Einzelposten auf der BOM ist das Gehäuse. Sie können sicher ein Alugehäuse für unter \EUR{5} bei ebay finden. Sie finden auch billige Clone der SI5351 break-out Platine für um die \EUR{3}, billige Drehimpulsgeber und 2x8 LCD Displays dort. So können Sie die BOM Kosten noch deutlich senken.
