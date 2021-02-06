@@ -380,7 +380,7 @@ sudo apt-get install git cmake gcc-avr avrdude
 
 Once all the software is installed, you need to download the firmware source from my github page. So call
 \begin{lstlisting}[language=bash]
-sudo git clone https://github.com/hmatuschek/cwtrx.git
+git clone https://github.com/hmatuschek/cwtrx.git
 \end{lstlisting}
 You will now find a new directory named \texttt{cwtrx}. Before the firmware can be programmed to the device, you may need to adjust some settings to reflect your programmer. The first lines in the \texttt{cwtrx/\-firmware/\-CMakeLists.txt} specify which programmer you use and where to find it. 
 
@@ -408,7 +408,7 @@ After this step, you need to set the fuses of the MCU. Simply call
 \begin{lstlisting}[language=bash]
 make set_fuses
 \end{lstlisting}
-This step may fail if the MCU is brand new. Just retry several times. Once the fuses are set. The communication with the MCU should be stable. Then upload the firmware to the MCU with
+This step may fail if the MCU is brand new. Just retry several times. Once the fuses are set, the communication with the MCU should be stable. Then upload the firmware to the MCU with
 \begin{lstlisting}[language=bash]
 make upload_firmware
 \end{lstlisting}

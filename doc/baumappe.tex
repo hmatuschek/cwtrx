@@ -19,6 +19,7 @@
 \usepackage{pdfpages}
 \usepackage[tikz]{bclogo}
 \usepackage{eurosym}
+\usepackage{listings}
 
 \hypersetup{
     colorlinks=true,
@@ -347,6 +348,83 @@ Die Audioendstufe neigt leider zum Schwingen, vor allem wenn ein kleiner Lautspr
 2 & 2A flink & optional \\
 1 & speaker & optional \\ \hline
 \end{longtable}
+
+
+\cleardoublepage 
+\section{Die Firmware bauen und laden} \label{sec:fw}
+Um die Firmware zu bauen und aufs Gerät zu laden oder auch um die Firmware zu aktualisieren, wird ein sogenannter \emph{in-system programmer} (ISP) benötigt. Dies sind kleine USB-Sticks die die Verbindung vom Computer zum Controller (MCU) herstellen. Es gibt eine Vielzahl an verschiedenen günstigen ISPs (üblicherweise zwischen 5\EUR und 10\EUR auf eBay). Es ist auch möglich einen ISP für die serielle Schnittstelle \href{http://www.lancos.com/siprogsch.html}{selbst zu bauen} oder auch einen \href{https://www.arduino.cc/en/Tutorial/BuiltInExamples/ArduinoISP}{Arduino als ISP} zu verwenden.
+
+Wenn Sie nun einen ISP besitzen, benötigen Sie etwas Software um die Firmware auf die MCU zu schreiben. I verwende \href{https://www.nongnu.org/avrdude/}{avrdude} unter Linux dafür. Andere funktionieren auch. Sie können nun einfach die Firmware sowie das EEPROM Abbild \href{https://github.com/hmatuschek/cwtrx/releases}{herunter laden} und diese auf die MCU spielen. Zuvor müssen Sie aber die sog. \emph{fuses} (Sicherungen) setzen. Setzen Sie die \emph{low-fuses} auf \texttt{0xE2} und die \emph{high-fuses} auf \texttt{0xD9}. Dies konfiguriert the MCU den internen RC-Oszillator als Takt zu verwenden und diesen Takt nicht um den Faktor 8 zu teilen. Alle weiteren Einstellungen bleiben auf den Standardwerten.
+
+\begin{wrapfigure}{l}{0.2\linewidth}
+  \includegraphics[width=\linewidth]{fig/icsp_6pin.png}
+\end{wrapfigure}
+Um nun die Firmware zu laden, muss die MCU mit dem Computer verbunden werden. Dazu wird ein Standard 6-Pin ISP-Steckverbinder verwendet. Der Pin 1 ist durch einen kleinen Kreis auf dem Board markiert. Daraus ergibt sich, dass die kleine \emph{Nase} am Stecker vom Controller weg zeigen muss.
+
+Wenn Sie den Controller programmieren, müssen Sie zunächst die \emph{fuses} setzen. Dieser Schritt muss nur einmal ausgeführt werden, da diese Einstellungen erhalten bleiben auch wenn die Firmware überschrieben wird. Im zweiten Schritt wird die eigentliche Firmware (\texttt{firmware-atmega328p.hex}) auf den Controller geschrieben. Dieser Schritt löscht normalerweise den internen EEPROM. Im EEPROM werden Ihre Einstellungen und die letzte eingestellte Frequenz gespeichert. Die Firmware kann ggf. nicht richtig funktionieren, wenn der EEPROM nicht korrekt initialisiert ist. Daher muss nach der Firmware das EEPROM Abbild (\texttt{firmware-atmega328p-eeprom.hex}) der \emph{Werkseinstellungen} aufgespielt werden.
+
+\subsection{Die Firmware aus den Quellen bauen und laden}
+In diesem Absatz will ich kurz das Bauen und Laden der Firmware aus den Quellen unter Ubuntu/Debian (und damit auf einem Raspberry Pi) beschreiben. Bevor Sie starten können, müssen Sie etwas Software nachinstallieren. Den Compiler, die Buildumgebung und die Programmiersoftware. Führen Sie also auf der Kommandozeile aus: 
+\begin{lstlisting}[language=bash]
+sudo apt-get install git cmake gcc-avr avrdude
+\end{lstlisting}
+
+\texttt{git} ist das Versionskontrollsystem. Es wird verwendet um den aktuellen Quellcode herunter zu laden. \texttt{cmake} ist die Buildumgebung. Es gibt eine nette Erweiterung für cmake, die es ermöglicht die Firmware einfach zu bauen und auf die MCU zu laden. \texttt{gcc-avr} ist der Compiler für die AVR MCUs. \texttt{avrdude} ist das Programmiersoftware um die Firmware letztlich auf die MCU zu schreiben.
+
+Sobald Sie die Software installiert haben, können Sie die Quellen von meiner github Seite laden mit
+\begin{lstlisting}[language=bash]
+git clone https://github.com/hmatuschek/cwtrx.git
+\end{lstlisting}
+
+Sie werden nun ein neues Verzeichnis mit dem Namen \texttt{cwtrx} finden. Bevor Sie die Firmware auf die MCU schreiben können, müssen Sie ggf. einige Einstellungen vornehmen. In den ersten Zeilen der Datei \texttt{cwtrx/\-firmware/\-CMakeLists.txt} wird der ISP festgelegt, den Sie verwenden wollen und wie die Software diesen finden kann.
+
+Standardmäßig sollte dort so etwas stehen:
+\lstinputlisting[linerange={1-4}, numbers=left]{../firmware/CMakeLists.txt}
+In der zweiten Zeile wird die Programmiersoftware festgelegt. Ich verwende hier avrdude. Die dritte Zeile legt den ISP fest. Ich verwende einen STK500V2 kompatiblen ISP (eigentlich heißt der DIAMEX-AVR). Letztendlich wird in Zeile 4 die Gerätedatei festgelegt, unter der der ISP gefunden werden kann. Dieser ISP stellt eine serielle Schnittstelle dar. Daher ist er bei mir unter der Datei \texttt{/dev/ttyACM0} zu finden. Gegebenenfalls müssen Sie die Zeilen 3 und 4 an Ihren ISP anpassen.
+
+Wenn alles aufgesetzt ist, können sie die Firmware bauen. Betreten Sie das Verzeichnis \texttt{cwtrx}, erzeugen Sie ein sog. \emph{build}-Verzeichnis und betreten Sie dieses auch.
+\begin{lstlisting}[language=bash]
+cd cwtrx
+mkdir build
+cd build
+\end{lstlisting}
+
+Im nächsten Schritt wird der build konfiguriert:
+\begin{lstlisting}[language=bash]
+cmake ..
+\end{lstlisting}
+Dieser Schritt sucht nach dem Compiler und bereitet alles vor. Sobald dieser Schritt abgeschlossen ist kann die Firmware und das EEPROM Abbild erstellt werden.
+\begin{lstlisting}[language=bash]
+make
+\end{lstlisting}
+
+Danach müssen die \emph{fuses} gesetzt werden.
+\begin{lstlisting}[language=bash]
+make set_fuses
+\end{lstlisting}
+Dieser Schritt kann bei brandneuen MCUs auch fehlschlagen. Versuchen Sie es einfach nochmal. Sobald die \emph{fuses} gesetzt sind, sollte die Kommunikation mit der MCU stabil sein.
+
+Laden Sie danach die Firmware auf die MCU mit
+\begin{lstlisting}[language=bash]
+make upload_firmware
+\end{lstlisting}
+und letztendlich das EEPROM Abbild mit
+\begin{lstlisting}[language=bash]
+make upload_eeprom
+\end{lstlisting}
+
+Ihr TRX ist nun betriebsbereit.
+
+\subsection{Firmware aktualisieren}
+Unter der Annahme, dass Sie die Schritte oben bereits ausgeführt haben, können Sie die Firmware recht einfach aktualisieren. Betreten Sie dazu das Verzeichnis \texttt{cwtrx} und führen sie die folgenden Schritte aus.
+\begin{lstlisting}[language=bash]
+git pull
+cd build
+make 
+make upload_firmware
+make upload_eeprom
+\end{lstlisting}
+Ihr TRX sollte nun über die aktuellste Firmware verfügen.
 
 
 \cleardoublepage
