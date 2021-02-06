@@ -18,6 +18,7 @@
 \usepackage{pdfpages}
 \usepackage[tikz]{bclogo}
 \usepackage{eurosym}
+\usepackage{listings}
 
 \hypersetup{
     colorlinks=true,
@@ -338,7 +339,6 @@ The second revision was a redesign to some extend. Hence not everything is perfe
 
 The audio PA has a tendency to oscillate, in particular if a small speaker is used. If it does so, it may drive the complete audio-chain into saturation. In this case, the audio-chain may feed-back $12\,V$ to the FST3253 mixer. This destroys the hard-to-get mixer! To prevent this problem, you \textbf{should} install four 5.1V Zener-diodes in parallel to C4-C7 on the receiver board. This limits the voltage that can be fed back to the mixer and saves it. 
 
-\clearpage
 \subsection{Mechanical Parts}
 \begin{longtable}{|l|p{6cm}|l|l|} \hline 
 \# & Component & Remarks \\ \hline 
@@ -355,6 +355,80 @@ The audio PA has a tendency to oscillate, in particular if a small speaker is us
 2 & 2A flink & optional \\
 1 & speaker & optional \\ \hline
 \end{longtable}
+
+
+\cleardoublepage 
+\section{Build \& Load the Firmware} \label{sec:fw}
+To program the firmware onto the device in the first place or update the firmware to a newer version, a so-called in-system programmer ISP is needed. This is a small USB device that provides the interface from the computer to the controller (MCU). There are many cheap AVR ISPs out there (usually between 5\EUR and 10\EUR on ebay). It is also possible to build a \href{http://www.lancos.com/siprogsch.html}{makeshift ISP for the good old serial-port} or using a \href{https://www.arduino.cc/en/Tutorial/BuiltInExamples/ArduinoISP}{Arduino as ISP}. 
+
+Once you got your hands on an ISP, you still need some software to upload the firmware to the device. I used \href{https://www.nongnu.org/avrdude/}{avrdude} under Linux for this but others should work as well. If you got a working setup, you can simply \href{https://github.com/hmatuschek/cwtrx/releases}{download} the pre-compiled firmware and EEPROM image from my github page and program the device immediately. You only need to set the fuses of the AtMega first to low=\texttt{0xE2} and high=\texttt{0xD9}. These fuse settings tells the MCU to use the internal 8Mhz RC-oscillator (no pins left for a crystal) and not to divide the clock by 8. All other settings are left as default. 
+
+\begin{wrapfigure}{l}{0.2\linewidth}
+  \includegraphics[width=\linewidth]{fig/icsp_6pin.png}
+\end{wrapfigure}
+You can find the 6-pin ISP header (J3) on the RX board. Pin 1 is marked by a small circle on the corner. Consequently the small tab on the ISP plug must face away from the MCU. 
+
+When programming the MCU, you need to first set the fuses. This step must only be done once as these settings are conserved across programming cycles. In a second step the firmware (\texttt{firmware-atmega328p.hex}) is written to the MCU. This step usually erases the EEPROM content. The EEPROM is used to store settings, last frequency etc. The firmware may not properly work with some uninitialized EEPROM. Hence, after the firmware was written, the default EEPROM image (\texttt{firmware-atmega328p-eeprom.hex}) must be written to the MCU.
+
+\subsection{Building Firmware from Scratch}
+In this section, I like to describe building and loading the firmware from scratch on a Ubuntu/Debian system (e.g., on a Raspberry Pi). Before you can start a bunch of software needs to be installed. That is the cross compiler, build tools and programming software. So run on a command line
+\begin{lstlisting}[language=bash]
+sudo apt-get install git cmake gcc-avr avrdude
+\end{lstlisting}
+
+\texttt{git} is the version control system I use. It is used to download the latest source code. \texttt{cmake} is the build system. There is a nice extension to cmake for the avr-gcc and avrdude that makes building and writing the firmware to the MCU easy. \texttt{gcc-avr} is the cross-compiler for the AVR devices. Finally, \texttt{avrdude} is the programming tool to write the firmware to the device.
+
+Once all the software is installed, you need to download the firmware source from my github page. So call
+\begin{lstlisting}[language=bash]
+sudo git clone https://github.com/hmatuschek/cwtrx.git
+\end{lstlisting}
+You will now find a new directory named \texttt{cwtrx}. Before the firmware can be programmed to the device, you may need to adjust some settings to reflect your programmer. The first lines in the \texttt{cwtrx/\-firmware/\-CMakeLists.txt} specify which programmer you use and where to find it. 
+
+By default you should find something like this
+\lstinputlisting[linerange={1-4}, numbers=left]{../firmware/CMakeLists.txt}
+In the second line, you can set the programming tool. Here avrdude is used. The third line specifies the ISP programmer being used. Here I used a STK500V2 compatible one (actually called DIAMEX-AVR). Finally, line 4 specifies the port where the programmer can be found. This programmer appears as a serial port to the computer (as device \texttt{/dev/ttyACM0}). You may need to change lines 3 and 4 to match your local setup.
+
+Once everything is set up, you can start to build the firmware. Enter the \texttt{cwtrx} directory, create a so-called build directory and enter it as well. 
+\begin{lstlisting}[language=bash]
+cd cwtrx
+mkdir build
+cd build
+\end{lstlisting}
+
+In the next step, the build will be configured with
+\begin{lstlisting}[language=bash]
+cmake ..
+\end{lstlisting}
+This step will search for the AVR GCC and prepare the build. Once completed, build the firmware and EEPROM image with
+\begin{lstlisting}[language=bash]
+make
+\end{lstlisting}
+
+After this step, you need to set the fuses of the MCU. Simply call
+\begin{lstlisting}[language=bash]
+make set_fuses
+\end{lstlisting}
+This step may fail if the MCU is brand new. Just retry several times. Once the fuses are set. The communication with the MCU should be stable. Then upload the firmware to the MCU with
+\begin{lstlisting}[language=bash]
+make upload_firmware
+\end{lstlisting}
+and finally write the EEPROM image with 
+\begin{lstlisting}[language=bash]
+make upload_eeprom
+\end{lstlisting}
+
+Your TRX is now ready.
+
+\subsection{Updating the Firmware}
+Assuming you already performed the steps above, updating the firmware is quiet straight forward. Enter the \texttt{cwtrx} directory and run
+\begin{lstlisting}[language=bash]
+git pull
+cd build
+make 
+make upload_firmware
+make upload_eeprom
+\end{lstlisting}
+And you are ready to go.
 
 
 \cleardoublepage
