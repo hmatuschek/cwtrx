@@ -70,7 +70,7 @@ The main difference to the first revision is the mixer. Instead of a \texttt{74H
  The controller and VFO section of the board consists of a \texttt{ATMega 328P} MCU controlling the \texttt{SI5351} PLL oscillator. The \texttt{CLK2} signal of the PLL drives the two flip-flops \texttt{U9}, which divide the \texttt{CLK2} frequency by four and produce a proper $90^\circ$ phase-shifted signal for the mixer.
  
 \subsection{Controller Assembly}
- In a first step, the controller section of the receiver board is assembled. Install \texttt{C2}, \texttt{C26}, \texttt{J7} connector, \texttt{L2}, \texttt{C40}, \texttt{C41}, \texttt{C42}, \texttt{U10}, \texttt{J10}, \texttt{C14}, \texttt{J3}, \texttt{R3}, \texttt{C46}, \texttt{R4}, \texttt{U11} + Socket, \texttt{LCD1} connector, \texttt{R43}, \texttt{R5}, \texttt{RV4}, \texttt{J9} connector, \texttt{R41}, \texttt{R40}, \texttt{C39} \& \texttt{U9} first. 
+ In a first step, the controller section of the receiver board is assembled. Install \texttt{C2}, \texttt{C26}, \texttt{J7} connector, \texttt{L3}, \texttt{C38}, \texttt{C40}, \texttt{C41}, \texttt{C42}, \texttt{U10}, \texttt{J10}, \texttt{C14}, \texttt{J3}, \texttt{R3}, \texttt{C46}, \texttt{R4}, \texttt{U11} + Socket, \texttt{LCD1} connector, \texttt{R43}, \texttt{R5}, \texttt{RV4}, \texttt{J9} connector, \texttt{R41}, \texttt{R40}, \texttt{C39} \& \texttt{U9} first. 
 
 \begin{remark}
  Due to the compact layout of the PCB, the component references might be hard to read. I therefore used a very nice plugin for KiCad to export an \href{https://dm3mat.darc.de/cw2019/rx_rev2_ibom.html}{interactive BOM} for this board. This certainly helps to find the spots where all components are placed, even if the silk-screen is hard to read.

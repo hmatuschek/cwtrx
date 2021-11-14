@@ -26,7 +26,7 @@ L Amplifier_Operational:TLC272 U3
 U 1 1 5E77D339
 P 3400 2250
 F 0 "U3" H 3400 2617 50  0000 C CNN
-F 1 "TLC272" H 3400 2526 50  0000 C CNN
+F 1 "LM833" H 3400 2526 50  0000 C CNN
 F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 3400 2250 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/tlc272.pdf" H 3400 2250 50  0001 C CNN
 	1    3400 2250
@@ -37,7 +37,7 @@ L Amplifier_Operational:TLC272 U3
 U 2 1 5E77E4B2
 P 5150 2250
 F 0 "U3" H 5150 2617 50  0000 C CNN
-F 1 "TLC272" H 5150 2526 50  0000 C CNN
+F 1 "LM833" H 5150 2526 50  0000 C CNN
 F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 5150 2250 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/tlc272.pdf" H 5150 2250 50  0001 C CNN
 	2    5150 2250
@@ -48,7 +48,7 @@ L Amplifier_Operational:TLC272 U3
 U 3 1 5E77F4FE
 P 6000 4550
 F 0 "U3" H 5958 4596 50  0000 L CNN
-F 1 "TLC272" H 5958 4505 50  0000 L CNN
+F 1 "LM833" H 5958 4505 50  0000 L CNN
 F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 6000 4550 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/tlc272.pdf" H 6000 4550 50  0001 C CNN
 	3    6000 4550
@@ -279,7 +279,7 @@ L Amplifier_Operational:TLC272 U5
 U 1 1 5E7B9DBD
 P 6950 2250
 F 0 "U5" H 6950 2617 50  0000 C CNN
-F 1 "TLC272" H 6950 2526 50  0000 C CNN
+F 1 "LM833" H 6950 2526 50  0000 C CNN
 F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 6950 2250 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/tlc272.pdf" H 6950 2250 50  0001 C CNN
 	1    6950 2250
@@ -290,7 +290,7 @@ L Amplifier_Operational:TLC272 U5
 U 2 1 5E7BBD09
 P 8750 2250
 F 0 "U5" H 8750 2617 50  0000 C CNN
-F 1 "TLC272" H 8750 2526 50  0000 C CNN
+F 1 "LM833" H 8750 2526 50  0000 C CNN
 F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 8750 2250 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/tlc272.pdf" H 8750 2250 50  0001 C CNN
 	2    8750 2250
@@ -710,7 +710,7 @@ L Amplifier_Operational:TLC272 U5
 U 3 1 5E8E2941
 P 6900 4550
 F 0 "U5" H 6858 4596 50  0000 L CNN
-F 1 "TLC272" H 6858 4505 50  0000 L CNN
+F 1 "LM833" H 6858 4505 50  0000 L CNN
 F 2 "Package_DIP:DIP-8_W7.62mm_LongPads" H 6900 4550 50  0001 C CNN
 F 3 "http://www.ti.com/lit/ds/symlink/tlc272.pdf" H 6900 4550 50  0001 C CNN
 	3    6900 4550

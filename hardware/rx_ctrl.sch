@@ -231,7 +231,7 @@ Text GLabel 4100 2450 2    50   Input ~ 0
 Dit
 Text GLabel 4100 2350 2    50   Input ~ 0
 Dah
-Text GLabel 4100 2750 2    50   Input ~ 0
+Text GLabel 4100 2750 2    50   Output ~ 0
 TX
 Wire Wire Line
 	4100 3850 4000 3850
