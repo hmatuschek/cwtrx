@@ -146,9 +146,9 @@ void menu_update(RotButton button, int8_t delta)
     if (ROT_BUTTON_CLICK == button) {
       trx_set_state(TRX_RX);
       _menu_state = MENU_SETUP;
-    } else if ((delta > 0) && (KEYER_MODE_STRAIGHT < trx_cw_mode())) {
+    } else if ((delta > 0) && (KEYER_MODE_STRAIGHT > trx_cw_mode())) {
       trx_set_cw_mode(trx_cw_mode()+1);
-    } else if ((delta < 0) && (KEYER_MODE_A > trx_cw_mode())){
+    } else if ((delta < 0) && (KEYER_MODE_A < trx_cw_mode())){
       trx_set_cw_mode(trx_cw_mode()-1);
     }
   } else if (MENU_CW_TONE == _menu_state) {

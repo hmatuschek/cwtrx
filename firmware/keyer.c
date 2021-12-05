@@ -112,6 +112,10 @@ keyer_set_speed_idx(uint8_t idx) {
 
 
 // Util function for modes
+inline uint8_t keyer_is_idle() {
+  return (KEYER_IDLE == _keyer_state);
+}
+
 inline uint8_t keyer_mode_is_straight() {
   if (KEYER_MODE_STRAIGHT == _keyer_mode)
     return 1;
@@ -122,6 +126,10 @@ inline uint8_t keyer_mode_is_iambic() {
   if (keyer_mode_is_straight())
     return 0;
   return 1;
+}
+
+inline uint8_t keyer_mode_is_iambic_B() {
+  return ((KEYER_MODE_B == _keyer_mode) || (KEYER_MODE_B_REV == _keyer_mode));
 }
 
 inline uint8_t keyer_mode_is_reversed() {
@@ -204,7 +212,7 @@ keyer_poll() {
   }
 
   // If waiting for the next symbol...
-  if (keyer_mode_is_iambic() && (KEYER_IDLE == _keyer_state))
+  if (keyer_mode_is_iambic() && keyer_is_idle())
   {
     // ... dispatch by paddle state
     // (left -> dit, right -> dah, both -> alternate dit & dah)
@@ -241,7 +249,7 @@ keyer_poll() {
     default:
       if (_keyer_is_iambic) {
         _keyer_is_iambic = 0;
-        if (KEYER_MODE_B ==_keyer_mode) {
+        if (keyer_mode_is_iambic_B()) {
           if (KEYER_SEND_DIT == _keyer_last_state) {
             _keyer_last_state = _keyer_state;
             _keyer_state = KEYER_SEND_DAH;
@@ -253,7 +261,7 @@ keyer_poll() {
       }
       break;
     }
-  } else if (_keyer_mode == KEYER_MODE_STRAIGHT) {
+  } else if (keyer_mode_is_straight()) {
     if (0x01 & keyer_read_paddle()) {
       _keyer_last_state = _keyer_state;
       _keyer_state = KEYER_SEND;
@@ -270,7 +278,7 @@ keyer_tick()
 {
   static uint16_t count = 0;
 
-  if (KEYER_IDLE == _keyer_state) {
+  if (keyer_is_idle()) {
     // Stop sending...
     trx_rx(); count = 0;
   } else if (KEYER_SEND_DIT == _keyer_state) {
