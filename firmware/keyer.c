@@ -111,6 +111,31 @@ keyer_set_speed_idx(uint8_t idx) {
 }
 
 
+// Util function for modes
+inline uint8_t keyer_mode_is_straight() {
+  if (KEYER_MODE_STRAIGHT == _keyer_mode)
+    return 1;
+  return 0;
+}
+
+inline uint8_t keyer_mode_is_iambic() {
+  if (keyer_mode_is_straight())
+    return 0;
+  return 1;
+}
+
+inline uint8_t keyer_mode_is_reversed() {
+  switch (_keyer_mode) {
+  case KEYER_MODE_A_REV:
+  case KEYER_MODE_B_REV:
+    return 1;
+  default:
+    break;
+  }
+  return 0;
+}
+
+
 /// Initializes the keyer and PTT interface and timer
 void
 keyer_init(KeyerMode mode, uint8_t speed) {
@@ -167,19 +192,19 @@ keyer_poll() {
   if (KEYER_SEND_TEXT == _keyer_state) {
     // and the key is pressed:
     //  -> stop sending
-    if ((((_keyer_mode == KEYER_MODE_A) || (_keyer_mode == KEYER_MODE_B)) && keyer_read_paddle()) ||
-        ((_keyer_mode == KEYER_MODE_STRAIGHT) && (0x01 & keyer_read_paddle())))
+    if ((keyer_mode_is_iambic() && keyer_read_paddle()) ||
+        (keyer_mode_is_straight() && (0x01 & keyer_read_paddle())))
     {
       _keyer_last_state = KEYER_IDLE;
       _keyer_state = KEYER_IDLE;
+      _keyer_is_iambic = 0;
     }
     // otherwise continue sending text...
     return;
   }
 
   // If waiting for the next symbol...
-  if (((_keyer_mode == KEYER_MODE_A) || (_keyer_mode == KEYER_MODE_B))
-      && (KEYER_IDLE == _keyer_state))
+  if (keyer_mode_is_iambic() && (KEYER_IDLE == _keyer_state))
   {
     // ... dispatch by paddle state
     // (left -> dit, right -> dah, both -> alternate dit & dah)
@@ -187,14 +212,14 @@ keyer_poll() {
     // On right paddle
     case 0x01:
       _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_SEND_DIT;
+      _keyer_state = (keyer_mode_is_reversed() ? KEYER_SEND_DAH : KEYER_SEND_DIT);
       _keyer_is_iambic = 0;
       break;
 
     // On left paddle
     case 0x02:
       _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_SEND_DAH;
+      _keyer_state = (keyer_mode_is_reversed() ? KEYER_SEND_DIT : KEYER_SEND_DAH);
       _keyer_is_iambic = 0;
       break;
 

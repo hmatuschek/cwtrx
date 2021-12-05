@@ -26,9 +26,11 @@ typedef enum {
 } KeyerState;
 
 typedef enum {
-  KEYER_MODE_A,
-  KEYER_MODE_B,
-  KEYER_MODE_STRAIGHT
+  KEYER_MODE_A = 0,
+  KEYER_MODE_B = 1,
+  KEYER_MODE_A_REV = 2,
+  KEYER_MODE_B_REV = 3,
+  KEYER_MODE_STRAIGHT = 4
 } KeyerMode;
 
 #define KEYER_NUM_SYMBOLS 39

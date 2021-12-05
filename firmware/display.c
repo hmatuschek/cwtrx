@@ -419,6 +419,14 @@ void display_menu_cw_mode() {
     lcd_setcursor(2,2);
     lcd_string("iamb B");
     break;
+  case KEYER_MODE_A_REV:
+    lcd_setcursor(3,2);
+    lcd_string("rev A");
+    break;
+  case KEYER_MODE_B_REV:
+    lcd_setcursor(3,2);
+    lcd_string("rev B");
+    break;
   }
 }
 
