@@ -26,7 +26,8 @@ typedef enum {
 } KeyerState;
 
 typedef enum {
-  KEYER_MODE_PADDLE,
+  KEYER_MODE_A,
+  KEYER_MODE_B,
   KEYER_MODE_STRAIGHT
 } KeyerMode;
 

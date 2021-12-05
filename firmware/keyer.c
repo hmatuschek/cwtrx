@@ -83,7 +83,9 @@ volatile KeyerState _keyer_state = KEYER_IDLE;
 /// The last state.
 volatile KeyerState _keyer_last_state = KEYER_IDLE;
 /// The current mode
-volatile KeyerMode _keyer_mode = KEYER_MODE_PADDLE;
+volatile KeyerMode _keyer_mode = KEYER_MODE_A;
+/// iambic state (needed for mode B)
+volatile uint8_t _keyer_is_iambic = 0;
 
 volatile uint8_t   _text_len        = 0;
 const    uint8_t   *_text           = 0;
@@ -122,6 +124,7 @@ keyer_init(KeyerMode mode, uint8_t speed) {
   // set default values
   _keyer_state = KEYER_IDLE;
   _keyer_last_state = KEYER_IDLE;
+  _keyer_is_iambic = 0;
   keyer_set_mode(mode);
   keyer_set_speed_idx(speed);
 }
@@ -164,7 +167,7 @@ keyer_poll() {
   if (KEYER_SEND_TEXT == _keyer_state) {
     // and the key is pressed:
     //  -> stop sending
-    if (((_keyer_mode == KEYER_MODE_PADDLE) && keyer_read_paddle()) ||
+    if ((((_keyer_mode == KEYER_MODE_A) || (_keyer_mode == KEYER_MODE_B)) && keyer_read_paddle()) ||
         ((_keyer_mode == KEYER_MODE_STRAIGHT) && (0x01 & keyer_read_paddle())))
     {
       _keyer_last_state = KEYER_IDLE;
@@ -175,38 +178,55 @@ keyer_poll() {
   }
 
   // If waiting for the next symbol...
-  if ((_keyer_mode == KEYER_MODE_PADDLE) && (KEYER_IDLE == _keyer_state)) {
+  if (((_keyer_mode == KEYER_MODE_A) || (_keyer_mode == KEYER_MODE_B))
+      && (KEYER_IDLE == _keyer_state))
+  {
     // ... dispatch by paddle state
     // (left -> dit, right -> dah, both -> alternate dit & dah)
     switch (keyer_read_paddle()) {
-      // On right paddle
-      case 0x01:
-        _keyer_last_state = _keyer_state;
-        _keyer_state = KEYER_SEND_DIT;
-        break;
+    // On right paddle
+    case 0x01:
+      _keyer_last_state = _keyer_state;
+      _keyer_state = KEYER_SEND_DIT;
+      _keyer_is_iambic = 0;
+      break;
 
-      // On left paddle
-      case 0x02:
+    // On left paddle
+    case 0x02:
+      _keyer_last_state = _keyer_state;
+      _keyer_state = KEYER_SEND_DAH;
+      _keyer_is_iambic = 0;
+      break;
+
+    // On both paddles alternate dit & dah
+    case 0x03:
+      _keyer_is_iambic = 1;
+      if (KEYER_SEND_DIT == _keyer_last_state) {
+        // If last state was a dit -> send dah
         _keyer_last_state = _keyer_state;
         _keyer_state = KEYER_SEND_DAH;
-        break;
+      } else {
+        // If last state was a dah -> send dit
+        _keyer_last_state = _keyer_state;
+        _keyer_state = KEYER_SEND_DIT;
+      }
+      break;
 
-      // On both paddles alternate dit & dah
-      case 0x03:
-        if (KEYER_SEND_DIT == _keyer_last_state) {
-          // If last state was a dit -> send dah
-          _keyer_last_state = _keyer_state;
-          _keyer_state = KEYER_SEND_DAH;
-        } else {
-          // If last state was a dah -> send dit
-          _keyer_last_state = _keyer_state;
-          _keyer_state = KEYER_SEND_DIT;
+    // Otherwise stay in idle
+    default:
+      if (_keyer_is_iambic) {
+        _keyer_is_iambic = 0;
+        if (KEYER_MODE_B ==_keyer_mode) {
+          if (KEYER_SEND_DIT == _keyer_last_state) {
+            _keyer_last_state = _keyer_state;
+            _keyer_state = KEYER_SEND_DAH;
+          } else if (KEYER_SEND_DAH == _keyer_last_state) {
+            _keyer_last_state = _keyer_state;
+            _keyer_state = KEYER_SEND_DIT;
+          }
         }
-        break;
-
-      // Otherwise stay in idle
-      default:
-        break;
+      }
+      break;
     }
   } else if (_keyer_mode == KEYER_MODE_STRAIGHT) {
     if (0x01 & keyer_read_paddle()) {

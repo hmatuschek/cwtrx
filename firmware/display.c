@@ -407,14 +407,18 @@ void display_menu_cw_mode() {
     lcd_data(0x7E);
   }
   switch (trx_cw_mode()) {
-    case KEYER_MODE_STRAIGHT:
-      lcd_setcursor(4,2);
-      lcd_string("str.");
-      break;
-    case KEYER_MODE_PADDLE:
-      lcd_setcursor(4,2);
-      lcd_string("pad.");
-      break;
+  case KEYER_MODE_STRAIGHT:
+    lcd_setcursor(4,2);
+    lcd_string("str.");
+    break;
+  case KEYER_MODE_A:
+    lcd_setcursor(2,2);
+    lcd_string("iamb A");
+    break;
+  case KEYER_MODE_B:
+    lcd_setcursor(2,2);
+    lcd_string("iamb B");
+    break;
   }
 }
 
