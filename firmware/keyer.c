@@ -76,7 +76,6 @@ volatile uint16_t dit_len = DEFAULT_DIT_LEN;
 // Precomputed multiples of ditlen
 volatile uint16_t dit_2len = 2*DEFAULT_DIT_LEN;
 volatile uint16_t dit_3len = 3*DEFAULT_DIT_LEN;
-volatile uint16_t dit_4len = 4*DEFAULT_DIT_LEN;
 
 /// The current state.
 volatile KeyerState _keyer_state = KEYER_IDLE;
@@ -86,6 +85,7 @@ volatile KeyerState _keyer_last_state = KEYER_IDLE;
 volatile KeyerMode _keyer_mode = KEYER_MODE_A;
 /// iambic state (needed for mode B)
 volatile uint8_t _keyer_is_iambic = 0;
+uint8_t _paddle_latch = 0;
 
 volatile uint8_t   _text_len        = 0;
 const    uint8_t   *_text           = 0;
@@ -107,13 +107,15 @@ keyer_set_speed_idx(uint8_t idx) {
   dit_len = dit_len_lut[ditlen_idx];
   dit_2len = 2*dit_len;
   dit_3len = 3*dit_len;
-  dit_4len = 4*dit_len;
 }
 
 
 // Util function for modes
 inline uint8_t keyer_is_idle() {
   return (KEYER_IDLE == _keyer_state);
+}
+inline uint8_t keyer_is_pausing() {
+  return (KEYER_PAUSE == _keyer_state);
 }
 
 inline uint8_t keyer_mode_is_straight() {
@@ -171,6 +173,18 @@ keyer_read_paddle() {
            (((~KEYER_B_PIN) & (1<<KEYER_B_BIT)) ? 0x02 : 0x00) );
 }
 
+uint8_t
+keyer_latch_input() {
+  _paddle_latch |= keyer_read_paddle();
+  return _paddle_latch;
+}
+uint8_t
+keyer_unlatch_paddle() {
+  uint8_t tmp = keyer_latch_input();
+  _paddle_latch = 0;
+  return tmp;
+}
+
 void
 keyer_set_mode(KeyerMode mode) {
   _keyer_mode = mode;
@@ -216,7 +230,7 @@ keyer_poll() {
   {
     // ... dispatch by paddle state
     // (left -> dit, right -> dah, both -> alternate dit & dah)
-    switch (keyer_read_paddle()) {
+    switch (keyer_unlatch_paddle()) {
     // On right paddle
     case 0x01:
       _keyer_last_state = _keyer_state;
@@ -261,6 +275,8 @@ keyer_poll() {
       }
       break;
     }
+  } else if (keyer_mode_is_iambic() && keyer_is_pausing()) {
+    keyer_latch_input();
   } else if (keyer_mode_is_straight()) {
     if (0x01 & keyer_read_paddle()) {
       _keyer_last_state = _keyer_state;
@@ -282,26 +298,34 @@ keyer_tick()
     // Stop sending...
     trx_rx(); count = 0;
   } else if (KEYER_SEND_DIT == _keyer_state) {
-    // Send a dit (10, with additional pause)
+    // Send a dit (1)
     if (0 == count) {
       trx_tx(); count++;
     } else if (dit_len == count) {
-      trx_rx(); count++;
-    } else if (dit_2len == count) {
+      trx_rx();
       _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_IDLE;
-      count = 0;
+      _keyer_state = KEYER_PAUSE;
+      count=0;
     } else {
       count++;
     }
   } else if (KEYER_SEND_DAH == _keyer_state) {
-    // Send a dah (1110, with additional pause)
+    // Send a dah (111)
     if (0 == count) {
       trx_tx(); count++;
     } else if (dit_3len == count) {
-      trx_rx(); count++;
-    } else if (dit_4len == count) {
+      trx_rx();
       _keyer_last_state = _keyer_state;
+      _keyer_state = KEYER_PAUSE;
+      count = 0;
+    } else {
+      count++;
+    }
+  } else if (KEYER_PAUSE == _keyer_state) {
+    // Send pause
+    if (0 == count) {
+      trx_rx(); count++;
+    } else if (dit_len == count) {
       _keyer_state = KEYER_IDLE;
       count = 0;
     } else {

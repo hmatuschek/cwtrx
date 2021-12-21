@@ -21,6 +21,7 @@ typedef enum {
   KEYER_IDLE,         ///< Idle, wait for keys.
   KEYER_SEND_DIT,     ///< Send a dit.
   KEYER_SEND_DAH,     ///< Send a dah.
+  KEYER_PAUSE,
   KEYER_SEND,         ///< Just enable TX for straight key or PTT
   KEYER_SEND_TEXT     ///< Sends a programmed text.
 } KeyerState;

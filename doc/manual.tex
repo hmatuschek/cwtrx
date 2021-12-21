@@ -12,7 +12,7 @@
 \usepackage{xfrac}
 \usepackage{xcolor}
 \usepackage{tikz}
-\usetikzlibrary{arrows}
+\usetikzlibrary{arrows,automata}
 \usetikzlibrary{arrows.meta}
 \usepackage{longtable}
 \usepackage{pdfpages}
@@ -294,7 +294,7 @@ The complete TRX is powered from the barrel-jack \texttt{J3} and the supply volt
 1 & D4 & 1N4001 & \\	
 4 & Q1, Q2, Q3, Q10 & 2N3904 & \\
 6 & Q4, Q6, Q7, Q8, Q9, Q11 & BS170 & \\
-1 & Q5 & BD140-16 & \\
+1 & Q5 & 2SB 772 & \\
 1 & U1 & 74HCT00 & \\
 1 & J1 & BNC & \\
 1 & J2 & 1 x 8 pin-socket & \\
@@ -546,7 +546,7 @@ To use this feature, you have to specify the settings you want to \emph{quick-se
 The quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
 
 \paragraph{Keyer mode}
-The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key} and \emph{iambic}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
+The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key}, \emph{iambic A}, \emph{iambic B} and \emph{iambic A/B reversed}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
 
 \paragraph{CW side-tone level}
 Specifies the volume of the CW side-tone. This is a value between 1 and 255.
@@ -586,7 +586,6 @@ This setting specifies the PLL clock frequency correction in PPM. See \texttt{RX
 
 \paragraph{Factory reset}
 The previous version of the TRX encountered some issues with the EEPROM memory, leading to corrupted settings which turn the TRX unusable. This option allows to reset the entire EEPROM memory to \emph{factory settings} fixing the corrupted memory issue.
-
 
 
 \cleardoublepage
