@@ -138,7 +138,7 @@ void menu_update(RotButton button, int8_t delta)
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_KEY_TYPE;
     } else if (delta > 0) {
-      _menu_state = MENU_IAMBIC_MODE;
+      _menu_state = MENU_KEY_REVERSE;
     } else {
       _menu_state = MENU_QUICK_SET;
     }
@@ -151,13 +151,30 @@ void menu_update(RotButton button, int8_t delta)
     } else if ((delta < 0) && (KEYER_TYPE_IAMBIC < trx_keyer_type())){
       trx_keyer_set_type(trx_keyer_type()-1);
     }
+  } else if (MENU_KEY_REVERSE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SET_KEY_REVERSE;
+    } else if (delta > 0) {
+      _menu_state = MENU_IAMBIC_MODE;
+    } else {
+      _menu_state = MENU_KEY_TYPE;
+    }
+  } else if (MENU_SET_KEY_REVERSE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      trx_set_state(TRX_RX);
+      _menu_state = MENU_SETUP;
+    } else if ((delta > 0) && (! trx_keyer_paddle_reversed())) {
+      trx_keyer_set_paddle_reversed(1);
+    } else if ((delta < 0) && (trx_keyer_paddle_reversed())) {
+      trx_keyer_set_paddle_reversed(0);
+    }
   } else if (MENU_IAMBIC_MODE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_IAMBIC_MODE;
     } else if (delta > 0) {
       _menu_state = MENU_CW_TONE;
     } else {
-      _menu_state = MENU_KEY_TYPE;
+      _menu_state = MENU_KEY_REVERSE;
     }
   } else if (MENU_SET_IAMBIC_MODE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {

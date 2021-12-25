@@ -3,11 +3,6 @@
 #include "button.h"
 #include <avr/pgmspace.h>
 
-/// Keep the delay short
-#define MAX_DELAY (F_CPU/1000UL)
-/// Helper macro to return the maximum of two values
-#define max(a,b) (a<b ? b : a)
-
 // LUT of 25 dit-lengths values (in 0.5ms),
 // (approx) linear in WPM, from 10 to 34 WPM.
 static const uint16_t dit_len_lut[] = {
@@ -70,33 +65,62 @@ const uint8_t symbol_table[KEYER_NUM_SYMBOLS] PROGMEM = {
 
 static uint8_t ditlen_idx = 10;
 
-// The current dit length in ms.
+// The default dit length and derived keyer timing
 #define DEFAULT_DIT_LEN 60
-uint16_t dit_len = DEFAULT_DIT_LEN;
-// Precomputed multiples of ditlen
-uint16_t dit_2len = 2*DEFAULT_DIT_LEN;
-uint16_t dit_3len = 3*DEFAULT_DIT_LEN;
-uint16_t iambic_dit_latch_delay = (DEFAULT_DIT_LEN/4);
-uint16_t iambic_dah_latch_delay = (3*DEFAULT_DIT_LEN/2);
-uint16_t latch_delay            = (DEFAULT_DIT_LEN/2);
+typedef struct {
+  uint16_t dit_len;
+  uint16_t dah_len;
+  uint16_t iambic_dit_latch_delay;
+  uint16_t iambic_dah_latch_delay;
+  uint16_t latch_delay;
+} KeyerTiming;
+
+KeyerTiming _keyer_timing = {
+  DEFAULT_DIT_LEN,
+  3*DEFAULT_DIT_LEN,
+  DEFAULT_DIT_LEN/4,
+  3*DEFAULT_DIT_LEN/2,
+  DEFAULT_DIT_LEN/2
+};
+
+
+/* Possible states of the state machine. */
+typedef enum {
+  KEYER_IDLE,         ///< Idle, wait for any input.
+  KEYER_SEND_DIT,     ///< Send a dit.
+  KEYER_SEND_DAH,     ///< Send a dah.
+  KEYER_PAUSE,        ///< Inter-symbol pause (i.e. between dits).
+  KEYER_SEND,         ///< Just enable TX for straight key.
+  KEYER_SEND_TEXT     ///< Sends a programmed text.
+} KeyerState;
 
 // The state variable
 volatile KeyerState _keyer_state = KEYER_IDLE;
 volatile KeyerState _keyer_last_state = KEYER_IDLE;
-// The latch mode
+
+/* Latching states. */
+typedef enum {
+  KEYER_NO_LATCH     = 0, ///< Do not latch any input.
+  KEYER_LATCH_LEFT   = KEYER_KEY_LEFT,  ///< Latch only left paddle
+  KEYER_LATCH_RIGHT  = KEYER_KEY_RIGHT, ///< Latch only right paddle
+  KEYER_LATCH        = (KEYER_LATCH_LEFT|KEYER_LATCH_RIGHT)  ///< Latch all inputs
+} KeyerLatch;
+
 volatile KeyerLatch _keyer_latch_state = KEYER_NO_LATCH;
-
-/// The type and mode
-volatile KeyerType _keyer_type = KEYER_TYPE_STRAIGHT;
-volatile KeyerIambicMode _keyer_iambic_mode = KEYER_IAMBIC_B;
-volatile uint8_t _keyer_is_reversed = 0;
-
+// Holds the currently latched key
 uint8_t _paddle_latch = 0;
 
+// The key type and keyer mode
+volatile KeyerType _keyer_type              = KEYER_TYPE_STRAIGHT;
+volatile KeyerIambicMode _keyer_iambic_mode = KEYER_IAMBIC_B;
+volatile uint8_t _keyer_is_reversed         = 0;
+
+// Auto text variables
 volatile uint8_t   _text_len        = 0;
 const    uint8_t   *_text           = 0;
 volatile uint8_t   _current_sym_len = 0;
 volatile uint32_t  _current_sym     = 0;
+
 
 uint8_t
 keyer_speed_wpm() {
@@ -104,19 +128,20 @@ keyer_speed_wpm() {
 }
 
 void
+keyer_update_timing(uint16_t ditlen) {
+  _keyer_timing.dit_len                = ditlen;
+  _keyer_timing.dah_len                = 3*ditlen;
+  _keyer_timing.iambic_dit_latch_delay = ditlen/4;
+  _keyer_timing.iambic_dah_latch_delay = 3*ditlen/2;
+  _keyer_timing.latch_delay            = ditlen/2;
+}
+
+void
 keyer_set_speed_idx(uint8_t idx) {
   if (idx >= KEYER_NUM_SPEED)
     idx = KEYER_NUM_SPEED-1;
   ditlen_idx = idx;
-
-  // Update dit-lengths
-  dit_len = dit_len_lut[ditlen_idx];
-  dit_2len = 2*dit_len;
-  dit_3len = 3*dit_len;
-  // Update latch delays
-  iambic_dit_latch_delay = (dit_len/4);
-  iambic_dah_latch_delay = (3*dit_len/2);
-  latch_delay            = (dit_len/2);
+  keyer_update_timing(dit_len_lut[ditlen_idx]);
 }
 
 KeyerType
@@ -137,6 +162,19 @@ keyer_set_iambic_mode(KeyerIambicMode mode) {
   _keyer_iambic_mode = mode;
 }
 
+uint8_t
+keyer_paddle_reversed() {
+  return _keyer_is_reversed;
+}
+void
+keyer_set_paddle_reversed(uint8_t reversed) {
+  if (reversed)
+    _keyer_is_reversed = 1;
+  else
+    _keyer_is_reversed = 0;
+}
+
+
 // Util function for modes
 inline uint8_t keyer_is_idle() {
   return (KEYER_IDLE == _keyer_state);
@@ -144,15 +182,20 @@ inline uint8_t keyer_is_idle() {
 inline uint8_t keyer_is_pausing() {
   return (KEYER_PAUSE == _keyer_state);
 }
+inline void keyer_state_reset() {
+  _keyer_last_state = _keyer_state = KEYER_IDLE;
+}
+inline void keyer_state_shift(KeyerState state) {
+  _keyer_last_state = _keyer_state;
+  _keyer_state = state;
+}
 
 inline uint8_t keyer_is_straight() {
   return KEYER_TYPE_STRAIGHT == _keyer_type;
 }
-
 inline uint8_t keyer_is_iambic() {
   return KEYER_TYPE_IAMBIC == _keyer_type;
 }
-
 inline uint8_t keyer_is_iambic_B() {
   return keyer_is_iambic() && (KEYER_IAMBIC_B == _keyer_iambic_mode);
 }
@@ -168,22 +211,19 @@ keyer_init(KeyerType type, KeyerIambicMode mode, uint8_t reverse, uint8_t speed)
   KEYER_A_PORT |= (1 << KEYER_A_BIT);
   KEYER_B_PORT |= (1 << KEYER_B_BIT);
 
-  // set default values
-  _keyer_state = KEYER_IDLE;
-  _keyer_last_state = KEYER_IDLE;
-  _keyer_type = type;
-  _keyer_iambic_mode = mode;
-  _keyer_is_reversed = reverse;
+  keyer_set_type(type);
+  keyer_set_iambic_mode(mode);
+  keyer_set_paddle_reversed(reverse);
   keyer_set_speed_idx(speed);
+
+  keyer_state_reset();
 }
 
-/// Read paddles, returns 0b00 if no paddle is touched,
-/// 0b01 if only the left is touched, 0b10 if only the right is
-/// touched and 0b11 if both are touched.
 inline uint8_t
 keyer_read_paddle() {
   uint8_t key = ( (((~KEYER_B_PIN) & (1<<KEYER_B_BIT)) ? KEYER_KEY_RIGHT: KEYER_KEY_NONE) |
                   (((~KEYER_A_PIN) & (1<<KEYER_A_BIT)) ? KEYER_KEY_LEFT : KEYER_KEY_NONE) );
+  // handle reversal (left dah, right dit)
   if (_keyer_is_reversed)
     return ((key >> 1) & 1) | ((key & 1) << 1);
   return key;
@@ -191,25 +231,14 @@ keyer_read_paddle() {
 
 inline uint8_t
 keyer_latch() {
-  switch (_keyer_latch_state) {
-  case KEYER_LATCH_LEFT:
-    _paddle_latch |= (keyer_read_paddle() & KEYER_KEY_LEFT);
-    break;
-  case KEYER_LATCH_RIGHT:
-    _paddle_latch |= (keyer_read_paddle() & KEYER_KEY_RIGHT);
-    break;
-  case KEYER_LATCH:
-    _paddle_latch |= keyer_read_paddle();
-  default:
-    break;
-  }
+  _paddle_latch |= (_keyer_latch_state & keyer_read_paddle());
   return _paddle_latch;
 }
 
 inline uint8_t
 keyer_unlatch() {
   uint8_t tmp = keyer_latch();
-  // Clear latched input
+  // clear latched input
   _paddle_latch = 0;
   // also stop latching
   _keyer_latch_state = KEYER_NO_LATCH;
@@ -229,21 +258,17 @@ void keyer_send_text(const uint8_t *text, uint8_t len) {
     _current_sym_len = 0;
     _text = text;
     _text_len = len;
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_SEND_TEXT;
+    keyer_state_shift(KEYER_SEND_TEXT);
   }
 }
 
 inline void
 keyer_poll_send_text() {
-  // and the key is pressed:
+  // On any input
   //  -> stop sending
-  if ((keyer_is_iambic() && keyer_read_paddle()) ||
-      (keyer_is_straight() && (KEYER_KEY_RIGHT & keyer_read_paddle())))
-  {
-    _keyer_last_state = KEYER_IDLE;
-    _keyer_state = KEYER_IDLE;
-  }
+  if ( (keyer_is_straight() && (KEYER_KEY_RIGHT & keyer_read_paddle())) ||
+       ((! keyer_is_straight()) && keyer_read_paddle()) )
+    keyer_state_reset();
 
   // otherwise continue sending text...
   return;
@@ -251,30 +276,26 @@ keyer_poll_send_text() {
 
 inline void
 keyer_poll_straight() {
-  if (KEYER_KEY_DOWN & keyer_read_paddle()) {
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_SEND;
-  } else {
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_IDLE;
-  }
+  // If key down -> send, otherwise not
+  if (KEYER_KEY_DOWN & keyer_read_paddle())
+    keyer_state_shift(KEYER_SEND);
+  else
+    keyer_state_shift(KEYER_IDLE);
 }
 
 inline void
 keyer_poll_paddle() {
-  // Then decide on idle what to do
+  // Decide on idle what to do
   if (! keyer_is_idle())
     return;
 
   switch (keyer_unlatch()) {
   case KEYER_KEY_LEFT:
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_SEND_DIT;
+    keyer_state_shift(KEYER_SEND_DIT);
     break;
 
   case KEYER_KEY_RIGHT:
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_SEND_DAH;
+    keyer_state_shift(KEYER_SEND_DAH);
     break;
   }
 }
@@ -282,34 +303,27 @@ keyer_poll_paddle() {
 
 inline void
 keyer_poll_iambic() {
-  // Then decide on idle what to do
+  // Decide on idle what to do
   if (! keyer_is_idle())
     return;
 
-  // ... dispatch by paddle state
+  // ... dispatch by latched paddle state
   // (left -> dit, right -> dah, both -> alternate dit & dah)
   switch (keyer_unlatch()) {
   case KEYER_KEY_LEFT:
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_SEND_DIT;
+    keyer_state_shift(KEYER_SEND_DIT);
     break;
 
   case KEYER_KEY_RIGHT:
-    _keyer_last_state = _keyer_state;
-    _keyer_state = KEYER_SEND_DAH;
+    keyer_state_shift(KEYER_SEND_DAH);
     break;
 
   // On both paddles alternate dit & dah
   case (KEYER_KEY_LEFT | KEYER_KEY_RIGHT):
-    if (KEYER_SEND_DIT == _keyer_last_state) {
-      // If last state was a dit -> send dah
-      _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_SEND_DAH;
-    } else {
-      // If last state was a dah -> send dit
-      _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_SEND_DIT;
-    }
+    if (KEYER_SEND_DIT == _keyer_last_state)
+      keyer_state_shift(KEYER_SEND_DAH);
+    else
+      keyer_state_shift(KEYER_SEND_DIT);
     break;
   }
 }
@@ -334,7 +348,7 @@ keyer_tick()
 {
   static uint16_t count = 0;
 
-  if (KEYER_TYPE_STRAIGHT != _keyer_type)
+  if (KEYER_TYPE_STRAIGHT != keyer_type())
     keyer_latch();
 
   if (keyer_is_idle()) {
@@ -346,57 +360,57 @@ keyer_tick()
     // Send a dit (1)
     if (0 == count) {
       trx_tx(); count++;
-    } else if (dit_len == count) {
+    } else if (_keyer_timing.dit_len == count) {
       trx_rx();
-      _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_PAUSE;
+      keyer_state_shift(KEYER_PAUSE);
       count=0;
     } else {
       count++;
     }
     // control latch
-    if (keyer_is_iambic_B() && (count >= iambic_dit_latch_delay)) {
+    if (keyer_is_iambic_B() && (count >= _keyer_timing.iambic_dit_latch_delay)) {
       _keyer_latch_state = KEYER_LATCH_RIGHT;
     }
   } else if (KEYER_SEND_DAH == _keyer_state) {
     // Send a dah (111)
     if (0 == count) {
       trx_tx(); count++;
-    } else if (dit_3len == count) {
+    } else if (_keyer_timing.dah_len == count) {
       trx_rx();
-      _keyer_last_state = _keyer_state;
-      _keyer_state = KEYER_PAUSE;
+      keyer_state_shift(KEYER_PAUSE);
       count = 0;
     } else {
       count++;
     }
     // control latch
-    if (keyer_is_iambic_B() && (count >= iambic_dah_latch_delay)) {
+    if (keyer_is_iambic_B() && (count >= _keyer_timing.iambic_dah_latch_delay)) {
       _keyer_latch_state = KEYER_LATCH_LEFT;
     }
   } else if (KEYER_PAUSE == _keyer_state) {
     // Send pause
     if (0 == count) {
       trx_rx(); count++;
-    } else if (dit_len == count) {
+    } else if (_keyer_timing.dit_len == count) {
+      // Do not shift idle here to maintain last DIT or DAH
       _keyer_state = KEYER_IDLE;
+      _keyer_latch_state = KEYER_LATCH;
       count = 0;
     } else {
       count++;
     }
     // control latch
-    if (count >= latch_delay) {
+    if (count >= _keyer_timing.latch_delay) {
       _keyer_latch_state = KEYER_LATCH;
     }
   } else if (KEYER_SEND == _keyer_state) {
     trx_tx();
   } else if (KEYER_SEND_TEXT == _keyer_state) {
-    if (dit_len == count) {
+    if (_keyer_timing.dit_len == count) {
       // If a dit-length has passed and ...
       // ... there is no symbol nor further text to send ...
       if ((0 == _text_len) && (0 == _current_sym_len)) {
         // Set keyer to idle
-        _keyer_state = _keyer_last_state = KEYER_IDLE;
+        keyer_state_reset();
         // Reset count
         count = 0;
         // reset TRX to RX

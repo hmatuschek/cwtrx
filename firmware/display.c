@@ -105,6 +105,7 @@ void display_menu_setup();
 void display_menu_tx_enabled();
 void display_menu_quickset();
 void display_menu_key_type();
+void display_menu_key_reverse();
 void display_menu_iambic_mode();
 void display_menu_cw_speed();
 void display_menu_cw_tone();
@@ -150,6 +151,10 @@ void display_menu(MenuState state) {
   case MENU_KEY_TYPE:
   case MENU_SET_KEY_TYPE:
     display_menu_key_type();
+    break;
+  case MENU_KEY_REVERSE:
+  case MENU_SET_KEY_REVERSE:
+    display_menu_key_reverse();
     break;
   case MENU_IAMBIC_MODE:
   case MENU_SET_IAMBIC_MODE:
@@ -424,6 +429,21 @@ void display_menu_key_type() {
     lcd_setcursor(2,2);
     lcd_string("iambic");
     break;
+  }
+}
+
+void display_menu_key_reverse() {
+  lcd_string("Pad.rev:");
+  if (MENU_SET_KEY_REVERSE == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  if (trx_keyer_paddle_reversed()) {
+    lcd_setcursor(5,2);
+    lcd_string("rev");
+  } else {
+    lcd_setcursor(4,2);
+    lcd_string("norm");
   }
 }
 

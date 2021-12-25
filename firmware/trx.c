@@ -527,6 +527,18 @@ void trx_keyer_set_iambic_mode(KeyerIambicMode mode) {
   }
 }
 
+KeyerIambicMode trx_keyer_paddle_reversed() {
+  return _trx.paddle_reverse;
+}
+
+void trx_keyer_set_paddle_reversed(uint8_t reversed) {
+  _trx.paddle_reverse = reversed;
+  keyer_set_paddle_reversed(_trx.paddle_reverse);
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.paddle_reverse), &(_ee_trx.paddle_reverse), sizeof(uint8_t));
+  }
+}
+
 uint16_t trx_cw_tone() {
   return _trx.cw_tone;
 }
