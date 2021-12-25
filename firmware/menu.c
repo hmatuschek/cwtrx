@@ -121,7 +121,7 @@ void menu_update(RotButton button, int8_t delta)
     if (ROT_BUTTON_CLICK == button) {
       _menu_state = MENU_SET_QUICK_SET;
     } else if (delta > 0) {
-      _menu_state = MENU_CW_MODE;
+      _menu_state = MENU_KEY_TYPE;
     } else {
       _menu_state = MENU_PLL_CORRECTION;
     }
@@ -134,22 +134,39 @@ void menu_update(RotButton button, int8_t delta)
     } else if ((delta < 0) && (trx_quickset() != TRX_QS_NONE)){
       trx_set_quickset(trx_quickset()-1);
     }
-  } else if (MENU_CW_MODE == _menu_state) {
+  } else if (MENU_KEY_TYPE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
-      _menu_state = MENU_SET_CW_MODE;
+      _menu_state = MENU_SET_KEY_TYPE;
     } else if (delta > 0) {
-      _menu_state = MENU_CW_TONE;
+      _menu_state = MENU_IAMBIC_MODE;
     } else {
       _menu_state = MENU_QUICK_SET;
     }
-  } else if (MENU_SET_CW_MODE == _menu_state) {
+  } else if (MENU_SET_KEY_TYPE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
       trx_set_state(TRX_RX);
       _menu_state = MENU_SETUP;
-    } else if ((delta > 0) && (KEYER_MODE_STRAIGHT > trx_cw_mode())) {
-      trx_set_cw_mode(trx_cw_mode()+1);
-    } else if ((delta < 0) && (KEYER_MODE_A < trx_cw_mode())){
-      trx_set_cw_mode(trx_cw_mode()-1);
+    } else if ((delta > 0) && (KEYER_TYPE_STRAIGHT > trx_keyer_type())) {
+      trx_keyer_set_type(trx_keyer_type()+1);
+    } else if ((delta < 0) && (KEYER_TYPE_IAMBIC < trx_keyer_type())){
+      trx_keyer_set_type(trx_keyer_type()-1);
+    }
+  } else if (MENU_IAMBIC_MODE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      _menu_state = MENU_SET_IAMBIC_MODE;
+    } else if (delta > 0) {
+      _menu_state = MENU_CW_TONE;
+    } else {
+      _menu_state = MENU_KEY_TYPE;
+    }
+  } else if (MENU_SET_IAMBIC_MODE == _menu_state) {
+    if (ROT_BUTTON_CLICK == button) {
+      trx_set_state(TRX_RX);
+      _menu_state = MENU_SETUP;
+    } else if ((delta > 0) && (KEYER_IAMBIC_B > trx_keyer_iambic_mode())) {
+      trx_keyer_set_iambic_mode(trx_keyer_iambic_mode()+1);
+    } else if ((delta < 0) && (KEYER_IAMBIC_A < trx_keyer_iambic_mode())){
+      trx_keyer_set_iambic_mode(trx_keyer_iambic_mode()-1);
     }
   } else if (MENU_CW_TONE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {
@@ -157,7 +174,7 @@ void menu_update(RotButton button, int8_t delta)
     } else if (delta > 0) {
       _menu_state = MENU_CW_LEVEL;
     } else {
-      _menu_state = MENU_CW_MODE;
+      _menu_state = MENU_IAMBIC_MODE;
     }
   } else if (MENU_SET_CW_TONE == _menu_state) {
     if (ROT_BUTTON_CLICK == button) {

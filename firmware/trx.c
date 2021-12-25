@@ -33,7 +33,9 @@
 #define TRX_DEFAULT_CW_TONE        700
 #define TRX_DEFAULT_CW_LEVEL       255
 #define TRX_DEFAULT_CW_SPEED       10
-#define TRX_DEFAULT_CW_MODE        KEYER_MODE_STRAIGHT
+#define TRX_DEFAULT_KEYER_TYPE     KEYER_TYPE_STRAIGHT
+#define TRX_DEFAULT_IAMBIC_MODE    KEYER_IAMBIC_B
+#define TRX_DEFAULT_PADDLE_REVERSE 0
 #define TRX_DEFAULT_METER_TYPE     METER_VOLTAGE
 #define TRX_DEFAULT_TX_HOLD        50
 #define TRX_DEFAULT_PLL_CORRECTION 0
@@ -72,38 +74,40 @@ typedef struct {
 /** Holds the entire settings for the TRX in memory. */
 typedef struct {
   /** Holds the current VFO mode, that is A, B and A/B split. */
-  VFOMode     vfo_mode;
+  VFOMode         vfo_mode;
   /** Settings for the VFO A. */
-  VFOSettings vfo_a;
+  VFOSettings     vfo_a;
   /** Settings for the VFO B. */
-  VFOSettings vfo_b;
+  VFOSettings     vfo_b;
   /** Quick-set option. */
-  TRXQuickSet quick_set;
+  TRXQuickSet     quick_set;
   /** Tuing stepsize. */
-  TRXStepSize step;
+  TRXStepSize     step;
   /** Sideband **/
-  TRXSideband sideband;
+  TRXSideband     sideband;
   /** RIT */
-  int8_t      rit;
+  int8_t          rit;
   /** If true, TX is enabled. */
-  uint8_t     tx_enabled;
+  uint8_t         tx_enabled;
   /** The frequency of the CW sidetone. */
-  uint16_t    cw_tone;
+  uint16_t        cw_tone;
   /** CW tone level. */
-  uint8_t     cw_level;
+  uint8_t         cw_level;
   /** Speed in WPM of the CW keyer. */
-  uint8_t     cw_speed;
-  /** Mode of the CW keyer (straight or paddle). */
-  KeyerMode   cw_mode;
-  MeterType   meter_type;
+  uint8_t         cw_speed;
+  /** CW keyer settings. */
+  KeyerType       keyer_type;
+  KeyerIambicMode iambic_mode;
+  uint8_t         paddle_reverse;
+  MeterType       meter_type;
   /** TX hold delay in ms. */
-  uint16_t    tx_hold;
+  uint16_t        tx_hold;
   /** PLL reference frequeny correction in 0.1ppm. */
-  int32_t     pll_correction;
+  int32_t         pll_correction;
   /** Type of rotary encoder. */
-  uint8_t     rot_type;
-  uint8_t     cwtext[TRX_CWTEXT_MAXLEN];
-  uint8_t     greet[8];
+  uint8_t         rot_type;
+  uint8_t         cwtext[TRX_CWTEXT_MAXLEN];
+  uint8_t         greet[8];
 } TRXSettings;
 
 
@@ -121,7 +125,9 @@ TRXSettings _ee_trx EEMEM = {
   TRX_DEFAULT_CW_TONE,
   TRX_DEFAULT_CW_LEVEL,
   TRX_DEFAULT_CW_SPEED,
-  TRX_DEFAULT_CW_MODE,
+  TRX_DEFAULT_KEYER_TYPE,
+  TRX_DEFAULT_IAMBIC_MODE,
+  TRX_DEFAULT_PADDLE_REVERSE,
   TRX_DEFAULT_METER_TYPE,
   TRX_DEFAULT_TX_HOLD,
   TRX_DEFAULT_PLL_CORRECTION,
@@ -144,7 +150,9 @@ const TRXSettings _prog_trx PROGMEM = {
   TRX_DEFAULT_CW_TONE,
   TRX_DEFAULT_CW_LEVEL,
   TRX_DEFAULT_CW_SPEED,
-  TRX_DEFAULT_CW_MODE,
+  TRX_DEFAULT_KEYER_TYPE,
+  TRX_DEFAULT_IAMBIC_MODE,
+  TRX_DEFAULT_PADDLE_REVERSE,
   TRX_DEFAULT_METER_TYPE,
   TRX_DEFAULT_TX_HOLD,
   TRX_DEFAULT_PLL_CORRECTION,
@@ -191,10 +199,10 @@ void trx_init() {
   for (uint8_t i=0; i<8; i++)
     lcd_data(_trx.greet[i]);
 
-  keyer_init(_trx.cw_mode, _trx.cw_speed);
+  keyer_init(_trx.keyer_type, _trx.iambic_mode, _trx.paddle_reverse, _trx.cw_speed);
   _delay_ms(100);
-  if (0x02 == keyer_read_paddle())
-    trx_set_cw_mode(KEYER_MODE_STRAIGHT);
+  if (KEYER_KEY_LEFT == keyer_read_paddle())
+    trx_keyer_set_type(KEYER_TYPE_STRAIGHT);
 
   tone_init();
   tone_set_frequency(_trx.cw_tone);
@@ -495,15 +503,27 @@ void trx_set_tx_enabled(uint8_t enable) {
   }
 }
 
-KeyerMode trx_cw_mode() {
-  return _trx.cw_mode;
+KeyerType trx_keyer_type() {
+  return _trx.keyer_type;
 }
 
-void trx_set_cw_mode(KeyerMode mode) {
-  _trx.cw_mode = mode;
-  keyer_set_mode(_trx.cw_mode);
+void trx_keyer_set_type(KeyerType type) {
+  _trx.keyer_type = type;
+  keyer_set_type(_trx.keyer_type);
   ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-    eeprom_write_block(&(_trx.cw_mode), &(_ee_trx.cw_mode), sizeof(KeyerMode));
+    eeprom_write_block(&(_trx.keyer_type), &(_ee_trx.keyer_type), sizeof(KeyerType));
+  }
+}
+
+KeyerIambicMode trx_keyer_iambic_mode() {
+  return _trx.iambic_mode;
+}
+
+void trx_keyer_set_iambic_mode(KeyerIambicMode mode) {
+  _trx.iambic_mode = mode;
+  keyer_set_iambic_mode(_trx.iambic_mode);
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    eeprom_write_block(&(_trx.iambic_mode), &(_ee_trx.iambic_mode), sizeof(KeyerIambicMode));
   }
 }
 

@@ -104,7 +104,8 @@ void display_menu_band();
 void display_menu_setup();
 void display_menu_tx_enabled();
 void display_menu_quickset();
-void display_menu_cw_mode();
+void display_menu_key_type();
+void display_menu_iambic_mode();
 void display_menu_cw_speed();
 void display_menu_cw_tone();
 void display_menu_cw_level();
@@ -146,9 +147,13 @@ void display_menu(MenuState state) {
   case MENU_SET_QUICK_SET:
     display_menu_quickset();
     break;
-  case MENU_CW_MODE:
-  case MENU_SET_CW_MODE:
-    display_menu_cw_mode();
+  case MENU_KEY_TYPE:
+  case MENU_SET_KEY_TYPE:
+    display_menu_key_type();
+    break;
+  case MENU_IAMBIC_MODE:
+  case MENU_SET_IAMBIC_MODE:
+    display_menu_iambic_mode();
     break;
   case MENU_CW_SPEED:
   case MENU_SET_CW_SPEED:
@@ -400,32 +405,42 @@ void display_menu_quickset() {
   }
 }
 
-void display_menu_cw_mode() {
+void display_menu_key_type() {
   lcd_string("CW key:");
-  if (MENU_SET_CW_MODE == menu_state()) {
+  if (MENU_SET_KEY_TYPE == menu_state()) {
     lcd_setcursor(0,2);
     lcd_data(0x7E);
   }
-  switch (trx_cw_mode()) {
-  case KEYER_MODE_STRAIGHT:
+  switch (trx_keyer_type()) {
+  case KEYER_TYPE_STRAIGHT:
     lcd_setcursor(4,2);
     lcd_string("str.");
     break;
-  case KEYER_MODE_A:
+  case KEYER_TYPE_PADDLE:
     lcd_setcursor(2,2);
-    lcd_string("iamb A");
+    lcd_string("paddle");
     break;
-  case KEYER_MODE_B:
+  case KEYER_TYPE_IAMBIC:
     lcd_setcursor(2,2);
-    lcd_string("iamb B");
+    lcd_string("iambic");
     break;
-  case KEYER_MODE_A_REV:
-    lcd_setcursor(3,2);
-    lcd_string("rev A");
+  }
+}
+
+void display_menu_iambic_mode() {
+  lcd_string("Iambic:");
+  if (MENU_SET_IAMBIC_MODE == menu_state()) {
+    lcd_setcursor(0,2);
+    lcd_data(0x7E);
+  }
+  switch (trx_keyer_iambic_mode()) {
+  case KEYER_IAMBIC_A:
+    lcd_setcursor(6,2);
+    lcd_string("A");
     break;
-  case KEYER_MODE_B_REV:
-    lcd_setcursor(3,2);
-    lcd_string("rev B");
+  case KEYER_IAMBIC_B:
+    lcd_setcursor(6,2);
+    lcd_string("B");
     break;
   }
 }

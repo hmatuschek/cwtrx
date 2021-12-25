@@ -27,10 +27,11 @@ add_definitions("-Werror")
 #add_definitions("-pedantic-errors")
 #add_definitions("-funsigned-char")
 #add_definitions("-funsigned-bitfields")
-#add_definitions("-ffunction-sections")
+add_definitions("-ffunction-sections")
+add_definitions("-Wl,--relax")
 add_definitions("-c")
 add_definitions("-std=gnu99")
-add_definitions("-Os")
+add_definitions("-O1")
 
 ##########################################################################
 # Firmware source

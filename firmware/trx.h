@@ -88,8 +88,14 @@ void trx_set_tune_step(TRXStepSize step);
 Band trx_band();
 void trx_set_band(Band band);
 
-KeyerMode trx_cw_mode();
-void trx_set_cw_mode(KeyerMode mode);
+KeyerType trx_keyer_type();
+void trx_keyer_set_type(KeyerType type);
+
+KeyerIambicMode trx_keyer_iambic_mode();
+void trx_keyer_set_iambic_mode(KeyerIambicMode mode);
+
+uint8_t trx_keyer_paddle_reversed();
+void trx_keyer_set_paddle_reversed(uint8_t reversed);
 
 uint16_t trx_cw_tone();
 void trx_set_cw_tone(uint16_t freq);
