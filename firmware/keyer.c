@@ -297,6 +297,10 @@ keyer_poll_paddle() {
   case KEYER_KEY_RIGHT:
     keyer_state_shift(KEYER_SEND_DAH);
     break;
+
+  case KEYER_KEY_NONE:
+    _keyer_latch_state = KEYER_LATCH;
+    break;
   }
 }
 
@@ -324,6 +328,10 @@ keyer_poll_iambic() {
       keyer_state_shift(KEYER_SEND_DAH);
     else
       keyer_state_shift(KEYER_SEND_DIT);
+    break;
+
+  case KEYER_KEY_NONE:
+    _keyer_latch_state = KEYER_LATCH;
     break;
   }
 }

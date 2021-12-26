@@ -39,7 +39,7 @@
 
 
 \title{QRP CW Transceiver Manual}
-\subtitle{Board rev. 2, Firmware rev. 2.0}
+\subtitle{Board rev. 2, Firmware rev. 2.5}
 \author{Hannes Matuschek -- DM3MAT\\\texttt{<dm3mat [at] darc [dot] de>}\\\texttt{https://dm3mat.darc.de/cw2019}}
 \date{\today}
 
@@ -454,13 +454,15 @@ The second menu level (red in figure \ref{fig:menu}) contains all settings that 
   \node (setup) [menu, right of=band] {Setup};
   
   \node (quick) [submenu, below of=setup] {Qick-set};
-  \node (cw) [submenu, left of=quick] {CW Mode}; 
-  \node (tone) [submenu, left of=cw] {CW Tone}; 
+  \node (type) [submenu, left of=quick] {CW key};
+  \node (rev) [submenu, left of=type] {Pad.rev};
+  \node (mode) [submenu, left of=rev] {Iambic}; 
+  \node (tone) [submenu, left of=mode] {CW Tone}; 
   \node (level) [submenu, left of=tone] {CW Level}; 
   \node (text) [submenu, left of=level] {CW Text}; 
-  \node (clr) [submenu, left of=text] {Clr. CWT};
+  \node (clr) [submenu, below of=text] {Clr. CWT};
   \node (meter) [submenu, below of=clr] {Meter};
-  \node (hold) [submenu, below of=meter] {TX Hold}; 
+  \node (hold) [submenu, right of=meter] {TX Hold}; 
   \node (greet) [submenu, right of=hold] {Greet};
   \node (enc) [submenu, right of=greet] {Enc.Type};
   \node (version) [submenu, right of=enc] {Version};
@@ -480,8 +482,10 @@ The second menu level (red in figure \ref{fig:menu}) contains all settings that 
   \path[->,thick,dashed]
     (setup) edge (quick);
   \path[->,thick]
-        (quick) edge (cw)
-    	(cw) edge (tone)
+        (quick) edge (type)
+        (type) edge (rev)
+        (rev) edge (mode)
+    	(mode) edge (tone)
     	(tone) edge (level) 
     	(level) edge (text)
     	(text) edge (clr)
@@ -545,8 +549,14 @@ To use this feature, you have to specify the settings you want to \emph{quick-se
 \paragraph{Quick-set}
 The quick-set feature allows to set a specific property without entering the menu. By holding and turning the rotary-encoder at the same time. This menu item allows to select one of four settings to be manipulated by the quick-set feature: RIT, keyer speed, tuning step-size, band or \emph{none}. The latter disables the quick-set feature (default).
 
-\paragraph{Keyer mode}
-The keyer mode specifies the type of keyer you use. Possible options are \emph{straight key}, \emph{iambic A}, \emph{iambic B} and \emph{iambic A/B reversed}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
+\paragraph{Key type}
+The key type specifies the type of keyer you use. Possible options are \emph{straight key}, \emph{paddle}and \emph{iambic}. The TRX switches automatically to \emph{straight key} if the TRX detects a mono-plug at startup.
+
+\paragraph{Paddle reverse}
+If enabled, the meaning of the two paddles are reversed. That is, the left paddle will produce a series of \emph{dahs} and the right one produces a series of \emph{dits}.
+
+\paragraph{Iambic mode}
+Specifies either \emph{iambic A} or \emph{iambic B} modes for the automatic keyer if the type is set to \emph{iambic}.
 
 \paragraph{CW side-tone level}
 Specifies the volume of the CW side-tone. This is a value between 1 and 255.
