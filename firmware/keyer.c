@@ -266,7 +266,7 @@ inline void
 keyer_poll_send_text() {
   // On any input
   //  -> stop sending
-  if ( (keyer_is_straight() && (KEYER_KEY_RIGHT & keyer_read_paddle())) ||
+  if ( (keyer_is_straight() && (KEYER_KEY_LEFT & keyer_read_paddle())) ||
        ((! keyer_is_straight()) && keyer_read_paddle()) )
     keyer_state_reset();
 
@@ -345,7 +345,9 @@ keyer_poll() {
     keyer_poll_iambic();
   } else if (KEYER_TYPE_PADDLE == _keyer_type) {
     keyer_poll_paddle();
-  } else if (KEYER_SEND_TEXT == _keyer_state) {
+  }
+
+  if (KEYER_SEND_TEXT == _keyer_state) {
     keyer_poll_send_text();
   }
 }

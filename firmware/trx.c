@@ -201,7 +201,7 @@ void trx_init() {
 
   keyer_init(_trx.keyer_type, _trx.iambic_mode, _trx.paddle_reverse, _trx.cw_speed);
   _delay_ms(100);
-  if (KEYER_KEY_LEFT == keyer_read_paddle())
+  if (KEYER_KEY_RIGHT & keyer_read_paddle())
     trx_keyer_set_type(KEYER_TYPE_STRAIGHT);
 
   tone_init();
