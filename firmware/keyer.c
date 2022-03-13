@@ -3,7 +3,7 @@
 #include "button.h"
 #include <avr/pgmspace.h>
 
-// LUT of 25 dit-lengths values (in 0.5ms),
+// LUT of 25 dit-lengths values (in 1ms)
 // (approx) linear in WPM, from 10 to 34 WPM.
 static const uint16_t dit_len_lut[] = {
   120, 109, 100,  92,  86,

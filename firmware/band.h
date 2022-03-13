@@ -3,18 +3,18 @@
 
 #include <avr/io.h>
 
-#define BAND_80_PORT          PORTB
-#define BAND_80_DDR           DDRB
-#define BAND_80_BIT           PB0
-#define BAND_60_40_PORT       PORTD
-#define BAND_60_40_DDR        DDRD
-#define BAND_60_40_BIT        PD7
-#define BAND_30_20_PORT       PORTD
-#define BAND_30_20_DDR        DDRD
-#define BAND_30_20_BIT        PD6
-#define BAND_17_15_12_10_PORT PORTD
-#define BAND_17_15_12_10_DDR  DDRD
-#define BAND_17_15_12_10_BIT  PD5
+#define BAND_80_60_PORT          PORTB
+#define BAND_80_60_DDR           DDRB
+#define BAND_80_60_BIT           PB0
+#define BAND_40_30_PORT       PORTD
+#define BAND_40_30_DDR        DDRD
+#define BAND_40_30_BIT        PD7
+#define BAND_20_17_PORT       PORTD
+#define BAND_20_17_DDR        DDRD
+#define BAND_20_17_BIT        PD6
+#define BAND_15_12_10_PORT PORTD
+#define BAND_15_12_10_DDR  DDRD
+#define BAND_15_12_10_BIT  PD5
 
 typedef enum {
   BAND_80 = 0,
