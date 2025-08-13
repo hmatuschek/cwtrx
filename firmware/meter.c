@@ -53,13 +53,15 @@ void meter_poll() {
     return;
   else if (METER_VOLTAGE == _meter_type)
     display_voltage(_meter_value);
+  else if (METER_SOC == _meter_type)
+    display_soc_lion4s(_meter_value);
   else if (METER_TEMP == _meter_type)
     display_temp(_meter_value);
 }
 
 ISR(ADC_vect) {
   uint16_t v = ADC;
-  if (METER_VOLTAGE == _meter_type) {
+  if ((METER_VOLTAGE == _meter_type) || (METER_SOC == _meter_type)) {
     int32_t temp = v;
     // Assuming voltage divider -> 47k + 4.7k to GND.
     temp *= 554; temp /= 1024;

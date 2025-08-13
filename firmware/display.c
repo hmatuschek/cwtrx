@@ -76,6 +76,50 @@ void display_voltage(uint8_t v) {
   lcd_data('V');
 }
 
+void display_soc_lion4s(uint8_t v) {
+  lcd_setcursor(0, 2);
+  int32_t soc = v;
+  if (v >= 161) {
+    soc *= 91; soc >>= 2; soc -= 2747;
+  } else if (v >= 159) {
+    soc *= 105; soc >>= 2; soc -= 3320;
+  } else if (v >= 150) {
+    soc *= 112; soc >>= 2; soc -= 3599;
+  } else if (v >= 147) {
+    soc *= 229; soc >>= 2; soc -= 8009;
+  } else if (v >= 144) {
+    soc *= 344; soc >>= 2; soc -= 12250;
+  } else if (v >= 140) {
+    soc *= 149; soc >>= 2; soc -= 5161;
+  } else if (v >= 140) {
+    soc *= 138; soc >>= 2; soc -= 4311;
+  } else {
+    soc *= 26; soc >>= 2; soc -= 886;
+  }
+
+  if (soc > 1000) soc = 1000;
+  if (soc < 0) soc = 0;
+
+  uint8_t d = soc%10; soc /= 10;
+  uint8_t c = soc%10; soc /= 10;
+  uint8_t b = soc%10; soc /= 10;
+  uint8_t a = soc%10;
+
+  if (a) {
+    lcd_data(' ');
+    lcd_data('0'+a);
+    lcd_data('0'+b);
+    lcd_data('0'+c);
+  } else {
+    if (b) lcd_data('0'+b);
+    else lcd_data(' ');
+    lcd_data('0'+c);
+    lcd_data('.');
+    lcd_data('0'+d);
+  }
+  lcd_data('%');
+}
+
 void display_temp(uint16_t v) {
   lcd_setcursor(0, 2);
   // sign
@@ -570,6 +614,10 @@ void display_menu_meter() {
       lcd_setcursor(2,2);
       lcd_string("Volt.");
       break;
+    case METER_SOC:
+      lcd_setcursor(4,2);
+      lcd_string("SoC");
+    break;
     case METER_TEMP:
       lcd_setcursor(2,2);
       lcd_string("Temp.");
