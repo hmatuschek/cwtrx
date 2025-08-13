@@ -1,19 +1,24 @@
 #include "rot.h"
+#include <stdbool.h>
 
 
-volatile uint8_t _last_a;
-volatile uint8_t _last_b;
-volatile uint8_t _last_m;
+volatile bool _last_a;
+volatile bool _last_b;
+volatile bool _last_m;
 
 volatile int8_t    _delta;
-volatile uint8_t   _button_down;
+volatile bool      _button_down;
 volatile uint16_t  _button_count;
 volatile RotButton _button;
 EncoderType _type = ROT_TYPE_A;
 
-#define read_a ( (ROT_PIN & (1 << ROT_A_BIT)) ? 1 : 0 )
-#define read_b ( (ROT_PIN & (1 << ROT_B_BIT)) ? 1 : 0 )
-#define read_m ( (ROT_PIN & (1 << ROT_M_BIT)) ? 1 : 0 )
+#define read_a ( (ROT_PIN & (1 << ROT_A_BIT)) ? true : false )
+#define read_b ( (ROT_PIN & (1 << ROT_B_BIT)) ? true : false )
+#define read_m ( (ROT_PIN & (1 << ROT_M_BIT)) ? true : false )
+
+#define _DEBOUNCE_TIMEOUT    200
+#define _LONGPRESS_DURATION  2000
+
 
 
 void rot_init(EncoderType type) {
@@ -34,12 +39,14 @@ void rot_init(EncoderType type) {
   _button = ROT_BUTTON_NONE;
 }
 
+
 void rot_set_type(EncoderType type) {
   _type = type;
 }
 
+
 void rot_tick() {
-  uint8_t a = read_a, b = read_b, button = read_m;
+  bool a = read_a, b = read_b, button = read_m;
   if ((ROT_TYPE_A == _type) || (ROT_TYPE_A_Rev == _type)) {
     if (_last_a != a) {
       if (ROT_TYPE_A == _type)
@@ -57,36 +64,40 @@ void rot_tick() {
   }
 
   if ( _last_m && (0 == button)) {
-    // On button down
-    _button_down = 1;
+    // On falling edge
+    _button_down = true;
     _button_count = 0;
   } else if (_button_down && button) {
-    // On button up
-    _button_down = 0;
-    if (_button_count < 100) {
+    // On rising edge
+    _button_down = false;
+    if (_button_count < _DEBOUNCE_TIMEOUT) {
       // ignore (bounce)
-    } else if ((_button_count < 2000) && (ROT_BUTTON_NONE == _button)){
-      // click (hold less than 2s)
+      _button = ROT_BUTTON_NONE;
+    } else if ((_button_count < _LONGPRESS_DURATION) && (ROT_BUTTON_NONE == _button)){
+      // click (hold less than LONGPRESS_DURATION)
       _button = ROT_BUTTON_CLICK;
     } else if (ROT_BUTTON_HOLD_TUNE == _button) {
       _button = ROT_BUTTON_HOLD_TUNE_DONE;
     }
   } else if (_button_down) {
-    // While button down count
-    if (_button_count < 2000) {
-      // Was turned
-      if (_delta) {
+    // While button pressed
+    if (_button_count < _DEBOUNCE_TIMEOUT) {
+      // Ingore everything within debounce interval
+      _button_count++;
+      _delta = 0;
+    } else if (_button_count < _LONGPRESS_DURATION) {
+      // Was turned within long-press interval ...
+      if (_delta)
         _button = ROT_BUTTON_HOLD_TUNE;
-      }
-      if (ROT_BUTTON_NONE == _button) {
+      // ... otherwise increment counter
+      if (ROT_BUTTON_NONE == _button)
         _button_count++;
-      }
-    } else if (_button_count == 2000) {
-      // until 2000 (2s) -> button hold event
+    } else if (_button_count == _LONGPRESS_DURATION) {
+      // until LONGPRESS_DURATION  -> button hold event
       _button_count++;
       _button = ROT_BUTTON_LONG;
     }
-    // over 2000 -> stop counting
+    // t > LONGPRESS_DURATION -> stop counting
   }
 
   _last_a = a;
@@ -101,6 +112,7 @@ RotButton rot_button() {
     _button = ROT_BUTTON_NONE;
   return state;
 }
+
 
 int8_t rot_delta() {
   int8_t delta = _delta;

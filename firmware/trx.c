@@ -527,7 +527,8 @@ void trx_keyer_set_iambic_mode(KeyerIambicMode mode) {
   }
 }
 
-KeyerIambicMode trx_keyer_paddle_reversed() {
+uint8_t
+trx_keyer_paddle_reversed() {
   return _trx.paddle_reverse;
 }
 
@@ -702,8 +703,10 @@ void trx_poll()
       _state = TRX_MENU;
       display_update();
     } else if (ROT_BUTTON_LONG == button) {
+      // Determine text length
       uint8_t len = TRX_CWTEXT_MAXLEN;
       for (; (len>0) && (0==_trx.cwtext[len-1]); --len);
+      // send text...
       keyer_send_text(_trx.cwtext, len);
     } else if ((ROT_BUTTON_HOLD_TUNE == button) && (TRX_QS_NONE != _trx.quick_set)) {
       // Handle quick-set
