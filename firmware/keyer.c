@@ -1,6 +1,7 @@
 #include "keyer.h"
 #include "trx.h"
 #include "button.h"
+#include "lcd.h"
 #include <avr/pgmspace.h>
 
 // LUT of 25 dit-lengths values (in 1ms)
@@ -55,10 +56,12 @@ const uint32_t codetable[KEYER_NUM_SYMBOLS] PROGMEM = {
 };
 
 const uint8_t symbol_table[KEYER_NUM_SYMBOLS] PROGMEM = {
-  ' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-  'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '/',
-  '.' };
-
+// 0    1    2    3    4    5    6    7    8    9
+  ' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', // 0x
+  'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', // 1x
+  'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', // 2x
+  '3', '4', '5', '6', '7', '8', '9', '/', '.'       // 3x
+};
 
 #define MIN_WPM    10
 #define MAX_WPM    34
@@ -267,8 +270,9 @@ keyer_poll_send_text() {
   // On any input
   //  -> stop sending
   if ( (keyer_is_straight() && (KEYER_KEY_LEFT & keyer_read_paddle())) ||
-       ((! keyer_is_straight()) && keyer_read_paddle()) )
+       ((! keyer_is_straight()) && keyer_read_paddle()) ) {
     keyer_state_reset();
+  }
 
   // otherwise continue sending text...
   return;
@@ -339,16 +343,14 @@ keyer_poll_iambic() {
 inline void
 keyer_poll() {
   // If keyer sends a text
-  if (KEYER_TYPE_STRAIGHT == _keyer_type) {
+  if (KEYER_SEND_TEXT == _keyer_state) {
+    keyer_poll_send_text();
+  } else if (KEYER_TYPE_STRAIGHT == _keyer_type) {
     keyer_poll_straight();
   } else if (KEYER_TYPE_IAMBIC == _keyer_type) {
     keyer_poll_iambic();
   } else if (KEYER_TYPE_PADDLE == _keyer_type) {
     keyer_poll_paddle();
-  }
-
-  if (KEYER_SEND_TEXT == _keyer_state) {
-    keyer_poll_send_text();
   }
 }
 

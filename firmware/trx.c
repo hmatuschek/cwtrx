@@ -132,7 +132,7 @@ TRXSettings _ee_trx EEMEM = {
   TRX_DEFAULT_TX_HOLD,
   TRX_DEFAULT_PLL_CORRECTION,
   TRX_DEFAULT_ROT_TYPE,
-  {},
+  {03, 17, 00, 03, 17, 00, 03, 17, 00, 17, 18, 16, 00, 04, 05, 00},
   {' ','D','M','3','M','A','T',' '}
 };
 

@@ -1,6 +1,6 @@
 # Specify programmer
 set(AVR_UPLOADTOOL avrdude)
-set(AVR_PROGRAMMER stk500v2)
+set(AVR_PROGRAMMER stk500)
 set(AVR_UPLOADTOOL_PORT /dev/ttyACM0)
 
 # Specify CPU
@@ -32,6 +32,8 @@ add_definitions("-Wl,--relax")
 add_definitions("-c")
 add_definitions("-std=gnu99")
 add_definitions("-O1")
+
+set(AVR_UPLOADTOOL_OPTIONS "")
 
 ##########################################################################
 # Firmware source
